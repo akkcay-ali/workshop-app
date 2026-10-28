@@ -30,4 +30,4 @@ head = """<!doctype html>
 <body>
 """
 (root / "src" / "index.html").write_text(head + body + "\n</body>\n</html>\n", encoding="utf-8")
-print("src/index.html yazıldı")
+print("src/index.html written")
