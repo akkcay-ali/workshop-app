@@ -33,6 +33,8 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   görev `status` (todo/doing/review/done, `done` ile eş) + Kanban, ayrıntı paneli `#drw` (yorum = `type:"comment"`,
   `target`, `mentions`), referans onayı (`card.review`), `public.notifications` (tetikleyici `private.notify_items`),
   sohbet `public.messages` (genel/özel, her pazartesi silinir: `private.prune_messages`).
+- Sesli oda: WebRTC kişiden kişiye (`V` nesnesi), sinyal `proj:<pid>` kanalında broadcast `rtc`, odadakiler presence `v:true`.
+  TURN: edge function `turn-ice` (secret `CF_TURN_KEY_ID`, `CF_TURN_TOKEN`; yoksa yalnızca STUN). macOS mikrofon izni `src-tauri/Info.plist`.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 
 ## Derleme
