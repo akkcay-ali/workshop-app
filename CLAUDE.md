@@ -29,6 +29,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Ekip (yalnızca ortak = üye/davet >1): görev `assignee`, `public.activity` (items tetikleyicisi `private.log_activity`
   ekle/düzenle/bitir/ata/sil kaydı), varlık kanalı `proj:<pid>` (özel, `realtime.messages` RLS), proje `brief` alanı,
   `profiles.name` görünen ad.
+- Merkez (`sHub`, ortak projelerde varsayılan sekme): kilometre taşı (`type:"milestone"`, görevde `milestone`),
+  görev `status` (todo/doing/review/done, `done` ile eş) + Kanban, ayrıntı paneli `#drw` (yorum = `type:"comment"`,
+  `target`, `mentions`), referans onayı (`card.review`), `public.notifications` (tetikleyici `private.notify_items`),
+  sohbet `public.messages` (genel/özel, her pazartesi silinir: `private.prune_messages`).
+- Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 
 ## Derleme
 - Masaüstü derlemesi yalnızca `src-tauri/tauri.conf.json` değişince (sürüm artışı) çalışır.
