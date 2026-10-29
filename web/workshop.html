@@ -529,6 +529,15 @@ button:disabled{cursor:var(--cur)}
 .wmark{width:18px;height:16px;flex:0 0 auto}
 .tab.home .wmark{width:21px;height:19px;margin:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}.tab.home:hover .wmark{transform:scale(1.12) rotate(-4deg)}
 :root[data-theme="light"] .wmark{--wm:#3E4A6B}
+.welcome{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgb(8 9 11 / .55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;transition:opacity .25s}
+.welcome.on{opacity:1}
+.wcard{width:min(380px,100%);box-sizing:border-box;padding:28px 26px 22px;border-radius:18px;background:var(--surface);border:1px solid var(--stroke-2);box-shadow:0 30px 80px rgb(0 0 0 / .45);display:flex;flex-direction:column;gap:12px;transform:translateY(14px) scale(.96);transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.welcome.on .wcard{transform:none}
+.wcard h2{margin:6px 0 0;font-family:var(--f-display);font-weight:400;font-size:22px;color:var(--ink)}.wcard p{margin:0;line-height:1.5}
+.wclogo .wlock{font-size:20px}.wclogo .wlock .wmark{width:30px;height:27px}
+.wcard .acform{display:flex;flex-direction:column;gap:8px;margin-top:4px}.wcmsg:empty{display:none}.wcmsg{color:var(--ink-2)}
+.wcor{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:11px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.08em}.wcor::before,.wcor::after{content:"";flex:1;height:1px;background:var(--stroke)}
+.wcnote{line-height:1.5;color:var(--ink-3)}
 .wlock{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:400;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
 .wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
 #updSec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
@@ -814,7 +823,7 @@ body.frameless .app{padding-top:8px}
       <div class="wctl" id="wctl" hidden>
         <button id="wMin" title="Simge durumuna küçült" aria-label="Küçült"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
         <button id="wMax" title="Ekranı kapla / küçült" aria-label="Büyüt"><svg viewBox="0 0 12 12"><rect x="2.3" y="2.3" width="7.4" height="7.4" rx="1.2"/></svg></button>
-        <button id="wClose" class="cls" title="Kapat" aria-label="Kapat"><svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+        <button id="wClose" class="cls" title="Görev çubuğuna küçült · sağ tık: uygulamadan çık" aria-label="Kapat (görev çubuğuna küçültür)"><svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
       </div>
     </div>
   </div>
@@ -883,6 +892,22 @@ body.frameless .app{padding-top:8px}
 <div class="fnote" id="fnote" hidden role="dialog" aria-label="Odak notu"><span class="small" id="fnT">Bu odakta ne yaptın?</span>
   <div class="row"><input class="field" id="fnIn" maxlength="140" placeholder="kısa bir not · Enter kaydeder"><button class="btn" id="fnSkip">Geç</button></div></div>
 
+<div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="wcT">
+  <div class="wcard">
+    <div class="wclogo" id="wcLogo"></div>
+    <h2 id="wcT">Hoş geldin</h2>
+    <p class="small">Ekip hesabınla giriş yaparsan ortak projeler, sohbet ve sesli oda açılır. Hesapsız da her şey bu bilgisayarda çalışır.</p>
+    <form class="acform" id="wcForm" autocomplete="on">
+      <input class="field" id="wcEmail" type="email" placeholder="e-posta" autocomplete="email" aria-label="E-posta">
+      <input class="field" id="wcPass" type="password" placeholder="şifre" autocomplete="current-password" aria-label="Şifre">
+      <button class="btn primary" type="submit" id="wcIn">Giriş yap</button>
+      <span class="small wcmsg" id="wcMsg" role="status"></span>
+    </form>
+    <div class="wcor"><span>ya da</span></div>
+    <button class="btn" id="wcGuest">Hesapsız devam et</button>
+    <span class="small wcnote">Projelerin bu bilgisayarda kalır. Sonra istediğin zaman sağ üstteki hesap simgesinden giriş yapabilirsin. Davet edildiysen hesabını orada “Hesap oluştur” ile açarsın.</span>
+  </div>
+</div>
 <div class="pop" id="acctPop" hidden role="dialog" aria-label="Hesap">
   <h3>Hesap</h3>
   <span class="small">Bulut ve ortak projeler için. Aynı hesapla PC, iPad ve web'de aynı projeleri görürsün.</span>
@@ -2792,7 +2817,7 @@ async function fileMode(){
   };
   setSync("ok","Projeler dosya olarak kaydediliyor: "+FS.dir);renderAll();flushFocus();
   const first=await tinv("initial_files");if(first&&first.length)openWorkshopFiles(first);
-  setTimeout(()=>checkUpdate(false),4000);cBoot();
+  setTimeout(()=>checkUpdate(false),4000);cBoot().then(maybeWelcome);
   TA.event.listen("open-files",e=>openWorkshopFiles(e.payload||[]));
   /* pencere kapanırken bekleyen kayıtları bitir */
   const win=TA.window.getCurrentWindow();let closing=false;
@@ -2812,7 +2837,14 @@ function winChrome(){
   for(const el of [document.querySelector(".app"),document.querySelector(".topbar"),$("tabs"),document.querySelector(".topbar .right")])el.setAttribute("data-tauri-drag-region","");
   $("wMin").onclick=()=>w.minimize();
   $("wMax").onclick=async()=>{if(await w.isFullscreen())await w.setFullscreen(false);else await w.toggleMaximize();syncMax()};
-  $("wClose").onclick=()=>w.close();
+  /* kapat = görev çubuğuna küçült (sesli oda, zamanlayıcı çalışmaya devam eder); gerçekten çıkmak: sağ tık ya da Ctrl+Q */
+  const quit=()=>w.close();
+  $("wClose").onclick=()=>{if(LS.get("minHint",false)){w.minimize();return}
+    /* ilk seferde ne olduğunu söyle, sonra küçült */
+    LS.set("minHint",true);toast("Workshop görev çubuğunda açık kalır · tamamen kapatmak için × üzerinde sağ tık ya da Ctrl+Q",null,true);setTimeout(()=>w.minimize(),1600)};
+  $("wClose").addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation();const r=$("wClose").getBoundingClientRect();
+    openCtx(r.right-200,r.bottom+4,"Pencere",[{label:"Görev çubuğuna küçült",fn:()=>w.minimize()},"-",{label:"Uygulamadan çık  ·  Ctrl+Q",danger:true,fn:quit}])});
+  document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.code==="KeyQ"&&!e.shiftKey&&!e.altKey){e.preventDefault();quit()}});
   w.onResized(()=>syncMax());syncMax();
 }
 /* ---------- kendi kendini güncelleme (GitHub sürümleri, imzalı) ---------- */
@@ -3082,6 +3114,17 @@ async function acct(kind){const email=$("acEmail").value.trim(),password=$("acPa
   if(r.error){msg.textContent=AUTH_TR(r.error.message||"");return}
   if(kind==="up"&&!r.data.session){msg.textContent="Onay e-postası gönderildi. Bağlantıya tıkla, sonra burada giriş yap.";return}
   msg.textContent="";$("acPass").value="";toast("Giriş yapıldı · ortak projeler yükleniyor",null,true)}
+/* --- masaüstü: ilk açılışta giriş ekranı (hesapla çevrimiçi, ya da hesapsız çevrimdışı) --- */
+async function maybeWelcome(){if(!CL.sb||LS.get("welcome",""))return;
+  try{const {data}=await CL.sb.auth.getSession();if(data&&data.session){LS.set("welcome","acct");return}}catch(_){}
+  $("wcLogo").innerHTML=WLOCK;const w=$("welcome");w.hidden=false;requestAnimationFrame(()=>w.classList.add("on"));setTimeout(()=>$("wcEmail").focus(),250)}
+function closeWelcome(v){LS.set("welcome",v);const w=$("welcome");w.classList.remove("on");setTimeout(()=>w.hidden=true,260)}
+$("wcForm").addEventListener("submit",async e=>{e.preventDefault();const email=$("wcEmail").value.trim(),password=$("wcPass").value;const m=$("wcMsg");
+  if(!email||!password){m.textContent="E-posta ve şifre gerekli";return}m.textContent="Giriş yapılıyor…";$("wcIn").disabled=true;
+  try{const r=await CL.sb.auth.signInWithPassword({email,password});if(r.error){m.textContent=AUTH_TR(r.error.message||"");return}
+    $("wcPass").value="";m.textContent="";closeWelcome("acct");toast("Giriş yapıldı · ortak projeler yükleniyor",null,true)}
+  catch(_){m.textContent="Bağlantı yok. Hesapsız devam edip sonra giriş yapabilirsin."}finally{$("wcIn").disabled=false}});
+$("wcGuest").onclick=()=>{closeWelcome("guest");toast("Çevrimdışı moddasın · giriş için sağ üstteki hesap simgesi",null,true)};
 $("acIn").onclick=()=>acct("in");$("acUp").onclick=()=>acct("up");
 $("acPass").addEventListener("keydown",e=>{if(e.key==="Enter")acct("in")});
 $("acOut").onclick=async()=>{await cFlush();await CL.sb.auth.signOut();cStop();toast("Çıkış yapıldı",null,true)};

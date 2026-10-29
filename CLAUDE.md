@@ -46,6 +46,10 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Presence: `presTrack` → `presFlush` (kanal başına yalnızca değişince, ≥1,2 sn arayla; Supabase istemci presence sınırı). Sesli odaya giriş/çıkış ayrıca broadcast `rtc` `join`/`here`/`bye` ile duyurulur.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 
+## Masaüstü davranışı
+- İlk açılış: giriş ekranı `#welcome` (`maybeWelcome`, LS `welcome` = `acct`|`guest`); hesapsız devam = çevrimdışı, bir daha sorulmaz, giriş sağ üstten. Girişsizken ses/bildirim düğmeleri gizli.
+- Pencere × düğmesi görev çubuğuna küçültür; çıkış: × üzerinde sağ tık › Uygulamadan çık ya da Ctrl+Q (`onCloseRequested` bekleyen kayıtları bitirir).
+
 ## Derleme
 - Masaüstü derlemesi yalnızca `src-tauri/tauri.conf.json` değişince (sürüm artışı) çalışır.
 - Web sürümü `pages.yml` ile GitHub Pages'e gider (arayüz değişince).
