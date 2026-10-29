@@ -578,7 +578,7 @@ button:disabled{cursor:var(--cur)}
 .rv.big{font-size:12px;padding:4px 10px;background:var(--glass-2)}
 .card[data-rv="wait"] .badges span:nth-last-child(1),.card .badges span{transition:none}
 /* referans dizini */
-.rdir{position:absolute;left:0;top:0;bottom:0;width:224px;box-sizing:border-box;padding:16px 10px 16px 14px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;scrollbar-width:thin;border-right:1px solid var(--stroke)}
+.rdir{position:absolute;left:0;top:0;bottom:0;width:224px;box-sizing:border-box;padding:44px 10px 16px 14px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;scrollbar-width:thin;border-right:1px solid var(--stroke)}
 #sBoard.dir{left:224px}body.boardfs .rdir{display:none}body.boardfs #sBoard.dir{left:0}
 .rdg{display:flex;flex-direction:column;gap:2px}
 .rdh{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:0 10px 5px;display:flex;align-items:center;gap:6px}
@@ -599,7 +599,14 @@ button:disabled{cursor:var(--cur)}
 .pill.name.priv{display:inline-flex;align-items:center;gap:6px;color:#E4C485;border-color:rgb(228 196 133 / .35)}.pill.name.priv .lk{width:12px;height:12px}
 :root[data-theme="light"] .pill.name.priv{color:#8A6A2C}
 .rdpick{display:none}
-@media (max-width:760px){.rdir{display:none}#sBoard.dir{left:0}.rdpick{display:inline-flex}}
+.rdir{transition:transform .32s cubic-bezier(.34,1.35,.64,1),opacity .2s}#sBoard{transition:left .32s cubic-bezier(.34,1.2,.64,1)}
+body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rdc #sBoard.dir{left:0}
+.rdcol{position:absolute;top:10px;right:8px;width:26px;height:26px;display:grid;place-items:center;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink-3);padding:0;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .15s,color .15s}
+.rdcol svg,.rdopen svg{width:15px;height:15px}.rdcol:hover{background:var(--glass-2);color:var(--ink);border-color:var(--stroke);transform:scale(1.08)}.rdcol:active{transform:scale(.9)}
+.rdir .rdg:first-of-type{margin-top:4px}
+.rdopen{display:none;padding-left:9px;padding-right:9px}body.rdc .rdopen{display:inline-flex;align-items:center}
+.rdopen:hover svg{transform:translateX(1px)}
+@media (max-width:760px){.rdir{display:none}#sBoard.dir{left:0}.rdpick{display:inline-flex}body.rdc .rdopen{display:none}}
 .tvbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px 0}.tvbar .afbar{margin:0}.tvbar .sp{flex:1}
 .pvb{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:1px 6px;border-radius:5px;border:1px solid var(--stroke);color:var(--ink-3)}
 .pvb.team{border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent)}
@@ -1501,7 +1508,7 @@ function renderBoard(){
   const bid=curBoard();const b=boards(curP()).find(x=>x.id===bid);if(!b)return;S.lastB=S.lastB||{};S.lastB[curP()]=bid;
   if(lastBoard!==bid){world.innerHTML='<svg class="ink" id="ink" xmlns="http://www.w3.org/2000/svg"></svg>';lastBoard=bid;ink=null}
   if(S.renaming!=="board"){
-    $("bbar").innerHTML=(isShared(curP())?`<button class="pill rdpick" id="rdpick">Panolar ▾</button>`:"")+`<button class="pill name${b.private?" priv":""}${b.locked?" lkd":""}" id="bname" title="${b.private?"Yalnızca sen görüyorsun · ":""}${b.locked?"Kilitli · sağ tıkla kilidi aç":"Yeniden adlandır"}">${b.private?PRIV_IC:""}${esc(b.name||"Pano")}${b.locked?LOCK_IC:""}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
+    $("bbar").innerHTML=(isShared(curP())?`<button class="pill rdpick" id="rdpick">Panolar ▾</button><button class="pill rdopen" id="rdopen" title="Pano panelini göster" aria-label="Pano panelini göster"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10"/><path d="M9 6.2 10.7 8 9 9.8"/></svg></button>`:"")+`<button class="pill name${b.private?" priv":""}${b.locked?" lkd":""}" id="bname" title="${b.private?"Yalnızca sen görüyorsun · ":""}${b.locked?"Kilitli · sağ tıkla kilidi aç":"Yeniden adlandır"}">${b.private?PRIV_IC:""}${esc(b.name||"Pano")}${b.locked?LOCK_IC:""}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
       `<button class="pill" id="bpng" title="Panonun tamamını PNG ya da PDF olarak indir">Dışa aktar</button>`+
       "";
   }
@@ -1787,7 +1794,7 @@ $("phead").addEventListener("contextmenu",e=>{
 function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filter(c=>c.kind!=="frame").length;
   const row=b=>`<button class="rdb${b.id===cur?" on":""}" data-rdb="${esc(b.id)}"><span>${esc(b.name||"Pano")}</span>${b.locked?`<span class="rdl" title="Kilitli">${LOCK_IC}</span>`:""}<span class="mono">${n(b)}</span></button>`;const mine=myBoards(pid);
   const add=(k,t)=>`<button class="rdadd" data-rdnew="${k}" title="${t}" aria-label="${t}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></button>`;
-  $("rdir").innerHTML=`<div class="rdg"><div class="rdh"><span>Ekip panoları</span>${add("team","Yeni ekip panosu")}</div>${teamBoards(pid).map(row).join("")}</div>
+  $("rdir").innerHTML=`<button class="rdcol" data-rdcol title="Paneli gizle" aria-label="Pano panelini gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10"/><path d="M10.5 6.2 8.8 8l1.7 1.8"/></svg></button><div class="rdg"><div class="rdh"><span>Ekip panoları</span>${add("team","Yeni ekip panosu")}</div>${teamBoards(pid).map(row).join("")}</div>
     <div class="rdg"><div class="rdh rdmine">${PRIV_IC}<span>Benim panolarım</span>${add("me","Yalnızca senin göreceğin yeni pano")}</div>${mine.length?mine.map(row).join(""):`<span class="rdempty">Yalnızca senin gördüğün panolar: keşif, deneme, ham referans. Hazır olanı ekip panosunun adına sürükle.</span>`}</div>
     <span class="rdtip">Sağ tık: kilitle, adını değiştir, sil</span>`}
 function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
@@ -1802,7 +1809,11 @@ function boardMenu(pid,id,x,y){const b=boards(pid).find(v=>v.id===id);if(!b)retu
   if(b.private&&isShared(pid))items.push({label:"Ekibe aç (herkes görür)",fn:()=>openBoardToTeam(pid,id)});
   if(!main&&!b.locked)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
   openCtx(x,y,(b.locked?"Kilitli · ":"")+(b.private?"Yalnızca sen · ":"")+(main?(b.name||"Pano")+" · ana pano":(b.name||"Pano")),items)}
-$("rdir").addEventListener("click",e=>{const pid=curP();
+/* panel gizle / göster (cihazda hatırlanır) */
+function setRdir(c){LS.set("rdirC",c);document.body.classList.toggle("rdc",c)}
+setRdir(!!LS.get("rdirC",false));
+$("bbar").addEventListener("click",e=>{if(e.target.closest("#rdopen"))setRdir(false)});
+$("rdir").addEventListener("click",e=>{const pid=curP();if(e.target.closest("[data-rdcol]")){setRdir(true);return}
   const r=e.target.closest("[data-rdb]");if(r){S.sub[pid]="b:"+r.dataset.rdb;S.selSet.clear();save();renderProject();return}
   const nb=e.target.closest("[data-rdnew]");if(nb)newBoard(pid,nb.dataset.rdnew==="me")});
 $("rdir").addEventListener("contextmenu",e=>{const r=e.target.closest("[data-rdb]");if(!r)return;e.preventDefault();boardMenu(curP(),r.dataset.rdb,e.clientX,e.clientY)});
