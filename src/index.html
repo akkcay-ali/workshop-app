@@ -3549,7 +3549,8 @@ function voiceBar(pid){const inn=voiceIn(pid).filter(u=>u!==CL.me);const me=V.pi
   return `<div class="vbar"><span class="vl">${MIC_IC}${inn.length?`<span><b>${inn.length} kişi</b> sesli odada</span>`:"<span>Sesli oda boş</span>"}</span><span class="vavs">${avs}</span><span class="sp"></span><button class="btn sm primary" data-vjoin>Sesli katıl</button></div>`}
 function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(isShared);btn.hidden=!CL.me||!shared.length;if(btn.hidden){animHide($("voicePop"));return}
   const ctx=V.pid||(isShared(curP())?curP():null);const n=ctx?voiceIn(ctx).filter(u=>u!==CL.me).length+(V.pid?1:0):0;
-  const others=shared.reduce((m,p)=>m+voiceIn(p).filter(u=>u!==CL.me).length,0);
+  /* odaya yalnızca açık olan ortak projeden girilir; başka projelerin odası burada görünmez */
+  const cp=isShared(curP())?curP():null;const others=cp?voiceIn(cp).filter(u=>u!==CL.me).length:0;
   btn.classList.toggle("on",!!V.pid);btn.classList.toggle("sharing",!!V.screen);btn.classList.toggle("muted",!!V.pid&&V.muted);btn.classList.toggle("talk",!!V.pid&&[...V.speak].some(u=>u!==CL.me));
   const shown=V.pid?n:others;$("voiceN").hidden=!shown;$("voiceN").textContent=shown;btn.title=V.pid?"Sesli oda · "+((proj(V.pid)||{}).name||""):others?others+" kişi sesli odada":"Sesli oda";
   if($("voicePop").hidden)return;const B=$("voiceBody");
@@ -3560,7 +3561,8 @@ function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(is
       ${shareBlock()}
       <div class="vctl"><button class="vbtn${V.muted?" off":""}" data-vmute title="${V.muted?"Mikrofonu aç":"Mikrofonu kapat"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button>
         <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`}
-  else{const ps=shared.slice().sort((a,b)=>(b===curP())-(a===curP())||voiceIn(b).length-voiceIn(a).length);
+  else{const ps=cp?[cp]:[];
+    if(!cp){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Odaya katılmak için önce ortak bir projeyi aç. Her projenin kendi odası var.</span></div></div>`;return}
     B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Çalışırken ekiple konuş; sayfa değiştirsen de bağlı kalırsın.</span></div></div>
       <div class="vrooms">${ps.map(p=>{const inn=voiceIn(p).filter(u=>u!==CL.me);return `<div class="vroom"><div class="vrt"><b>${esc((proj(p)||{}).name||"Proje")}</b><span class="small">${inn.length?inn.length+" kişi konuşuyor":"boş"}</span></div>
         <span class="vavs">${inn.map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join("")}</span><button class="btn sm primary" data-vjoinp="${esc(p)}">Katıl</button></div>`}).join("")}</div>`}}
