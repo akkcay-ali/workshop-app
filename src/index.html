@@ -523,6 +523,22 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   background:var(--ink);color:var(--accent-ink);font-size:13px;font-weight:500;z-index:60;box-shadow:0 12px 30px -10px rgb(0 0 0 / .7);max-width:calc(100% - 32px)}
 .toast button{border:0;background:var(--accent-ink);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
+/* odak: mola durumu, seans noktaları, seçenekler, not kutusu */
+.ibtn.brk .ring .fg{stroke:var(--t5)}.ibtn.brk .tpill{color:var(--t5)}
+.tcyc{display:flex;justify-content:center;gap:6px;min-height:8px;margin:-2px 0 2px}
+.tcyc i{width:7px;height:7px;border-radius:50%;background:var(--stroke-2);transition:background .2s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.tcyc i.on{background:var(--accent);transform:scale(1.15)}
+.topts{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--stroke);padding-top:10px}
+.opt{border:1px solid var(--stroke);background:transparent;border-radius:999px;padding:4px 10px;font-size:11.5px;color:var(--ink-3);transition:all .15s}
+.opt::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--stroke-2);margin-right:6px;vertical-align:1px;transition:background .15s}
+.opt[aria-pressed="true"]{color:var(--ink);border-color:var(--stroke-2);background:var(--glass-2)}.opt[aria-pressed="true"]::before{background:var(--t5)}
+.fnote{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:61;width:min(420px,calc(100% - 32px));
+  display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--stroke-2);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 16px 40px -12px rgb(0 0 0 / .6)}
+.fnote .row{display:flex;gap:8px}.fnote .field{flex:1}
+@media (prefers-reduced-motion:no-preference){.fnote:not([hidden]){animation:fnIn .45s cubic-bezier(.34,1.56,.64,1) both}.fnote.closing{animation:fnOut .2s ease-in both}}
+@keyframes fnIn{from{opacity:0;transform:translate(-50%,18px) scale(.94)}}@keyframes fnOut{to{opacity:0;transform:translate(-50%,10px) scale(.97)}}
+.fnl{margin-top:8px;border-top:1px solid var(--stroke);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+.fnl div{font-size:12.5px;color:var(--ink-2);display:flex;gap:8px}.fnl div b{font-weight:500;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* çerçevesiz pencere (Windows): kendi pencere düğmeleri */
 .wctl{display:flex;gap:2px;margin-left:4px}
 .wctl button{width:34px;height:30px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2);background:transparent;border:0;transition:background .12s,color .12s,transform .25s cubic-bezier(.34,1.56,.64,1)}
@@ -596,17 +612,25 @@ body.frameless .app{padding-top:8px}
 </div>
 
 <div class="pop" id="timerPop" hidden role="dialog" aria-label="Odak zamanlayıcısı">
-  <h3>Odak</h3>
+  <h3 id="th3">Odak</h3>
   <div class="big" id="tbig">25:00</div>
+  <div class="tcyc" id="tcyc" title="Her 4 odakta bir uzun mola (15 dk)"></div>
   <div class="presets" id="presets">
-    <button class="chip" data-min="15">15</button><button class="chip" data-min="25">25</button><button class="chip" data-min="50">50</button><button class="chip" data-min="90">90</button><button class="chip" data-min="5">5 mola</button>
+    <button class="chip" data-min="15">15</button><button class="chip" data-min="25">25</button><button class="chip" data-min="50">50</button><button class="chip" data-min="90">90</button><button class="chip" data-min="5" data-brk>5 mola</button>
   </div>
   <div class="row"><input class="field mono" id="tmin" type="number" min="1" max="240" placeholder="dk" style="width:76px" aria-label="Dakika"><button class="btn" id="tsetBtn">Ayarla</button></div>
   <input class="field" id="tlabel" placeholder="Neye odaklanıyorsun? (isteğe bağlı)" maxlength="80">
   <div class="small" id="ttask" hidden></div>
   <div class="row"><button class="btn primary" id="tgo" style="flex:1">Başlat</button><button class="btn" id="treset">Sıfırla</button></div>
   <div class="small" id="tstat"></div>
+  <div class="topts" id="topts">
+    <button class="opt" data-opt="pomo" title="Odak bitince mola, mola bitince yeni odak kendiliğinden başlar. Her 4 odakta bir 15 dk uzun mola.">Otomatik mola</button>
+    <button class="opt" data-opt="fnotify" title="Workshop arka plandayken süre dolunca sistem bildirimi gösterir">Bildirim</button>
+    <button class="opt" data-opt="quiet" title="Odak sürerken uygulama içi bilgi mesajlarını gizler (hatalar ve geri al yine görünür)">Sessiz odak</button>
+  </div>
 </div>
+<div class="fnote" id="fnote" hidden role="dialog" aria-label="Odak notu"><span class="small" id="fnT">Bu odakta ne yaptın?</span>
+  <div class="row"><input class="field" id="fnIn" maxlength="140" placeholder="kısa bir not · Enter kaydeder"><button class="btn" id="fnSkip">Geç</button></div></div>
 
 <div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
   <h3>Ayarlar</h3>
@@ -736,12 +760,13 @@ const boardVisible=()=>curP()&&curBoard();
 
 /* ---------- toast ---------- */
 let toastTimer;
-function toast(msg,action){
+let quietNow=()=>false;/* zamanlayıcı bölümü doldurur */
+function toast(msg,action,force){if(!action&&!force&&quietNow())return;
   $("toastT").textContent=msg;const b=$("toastB");b.hidden=!action;
   if(action){b.textContent=action.label||"Geri al";b.onclick=()=>{action.fn();$("toast").hidden=true}}
   $("toast").hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").hidden=true,action?7000:3500);
 }
-function run(p){return Promise.resolve(p).catch(err=>{toast(err&&err.code==="quota_exceeded"?"Depolama sınırı doldu, eski kayıtları silmen gerekiyor.":"Kaydedilemedi: "+((err&&err.message)||"bilinmeyen hata"))})}
+function run(p){return Promise.resolve(p).catch(err=>{toast(err&&err.code==="quota_exceeded"?"Depolama sınırı doldu, eski kayıtları silmen gerekiyor.":"Kaydedilemedi: "+((err&&err.message)||"bilinmeyen hata"),null,true)})}
 
 /* ---------- tabs / navigation ---------- */
 const ICON={
@@ -921,7 +946,10 @@ function weekBlock(){
   const row=(n,m,d,pid)=>`<button class="wkrow"${pid?` data-go="${esc(pid)}"`:""}><span class="n">${esc(n)}</span><span class="bar"><i style="width:${Math.round(m/mx*100)}%"></i></span><span class="v">${m?fmtMin(m):"—"}${d!=null?` · ${d} ✓`:""}</span></button>`;
   return `<div class="block"><div class="bhead"><h2>Bu hafta</h2><span class="count">${tm?fmtMin(tm)+" odak · ":""}${td} görev bitti</span></div>
     ${rows.length||free?rows.sort((a,b)=>b.m-a.m||b.d-a.d).map(r=>row(r.p.name||"Proje",r.m,r.d,r.p.id)).join("")+(free?row("Görevsiz odak",free,null):"")
-      :`<div class="empty">Bu hafta henüz kayıt yok. Bir görevden "odak" başlatınca süreler burada toplanır.</div>`}</div>`;
+      :`<div class="empty">Bu hafta henüz kayıt yok. Bir görevden "odak" başlatınca süreler burada toplanır.</div>`}
+    ${(()=>{const ns=fs.filter(f=>f.note).sort((a,b)=>(b.created||0)-(a.created||0)).slice(0,6);if(!ns.length)return "";
+      const pn=id=>{const p=projects().find(x=>x.id===id);return p?p.name||"Proje":""};
+      return `<div class="fnl"><span class="small">Odak notları</span>${ns.map(f=>`<div><b title="${esc(f.note)}">${esc(f.note)}</b><span class="small">${esc([pn(f.project),fmtMin(f.mins||0)].filter(Boolean).join(" · "))}</span></div>`).join("")}</div>`})()}</div>`;
 }
 function renderHome(){
   const ps=projects();const all=S.items.filter(i=>i.type==="task");
@@ -1985,13 +2013,16 @@ document.addEventListener("keydown",e=>{if($("ed").hidden)return;e.stopImmediate
   else return;e.preventDefault()},true);
 
 /* ---------- TIMER ---------- */
-const TM=Object.assign({dur:1500,left:1500,endAt:null,label:"",task:null,pend:[]},LS.get("timer",{}));
+const TM=Object.assign({dur:1500,left:1500,endAt:null,label:"",task:null,pend:[],mode:"focus",fdur:1500,cycle:0,cday:"",proj:null},LS.get("timer",{}));
+const OPT=k=>LS.get("t_"+k,true);/* pomo, fnotify, quiet: varsayılan açık */
+quietNow=()=>!!TM.endAt&&TM.mode==="focus"&&OPT("quiet");
 const fmtMin=m=>m>=60?Math.floor(m/60)+" sa"+(m%60?" "+(m%60)+" dk":""):m+" dk";
-function creditTask(id,mins,date){const t=id&&S.items.find(i=>i.id===id);if(t)run(api.update(id,{focus:(t.focus||0)+mins}));
-  run(api.add({type:"focus",task:t?id:null,project:t?projOf(t):null,date:date||TODAY,mins,created:Date.now()}))}
-function flushFocus(){if(!api||!S.loaded||!TM.pend||!TM.pend.length)return;const p=TM.pend;TM.pend=[];tSave();p.forEach(([id,m,d])=>creditTask(id,m,d))}
+function creditTask(id,mins,date,proj){const t=id&&S.items.find(i=>i.id===id);if(t)run(api.update(id,{focus:(t.focus||0)+mins}));
+  const pr=t?projOf(t):(proj&&proj!=="home"&&projects().some(p=>p.id===proj)?proj:null);
+  return run(api.add({type:"focus",task:t?id:null,project:pr,date:date||TODAY,mins,created:Date.now()})).then(r=>r&&r.id)}
+function flushFocus(){if(!api||!S.loaded||!TM.pend||!TM.pend.length)return;const p=TM.pend;TM.pend=[];tSave();p.forEach(([id,m,d,pr])=>creditTask(id,m,d,pr))}
 function focusTask(id){const t=S.items.find(i=>i.id===id);if(!t)return;TM.task=id;TM.label=t.title;$("tlabel").value=t.title;
-  if(TM.dur<600)tSet(25);TM.endAt=null;TM.left=TM.dur;tStart();toast("Odak başladı: "+t.title+" · "+Math.round(TM.dur/60)+" dk");renderAll()}
+  if(TM.mode==="break"||TM.dur<600)tSet(TM.fdur>=600?TM.fdur/60:25,"focus");TM.endAt=null;TM.left=TM.dur;TM.proj=null;tStart();toast("Odak başladı: "+t.title+" · "+Math.round(TM.dur/60)+" dk",null,true);renderAll()}
 let actx=null;
 const tLeft=()=>TM.endAt?Math.max(0,Math.ceil((TM.endAt-Date.now())/1000)):TM.left;
 const fmt=s=>pad(Math.floor(s/60))+":"+pad(s%60);
@@ -2005,27 +2036,66 @@ function bell(t,f,vol){const out=actx.createGain();out.gain.value=vol;out.connec
 function chime(force){if(!force&&!sndOn())return;ensureAudio();if(!actx)return;
   try{const t0=actx.currentTime+.05;for(let k=0;k<3;k++){bell(t0+k*1.1,880,.32);bell(t0+k*1.1+.18,1318.5,.24)}}catch(e){}}
 document.addEventListener("pointerdown",()=>{if(TM.endAt&&!actx)ensureAudio()},{capture:true});
-function tStart(){ensureAudio();if(tLeft()<=0)TM.left=TM.dur;TM.endAt=Date.now()+tLeft()*1000;tSave();drawTimer()}
+function tStart(){ensureAudio();if(tLeft()<=0)TM.left=TM.dur;
+  /* görevsiz odak, o an açık olan projeye yazılır */
+  if(TM.mode==="focus"&&!TM.task&&!TM.proj&&S.view&&S.view!=="home")TM.proj=S.view;
+  if(TM.mode==="focus"&&"Notification"in window&&!TA&&OPT("fnotify")&&Notification.permission==="default"){try{Notification.requestPermission()}catch(_){}}
+  TM.endAt=Date.now()+tLeft()*1000;tSave();drawTimer()}
 function tPause(){TM.left=tLeft();TM.endAt=null;tSave();drawTimer()}
-function tReset(){TM.endAt=null;TM.left=TM.dur;tSave();drawTimer()}
-function tSet(min){min=Math.max(1,Math.min(240,Math.round(min)));TM.dur=min*60;TM.left=TM.dur;TM.endAt=null;tSave();drawTimer()}
+function tReset(){if(!TM.endAt&&TM.left===TM.dur)TM.cycle=0;/* ikinci sıfırla seansları da sıfırlar */
+  TM.endAt=null;TM.left=TM.dur;TM.proj=null;tSave();drawTimer()}
+function tSet(min,mode){min=Math.max(1,Math.min(240,Math.round(min)));TM.mode=mode||"focus";if(TM.mode==="focus")TM.fdur=min*60;
+  TM.dur=min*60;TM.left=TM.dur;TM.endAt=null;tSave();drawTimer()}
+/* sistem bildirimi: sadece uygulama arka plandayken */
+async function notify(title,body){if(!OPT("fnotify")||(document.hasFocus()&&!document.hidden))return;
+  try{if(TA&&TA.notification){const N=TA.notification;let g=await N.isPermissionGranted();if(!g)g=(await N.requestPermission())==="granted";if(g)N.sendNotification({title,body});return}
+    if("Notification"in window&&Notification.permission==="granted")new Notification(title,{body,silent:true})}catch(_){}}
+/* odak sonrası kısa not */
+let fnId=null,fnTimer=null;
+function askNote(idP,mins){Promise.resolve(idP).then(id=>{if(!id)return;fnId=id;$("fnT").textContent=`${fmtMin(mins)} odak bitti · bu sürede ne yaptın?`;$("fnIn").value="";
+  animShow($("fnote"));setTimeout(()=>$("fnIn").focus(),60);clearTimeout(fnTimer);fnTimer=setTimeout(closeNote,120000)})}
+function closeNote(){clearTimeout(fnTimer);fnId=null;animHide($("fnote"))}
+function saveNote(){const v=$("fnIn").value.trim(),id=fnId;closeNote();if(v&&id&&api){run(api.update(id,{note:v}));toast("Not kaydedildi",null,true)}}
+$("fnIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveNote()}else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeNote()}});
+$("fnSkip").onclick=closeNote;
 function finish(silent){
-  const mins=Math.round(TM.dur/60);TM.endAt=null;TM.left=TM.dur;
-  const ftk=TM.task;TM.task=null;tSave();
-  if(ftk||mins>5){if(api&&S.loaded)creditTask(ftk,mins);else{(TM.pend=TM.pend||[]).push([ftk,mins,TODAY]);tSave()}}
+  const mins=Math.round(TM.dur/60),brk=TM.mode==="break";TM.endAt=null;TM.left=TM.dur;
+  const ding=()=>{chime();const b=$("timerBtn");b.classList.remove("ding");void b.offsetWidth;b.classList.add("ding")};
+  if(brk){drawTimer();if(silent)return;ding();
+    if(OPT("pomo")){tSet(Math.round(TM.fdur/60),"focus");tStart();notify("Mola bitti","Yeni odak başladı · "+fmtMin(Math.round(TM.fdur/60)));
+      toast("Mola bitti · yeni odak başladı",{label:"Duraklat",fn:tPause})}
+    else{notify("Mola bitti","Odaklanmaya hazır mısın?");toast("Mola bitti",{label:"Odak başlat",fn:()=>{tSet(Math.round(TM.fdur/60),"focus");tStart()}})}
+    return}
+  const ftk=TM.task,fpr=TM.proj;TM.task=null;TM.proj=null;
+  if(TM.cday!==TODAY){TM.cday=TODAY;TM.cycle=0}if(mins>5)TM.cycle++;tSave();
+  let rid=null;
+  if(ftk||mins>5){if(api&&S.loaded)rid=creditTask(ftk,mins,TODAY,fpr);else{(TM.pend=TM.pend||[]).push([ftk,mins,TODAY,fpr]);tSave()}}
   if(mins>5){const f=LS.get("focus",{});const d=f[TODAY]||{n:0,m:0};d.n++;d.m+=mins;f[TODAY]=d;LS.set("focus",f)}
   drawTimer();if(S.view==="home")renderHome();else if(subOf(curP())==="tasks")renderTasks();
   if(silent)return;
-  chime();const b=$("timerBtn");b.classList.remove("ding");void b.offsetWidth;b.classList.add("ding");
-  toast((TM.label?TM.label+" · ":"")+mins+" dakikalık odak bitti",mins>5?{label:"5 dk mola",fn:()=>{tSet(5);tStart()}}:null);
+  ding();const lbl=(TM.label?TM.label+" · ":"")+fmtMin(mins)+" odak bitti";
+  if(mins>5&&OPT("pomo")){const long=TM.cycle%4===0,bm=long?15:5;tSet(bm,"break");tStart();
+    notify("Odak bitti",lbl.replace(" odak bitti","")+" · "+bm+" dk "+(long?"uzun ":"")+"mola başladı");toast(lbl+" · "+bm+" dk "+(long?"uzun ":"")+"mola",{label:"Molayı atla",fn:()=>finish(false)})}
+  else{notify("Odak bitti",lbl);toast(lbl,mins>5?{label:"5 dk mola",fn:()=>{tSet(5,"break");tStart()}}:null,true)}
+  if(rid)askNote(rid,mins);
 }
+let lastTitle="",lastProg="";
+function winStatus(left,run_,frac){/* sekme başlığı + Windows görev çubuğu */
+  const t=run_?`${fmt(left)} · ${TM.mode==="break"?"Mola":"Odak"} — Workshop`:"Workshop";
+  if(t!==lastTitle){lastTitle=t;document.title=t;if(TA)try{TA.window.getCurrentWindow().setTitle(t)}catch(_){}}
+  if(!TA)return;const pg=run_?(TM.mode==="break"?"paused":"normal")+":"+Math.round(frac*100):(left<TM.dur?"paused:"+Math.round(frac*100):"none");
+  if(pg===lastProg)return;lastProg=pg;const [st,v]=pg.split(":");try{TA.window.getCurrentWindow().setProgressBar(st==="none"?{status:"none"}:{status:st,progress:+v})}catch(_){}}
 function drawTimer(){
-  const left=tLeft(),run_=!!TM.endAt;
+  const left=tLeft(),run_=!!TM.endAt,brk=TM.mode==="break";
+  $("timerBtn").classList.toggle("brk",brk);$("th3").textContent=brk?(TM.dur>=900?"Uzun mola":"Mola"):"Odak";
+  if(TM.cday!==TODAY&&TM.cycle){TM.cycle=0;TM.cday=TODAY}
+  const cy=TM.cycle%4,full=TM.cycle>0&&cy===0;$("tcyc").innerHTML=OPT("pomo")?[0,1,2,3].map(k=>`<i class="${full||k<cy?"on":""}"></i>`).join(""):"";
+  document.querySelectorAll("#topts [data-opt]").forEach(b=>b.setAttribute("aria-pressed",OPT(b.dataset.opt)));
   $("tpill").textContent=fmt(left);$("tpill").classList.toggle("idle",!run_&&left===TM.dur);
   $("timerBtn").classList.toggle("running",run_);
-  const frac=TM.dur?1-left/TM.dur:0;$("ringFg").setAttribute("stroke-dashoffset",(50.27*(1-frac)).toFixed(2));
+  const frac=TM.dur?1-left/TM.dur:0;$("ringFg").setAttribute("stroke-dashoffset",(50.27*(1-frac)).toFixed(2));winStatus(left,run_,frac);
   $("tbig").textContent=fmt(left);$("tgo").textContent=run_?"Duraklat":(left<TM.dur?"Devam et":"Başlat");
-  document.querySelectorAll("#presets [data-min]").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.min*60===TM.dur));
+  document.querySelectorAll("#presets [data-min]").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.min*60===TM.dur&&(c.dataset.brk!=null)===brk));
   const fs=focusStats();$("tstat").textContent=`Bugün ${fs.n} seans · ${fs.m} dakika odak`;
   const tk=TM.task&&S.items.find(i=>i.id===TM.task);$("ttask").hidden=!TM.task;
   if(TM.task)$("ttask").innerHTML=`Görev: <b style="color:var(--ink)">${esc(tk?tk.title:"…")}</b> · bitince süre göreve yazılır <button class="mini" id="tunlink">bağı kaldır</button>`;
@@ -2036,7 +2106,10 @@ $("tlabel").value=TM.label||"";
 $("tlabel").addEventListener("input",e=>{TM.label=e.target.value;if(TM.task){TM.task=null;drawTimer()}tSave()});
 $("ttask").addEventListener("click",e=>{if(e.target.closest("#tunlink")){TM.task=null;tSave();drawTimer();renderAll()}});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-focus]");if(b&&api)focusTask(b.dataset.focus)});
-$("presets").addEventListener("click",e=>{const c=e.target.closest("[data-min]");if(c)tSet(+c.dataset.min)});
+$("presets").addEventListener("click",e=>{const c=e.target.closest("[data-min]");if(c)tSet(+c.dataset.min,c.dataset.brk!=null?"break":"focus")});
+$("topts").addEventListener("click",e=>{const b=e.target.closest("[data-opt]");if(!b)return;const k=b.dataset.opt,v=!OPT(k);LS.set("t_"+k,v);
+  if(k==="fnotify"&&v&&!TA&&"Notification"in window&&Notification.permission==="default"){try{Notification.requestPermission()}catch(_){}}
+  drawTimer();toast({pomo:v?"Otomatik mola açık · her 4 odakta bir 15 dk uzun mola":"Otomatik mola kapalı",fnotify:v?"Arka plandayken sistem bildirimi gösterilecek":"Sistem bildirimi kapalı",quiet:v?"Odak sırasında bilgi mesajları gizlenecek":"Sessiz odak kapalı"}[k],null,true)});
 $("tsetBtn").onclick=()=>{const v=+$("tmin").value;if(v>0){tSet(v);$("tmin").value=""}};
 $("tmin").addEventListener("keydown",e=>{if(e.key==="Enter")$("tsetBtn").click()});
 $("tgo").onclick=()=>TM.endAt?tPause():tStart();
