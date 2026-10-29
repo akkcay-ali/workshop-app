@@ -666,6 +666,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .kcol{background:var(--glass);border:1px solid var(--stroke);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:120px;transition:border-color .15s,background .15s}
 .kcol.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--glass))}
 .kadd input{width:100%;box-sizing:border-box;border:1px dashed var(--stroke-2);background:transparent;color:var(--ink);border-radius:8px;padding:8px 9px;font:inherit;font-size:12.5px}
+.kcard .kref{display:block;width:100%;border:0;padding:0;background:none;cursor:pointer}.kcard .kref .crop{margin:0 auto}
 .kcard{background:var(--field,var(--glass-2));border:1px solid var(--stroke);border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;gap:7px;cursor:var(--cur-pt);transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
 .kcard:hover{transform:translateY(-1px);box-shadow:0 10px 24px -14px rgb(0 0 0 / .6)}.kcard.dragging{opacity:.4}
 .kt{border:0;background:none;color:var(--ink);text-align:left;padding:0;font-size:13px;line-height:1.35}
@@ -752,6 +753,28 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vcb.on{color:var(--t5);border-color:color-mix(in srgb,var(--t5) 50%,transparent);background:color-mix(in srgb,var(--t5) 12%,var(--glass))}
 .vcb.on.muted{color:#E6A3B4}.vcb.talk{box-shadow:0 0 0 2px color-mix(in srgb,var(--t5) 60%,transparent),0 0 14px color-mix(in srgb,var(--t5) 45%,transparent)}
 @media (prefers-reduced-motion:no-preference){.vcb.talk{animation:vtalk 1.2s ease-in-out infinite}}@keyframes vtalk{50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--t5) 35%,transparent),0 0 18px color-mix(in srgb,var(--t5) 30%,transparent)}}
+/* kompozisyon katmanı */
+.card .cguide{position:absolute;inset:0;pointer-events:none;border-radius:inherit;overflow:hidden}.card .cguide svg{width:100%;height:100%;display:block}
+.cguide .gd{stroke:rgb(0 0 0 / .45);stroke-width:3}.cguide .gl{stroke:rgb(255 255 255 / .85);stroke-width:1.2}.cguide path{fill:none;vector-effect:non-scaling-stroke}
+/* görselden görev */
+.rtbox{width:min(760px,100%)}.rtbody{padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px}
+.rtimg{position:relative;align-self:center;max-width:100%;cursor:crosshair;user-select:none;touch-action:none;border-radius:10px;overflow:hidden;background:#000}
+.rtimg img{display:block;max-width:100%;max-height:min(52vh,520px)}
+.rtsel{position:absolute;border:2px solid var(--accent);border-radius:4px;box-shadow:0 0 0 9999px rgb(0 0 0 / .45);pointer-events:none}
+.rtform{display:flex;flex-direction:column;gap:8px}.rtform .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.crop{display:block;background-repeat:no-repeat;background-color:#111;border-radius:7px;flex:0 0 auto}
+.tref .crop{height:26px;max-width:60px;border-radius:5px}.kcard .crop{height:78px;max-width:100%;border:1px solid var(--stroke)}
+.drref{display:flex;flex-direction:column;gap:6px}.drref .crop{width:100%;max-height:260px;border:1px solid var(--stroke)}
+/* sesli not */
+.tool.rec{color:#fff;background:#C8473B}.tool.rec:hover{background:#D5564A;color:#fff}.tool.rec svg{animation:recp 1s ease-in-out infinite}@keyframes recp{50%{opacity:.35}}
+/* pano şablonları */
+.tpbox{width:min(780px,100%)}.tpgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px 18px 18px}
+.tpl{position:relative;display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink);transition:transform .25s cubic-bezier(.34,1.6,.64,1),border-color .15s}
+.tpl:hover{border-color:var(--stroke-2);transform:translateY(-2px)}.tpl b{font-weight:600;font-size:13px}.tpl .small{line-height:1.35}
+.tpl svg{width:100%;height:74px;border-radius:8px;background:rgb(255 255 255 / .03)}.tpl svg rect{fill:rgb(255 255 255 / .05);stroke:rgb(255 255 255 / .28);stroke-width:1;vector-effect:non-scaling-stroke}.tpl svg rect.n{fill:color-mix(in srgb,var(--t3) 35%,transparent);stroke:none}
+.tpl .tpx{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:6px;border:0;background:transparent;color:var(--ink-3);display:grid;place-items:center}.tpl .tpx:hover{color:var(--warn);background:var(--glass-2)}
+.tphead{padding:0 18px;font-size:11px;letter-spacing:.06em;color:var(--ink-3);font-family:var(--f-mono)}
+@media (max-width:620px){.tpgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* canlı imleçler */
 #curs{position:fixed;inset:0;pointer-events:none;z-index:43;overflow:hidden}
 .cur{position:absolute;left:0;top:0;opacity:0;will-change:transform;transition:opacity .25s}.cur.on{opacity:1}
@@ -950,6 +973,7 @@ body.frameless .app{padding-top:8px}
             <button class="tool" data-tool="note" title="Not ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2.5h10v8l-3 3H3z"/><path d="M10 13.5v-3h3"/></svg><span class="lbl">Not</span></button>
             <button class="tool" data-tool="image" title="Görsel ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><circle cx="6" cy="6.5" r="1.2"/><path d="M2.5 12l4-4 3 3 2-2 2.5 2.5"/></svg><span class="lbl">Görsel</span></button>
             <button class="tool" data-tool="link" title="Link ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 9.5l3-3"/><path d="M7 4.5l1.2-1.2a2.6 2.6 0 013.7 3.7L10.7 8.2"/><path d="M9 11.5l-1.2 1.2a2.6 2.6 0 01-3.7-3.7L5.3 7.8"/></svg><span class="lbl">Link</span></button>
+            <button class="tool" data-tool="rec" title="Sesli not kaydet · tekrar bas, bitir"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5.5" y="1.8" width="5" height="8" rx="2.5"/><path d="M3.2 7.6a4.8 4.8 0 009.6 0M8 12.4v2"/></svg><span class="lbl" id="recL">Ses</span></button>
             <button class="tool deskonly" data-tool="snip" title="Ekran alıntısı · Ctrl+Alt+W (uygulama arkadayken de çalışır)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/><circle cx="8" cy="8" r="2"/></svg>Alıntı</button>
             <span class="sep"></span>
             <button class="tool" data-tool="out" aria-label="Uzaklaş">−</button>
@@ -1047,6 +1071,12 @@ body.frameless .app{padding-top:8px}
   <button data-scrx title="Gizle" aria-label="Gizle">×</button></div><video id="scrV" autoplay playsinline muted></video></div>
 <button class="vtab vcb" id="voiceBtn" hidden aria-expanded="false" aria-controls="voicePop" title="Ses ve yayın" aria-label="Ses ve yayın"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 10V8a5.5 5.5 0 0111 0v2"/><rect x="2" y="9.5" width="3" height="4.5" rx="1.3"/><rect x="11" y="9.5" width="3" height="4.5" rx="1.3"/></svg><span class="bn" id="voiceN" hidden></span><span class="vtav" id="vtAv"></span></button>
 <div id="curs" aria-hidden="true"></div>
+<div class="sk" id="rtk" hidden role="dialog" aria-label="Görselden görev"><div class="skbox rtbox"><div class="kbhead"><h2>Görselden görev</h2><button class="btn" id="rtClose">Vazgeç <kbd>Esc</kbd></button></div>
+  <div class="rtbody"><div class="rtimg" id="rtImg"><img id="rtI" alt="" draggable="false"><span class="rtsel" id="rtSel" hidden></span></div>
+  <span class="small" id="rtHint">İstersen görselde ilgili bölgeyi sürükleyerek seç; görevde o bölge görünür.</span>
+  <form class="rtform" id="rtForm" autocomplete="off"><input class="field" id="rtTitle" maxlength="200" placeholder="Ne yapılacak? ör. Kemer detayını modelle">
+    <div class="row" id="rtMeta"></div><div class="row" style="justify-content:flex-end"><button class="btn primary" type="submit">Görev oluştur</button></div></form></div></div></div>
+<div class="sk" id="tpk" hidden role="dialog" aria-label="Yeni pano"><div class="skbox tpbox"><div class="kbhead"><h2 id="tpT">Yeni pano</h2><button class="btn" id="tpClose">Vazgeç <kbd>Esc</kbd></button></div><div id="tpBody"></div></div></div>
 <aside class="vhub" id="voicePop" hidden aria-label="Ses ve yayın"><div class="vhh"><b>Ses ve yayın</b><span class="sp"></span><button class="vhx" id="vhClose" title="Paneli gizle" aria-label="Paneli gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
   <div class="vhprev" id="vhPrev" hidden><video id="vhV" autoplay playsinline muted></video><div class="vhpb"><span class="dot"></span><span id="vhPl"></span><span class="sp"></span><button class="btn sm" data-vhbig>Büyük izle</button></div></div>
   <div class="vhbody" id="voiceBody"></div></aside>
@@ -1342,7 +1372,7 @@ function refMini(c,cls){
 }
 function refThumbs(t){
   const rs=(t.refs||[]).map(id=>S.items.find(i=>i.id===id)).filter(c=>c&&REFK.includes(c.kind));if(!rs.length)return "";
-  return `<span class="trefs">${rs.slice(0,4).map(c=>`<button class="tref${c.kind==="note"?" note":c.kind==="link"?" lnk":""}" data-goto="${c.id}" title="Panoda göster">${refMini(c,"tref")}</button>`).join("")}${rs.length>4?`<span class="count">+${rs.length-4}</span>`:""}</span>`;
+  return `<span class="trefs">${rs.slice(0,4).map(c=>`<button class="tref${c.kind==="note"?" note":c.kind==="link"?" lnk":""}" data-goto="${c.id}" title="Panoda göster">${(t.rbox&&t.rbox.id===c.id&&c.kind==="image"?cropHTML(c,t.rbox):refMini(c,"tref"))}</button>`).join("")}${rs.length>4?`<span class="count">+${rs.length-4}</span>`:""}</span>`;
 }
 let rpTask=null;
 function renderRefPick(){
@@ -1540,7 +1570,7 @@ function renderHead(){
 $("phead").addEventListener("click",e=>{
   const pid=curP();
   const sb=e.target.closest("[data-sub]");if(sb){if(document.body.classList.contains("boardfs"))setBoardFS(false);S.sub[pid]=sb.dataset.sub;S.selSet.clear();save();renderProject();return}
-  if(e.target.closest("[data-newb]")){run(api.add({type:"board",project:pid,name:"Yeni pano",order:Date.now()}).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}));return}
+  if(e.target.closest("[data-newb]")){newBoard(pid,false);return}if(0){run(api.add({type:"board",project:pid,name:"Yeni pano",order:Date.now()}).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}));return}
   const d=e.target.closest("[data-day]");if(d){S.sel=d.dataset.day;renderProject();return}
   const hd=e.target.closest("[data-hubday]");if(hd){hubDay(hd.dataset.hubday,hd);return}
   const w=e.target.closest("[data-wk]");if(w){S.week=addDays(S.week,7*+w.dataset.wk);renderHead();return}
@@ -1681,15 +1711,15 @@ function syncCards(){
     {const rvt=isShared(curP())&&c.review&&c.review.state?{wait:"onay bekliyor",ok:"onaylandı",rev:"revizyon"}[c.review.state]:null,ncm=isShared(curP())?commentsOf(c.id).length:0;
      el.dataset.rv=rvt?c.review.state:"";const bs=[...((c.tags||[]).slice(0,2).map(t=>"#"+t)),c.versions&&c.versions.length&&("v"+(c.versions.length+1)),c.locked&&"kilitli",c.ext&&"web",rvt,ncm&&{cm:ncm}].filter(Boolean);let bd=el.querySelector(":scope > .badges");
      if(bs.length){if(!bd){bd=document.createElement("span");bd.className="badges";el.appendChild(bd)}const h=bs.map(x=>typeof x==="object"?`<span class="bcm" data-cmopen data-nodrag title="Yorumları aç (C)">${x.cm} yorum</span>`:`<span>${x}</span>`).join("");if(bd.innerHTML!==h)bd.innerHTML=h}else if(bd)bd.remove()}
-    if(c.kind==="image"){const img=el.querySelector("img");const s=imgSrc(c);if(img.getAttribute("src")!==s)img.setAttribute("src",s);el.classList.toggle("gray",!!c.gray);el.classList.toggle("flip",!!c.flip);
+    if(c.kind==="image"){const img=el.querySelector("img");const s=imgSrc(c);if(img.getAttribute("src")!==s)img.setAttribute("src",s);el.classList.toggle("gray",!!c.gray);el.classList.toggle("flip",!!c.flip);guideSync(el,c);
       /* görsele iğneli yorumlar: panoda küçük numaralı noktalar */
       const pins=commentsOf(c.id).filter(x=>x.pin);let pl=el.querySelector(":scope > .cpins");
       if(pins.length){if(!pl){pl=document.createElement("span");pl.className="cpins";el.appendChild(pl)}const h=pins.map((x,i)=>`<span class="cpin" style="left:${(c.flip?1-x.pin.x:x.pin.x)*100}%;top:${x.pin.y*100}%" data-cmopen data-nodrag title="${esc((x.text||"").slice(0,80))}">${i+1}</span>`).join("");if(pl.innerHTML!==h)pl.innerHTML=h}else if(pl)pl.remove()}
     const txt=el.querySelector(".txt");
     if(txt&&S.editing!==c.id){const val=c.kind==="audio"?(c.text||"Ses kaydı"):c.kind==="video"?(c.text||""):c.kind==="link"?(c.text||hostOf(c.url)||c.url):(c.text||"");if(txt.textContent!==val)txt.textContent=val}
     if(c.kind==="image")syncImgNote(el,c);
-    if((c.kind==="audio"||c.kind==="video")&&!c.text&&S.editing!==c.id)fillName(c);
-    if(c.kind==="audio"){el.dataset.au=c.id;const ho=el.querySelector(".host");const hv=driveId(c.url)?"Google Drive · ses":hostOf(c.url);if(ho.textContent!==hv)ho.textContent=hv;const a=el.querySelector(".aulink");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
+    if((c.kind==="audio"||c.kind==="video")&&!c.text&&c.url&&S.editing!==c.id)fillName(c);
+    if(c.kind==="audio"){el.dataset.au=c.id;const ho=el.querySelector(".host");const hv=auHost(c);if(ho.textContent!==hv)ho.textContent=hv;const a=el.querySelector(".aulink");a.hidden=!c.url;if(c.url&&a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
     if(c.kind==="video")syncVideo(el,c);
     if(c.kind==="link"){el.querySelector(".host").textContent=hostOf(c.url);const a=el.querySelector("a");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
   }
@@ -1970,7 +2000,7 @@ $("tools").addEventListener("click",e=>{
   const t=e.target.closest("[data-tool]");if(!t)return;const r=stage.getBoundingClientRect();
   const tl=t.dataset.tool;
   if(INK_TOOLS.includes(tl)){setTool(tl);return}
-  if(tl==="undo"){undo();return}if(tl==="redo"){redo();return}if(tl==="snip"){startSnip();return}
+  if(tl==="undo"){undo();return}if(tl==="redo"){redo();return}if(tl==="snip"){startSnip();return}if(tl==="rec"){recToggle();return}
   if(tl==="note"||tl==="image"||tl==="link")setTool("select");
   switch(tl){
     case "note":{if(!api)return;const p=centerWorld();addNote(p.x-120+Math.random()*40,p.y-60+Math.random()*40);break}
@@ -2006,7 +2036,10 @@ function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filt
   $("rdir").innerHTML=`<button class="rdcol" data-rdcol title="Paneli gizle" aria-label="Pano panelini gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10"/><path d="M10.5 6.2 8.8 8l1.7 1.8"/></svg></button><div class="rdg"><div class="rdh"><span>Ekip panoları</span>${add("team","Yeni ekip panosu")}</div>${teamBoards(pid).map(row).join("")}</div>
     <div class="rdg"><div class="rdh rdmine">${PRIV_IC}<span>Benim panolarım</span>${add("me","Yalnızca senin göreceğin yeni pano")}</div>${mine.length?mine.map(row).join(""):`<span class="rdempty">Yalnızca senin gördüğün panolar: keşif, deneme, ham referans. Hazır olanı ekip panosunun adına sürükle.</span>`}</div>
     <span class="rdtip">Sağ tık: kilitle, adını değiştir, sil</span>`}
-function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},CL.me&&isCloud(pid)?{owner:CL.me}:{},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
+function newBoard(pid,priv){openTpl(pid,priv)}
+function createBoard(pid,priv,tp){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},CL.me&&isCloud(pid)?{owner:CL.me}:{},priv?{private:true}:{},tp&&tp.id!=="blank"?{name:tp.n}:{})).then(async ref=>{if(!ref)return;
+  if(tp&&tp.id!=="blank"){const L=tplLayout(tp),now=Date.now();for(const [i,f] of L.entries())await run(api.add(Object.assign({type:"card",board:ref.id,created:now+i},f)))}
+  S.sub[pid]="b:"+ref.id;save();renderProject();if(tp&&tp.id!=="blank")setTimeout(fit,250);startBoardRename()}))}
 /* kilitli pano: adı değişmez, silinemez (kartlar düzenlenebilir) */
 function lockBoard(pid,b){if(!canMng(pid,b)){toast(ownerNote(b),null,true);return}const v=!b.locked;if(b.virtual)run(api.set(b.id,Object.assign({type:"board",project:pid,name:b.name||"Referanslar",order:0,locked:v},isCloud(pid)&&CL.own.has(pid)?{owner:CL.me}:{})));else run(api.update(b.id,{locked:v}));
   toast(v?"Pano kilitlendi · silinemez, adı değişmez":"Kilit açıldı",null,true)}
@@ -2018,6 +2051,7 @@ function boardMenu(pid,id,x,y){const b=boards(pid).find(v=>v.id===id);if(!b)retu
   items.push({label:b.locked?"Kilidi aç":"Kilitle (silinmez, adı değişmez)",fn:()=>lockBoard(pid,b)});
   if(b.private&&isShared(pid))items.push({label:"Ekibe aç (herkes görür, düzenleyebilir)",fn:()=>openBoardToTeam(pid,id)});
   if(!b.private&&!main&&isShared(pid)&&b.owner===CL.me)items.push({label:"Gizliye al (yalnızca sen görürsün)",confirm:"Ekip bu panoyu ve kartlarını artık görmez",fn:()=>boardToPrivate(pid,id)});
+  items.push({label:"Şablon olarak kaydet…",fn:()=>saveTpl(pid,id)});
   if(!main&&!b.locked)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
   openCtx(x,y,(b.locked?"Kilitli · ":"")+(b.private?"Yalnızca sen · ":"")+(main?(b.name||"Pano")+" · ana pano":(b.name||"Pano")),items)}
 /* panel gizle / göster (cihazda hatırlanır) */
@@ -2110,7 +2144,8 @@ stage.addEventListener("contextmenu",e=>{
   if(!S.selSet.has(id))selOnly(id);
   if(S.selSet.size>1){multiItems.ref=id;const mi=multiItems();multiItems.ref=null;openCtx(e.clientX,e.clientY,S.selSet.size+" öğe seçili",mi);return}
   const items=[];
-  if(c.kind==="image")items.push({label:"Odak görünümü",fn:()=>openLB(c.id)},{label:c.gray?"Gri tonu kapat  ·  G":"Gri ton  ·  G",fn:()=>toggleImg("gray",[c.id])},{label:c.flip?"Çevirmeyi kapat  ·  H":"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[c.id])},{label:"Renk paleti çıkar",fn:()=>makePalette(c)});
+  if(c.kind==="image")items.push({label:"Odak görünümü",fn:()=>openLB(c.id)},{label:c.gray?"Gri tonu kapat  ·  G":"Gri ton  ·  G",fn:()=>toggleImg("gray",[c.id])},{label:c.flip?"Çevirmeyi kapat  ·  H":"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[c.id])},{label:"Renk paleti çıkar",fn:()=>makePalette(c)},{label:"Kompozisyon katmanı"+(c.guide?"  ·  "+GUIDES[c.guide]:"")+"…",fn:()=>guideMenu(c,e.clientX,e.clientY)},{label:"Bu görselden görev…",fn:()=>openRTask(c.id)});
+  if(c.kind==="audio"&&c.assetId&&imgSrc(c))items.push({label:"Ses dosyasını indir",fn:()=>{const a=document.createElement("a");a.href=imgSrc(c);a.download=(c.text||"ses-notu").replace(/[\\/:*?"<>|]/g,"-")+"."+(IMG_EXT[(c.mime||"audio/webm")]||"webm");a.click()}});
   if(c.kind==="frame"||c.kind==="note"||c.kind==="link"||c.kind==="audio"||c.kind==="video")items.push({label:c.kind==="frame"?"Yeniden adlandır":c.kind==="audio"||c.kind==="video"?"Adını düzenle":"Düzenle",fn:()=>startEdit(id,c.kind==="frame"||c.kind==="audio"||c.kind==="video")});
   if(c.kind==="image")items.push({label:c.note?"Notu düzenle":"Not ekle",fn:()=>openImgNote(c.id)});
   if(c.kind==="image"&&assets)items.push({label:"Yeni sürüm ekle…",fn:()=>addVersion(c.id)},...verItems(c));
@@ -2126,6 +2161,107 @@ stage.addEventListener("contextmenu",e=>{
   if(!c.locked)items.push({label:S.selSet.size>1?`Seçileni sil (${S.selSet.size})`:(c.kind==="frame"?"Çerçeveyi sil (içindekiler kalır)":"Sil"),danger:true,fn:deleteSelected});
   openCtx(e.clientX,e.clientY,{image:"Görsel",note:"Not",link:"Link",audio:"Ses",video:"Video",frame:c.text||"Çerçeve",palette:"Palet",draw:"Çizim"}[c.kind]||"",items);
 });
+
+/* ---------- kompozisyon katmanı: görselin üstünde geçici kılavuz (karta kaydedilir, ekip de görür) ---------- */
+const GUIDES={thirds:"Üçte bir",golden:"Altın oran",cross:"Merkez ve köşegenler",grid:"Izgara 4×4"};
+const GPATH={thirds:"M33.33 0V100M66.67 0V100M0 33.33H100M0 66.67H100",golden:"M38.2 0V100M61.8 0V100M0 38.2H100M0 61.8H100",
+  cross:"M50 0V100M0 50H100M0 0L100 100M100 0L0 100",grid:"M25 0V100M50 0V100M75 0V100M0 25H100M0 50H100M0 75H100"};
+function guideSync(el,c){let g=el.querySelector(":scope > .cguide");if(!c.guide||!GPATH[c.guide]){if(g)g.remove();return}
+  if(!g){g=document.createElement("span");g.className="cguide";el.insertBefore(g,el.querySelector("img").nextSibling)}
+  if(g.dataset.g!==c.guide){g.dataset.g=c.guide;g.innerHTML=`<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path class="gd" d="${GPATH[c.guide]}"/><path class="gl" d="${GPATH[c.guide]}"/></svg>`}}
+function guideMenu(c,x,y){const set=v=>{c.guide=v;run(api.update(c.id,{guide:v}));syncCards()};
+  openCtx(x,y,"Kompozisyon katmanı",[...Object.entries(GUIDES).map(([k,n])=>({label:n,on:c.guide===k,fn:()=>set(c.guide===k?null:k)})),...(c.guide?["-",{label:"Kapat",fn:()=>set(null)}]:[])])}
+
+/* ---------- görselden görev: bölge seç, görev oluştur (görevde o bölge görünür) ---------- */
+const RT={id:null,box:null,ar:1};
+function rboxOf(t){if(!t||!t.rbox)return null;const c=S.items.find(i=>i.id===t.rbox.id&&i.type==="card");return c&&imgSrc(c)?[c,t.rbox]:null}
+function cropHTML(c,b){const w=b.w||1,h=b.h||1;const u=imgSrc(c).replace(/"/g,"%22");
+  return `<span class="crop" style="background-image:url(&quot;${esc(u)}&quot;);background-size:${100/w}% ${100/h}%;background-position:${w<1?b.x/(1-w)*100:0}% ${h<1?b.y/(1-h)*100:0}%;aspect-ratio:${Math.max(.2,Math.min(5,b.ar||1))}"></span>`}
+function openRTask(id){const c=S.items.find(i=>i.id===id);if(!c||!api)return;const pid=itemProject(c);RT.id=id;RT.box=null;
+  const img=$("rtI");img.src=imgSrc(c);$("rtSel").hidden=true;$("rtTitle").value="";
+  const sh=isShared(pid),ppl=sh?people(pid):[];
+  $("rtMeta").innerHTML=(sh?`<label class="small">Kişi <select class="field sm" id="rtAsg"><option value="">Atanmamış</option>${ppl.map(m=>`<option value="${esc(m.id)}"${m.id===CL.me?"":""}>${esc(m.id===CL.me?"Ben":pname(m.id))}</option>`).join("")}</select></label>`:"")
+    +`<label class="small">Tarih <input type="date" class="field sm" id="rtDate"></label>`+(sh?`<span class="small">Ekip görevi olarak Ekip panosuna düşer.</span>`:"");
+  animShow($("rtk"));setTimeout(()=>$("rtTitle").focus(),80)}
+function closeRTask(){animHide($("rtk"));RT.id=null}
+(()=>{const W=$("rtImg");let d=null;
+  W.addEventListener("pointerdown",e=>{const r=$("rtI").getBoundingClientRect();d={r,x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};W.setPointerCapture(e.pointerId);e.preventDefault()});
+  W.addEventListener("pointermove",e=>{if(!d)return;const r=d.r,cl=v=>Math.min(1,Math.max(0,v));const x2=cl((e.clientX-r.left)/r.width),y2=cl((e.clientY-r.top)/r.height),x1=cl(d.x),y1=cl(d.y);
+    const b={x:Math.min(x1,x2),y:Math.min(y1,y2),w:Math.abs(x2-x1),h:Math.abs(y2-y1)};const s=$("rtSel");
+    if(b.w<.02||b.h<.02){s.hidden=true;RT.box=null;return}RT.box=b;s.hidden=false;Object.assign(s.style,{left:b.x*100+"%",top:b.y*100+"%",width:b.w*100+"%",height:b.h*100+"%"})});
+  const up=()=>{d=null};W.addEventListener("pointerup",up);W.addEventListener("pointercancel",up)})();
+$("rtClose").onclick=closeRTask;$("rtk").addEventListener("click",e=>{if(e.target===$("rtk"))closeRTask()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("rtk").hidden)closeRTask()});
+$("rtForm").addEventListener("submit",async e=>{e.preventDefault();const c=S.items.find(i=>i.id===RT.id);const title=$("rtTitle").value.trim();if(!c){closeRTask();return}
+  if(!title){$("rtTitle").focus();toast("Görevin ne olduğunu yaz");return}
+  const pid=itemProject(c),sh=isShared(pid),img=$("rtI");const nw=img.naturalWidth||1,nh=img.naturalHeight||1;
+  const b=RT.box?{id:c.id,x:+RT.box.x.toFixed(4),y:+RT.box.y.toFixed(4),w:+RT.box.w.toFixed(4),h:+RT.box.h.toFixed(4)}:{id:c.id,x:0,y:0,w:1,h:1};b.ar=+((b.w*nw)/(b.h*nh)).toFixed(3);
+  const asg=sh&&$("rtAsg")?$("rtAsg").value:"",date=$("rtDate").value||"";
+  const t=Object.assign({type:"task",project:pid,title,date,done:false,status:"todo",created:Date.now(),refs:[c.id],rbox:b},asg?{assignee:asg}:{});
+  closeRTask();const ref=await run(api.add(t));if(!ref)return;
+  toast(sh?"Görev Ekip panosuna eklendi":"Görev eklendi"+(date?"":" · Sonra listesinde"),{label:"Aç",fn:()=>{if(sh)openDrawer(ref.id);else{S.sub[pid]="tasks";if(date)S.sel=date;save();renderProject()}}},true)});
+
+/* ---------- sesli not: panoda kaydet, kart olarak düşer (dosya projede saklanır) ---------- */
+const REC={mr:null,chunks:[],t0:0,timer:0};
+const auHost=c=>c.assetId?"Sesli not"+(c.author?" · "+(c.author===CL.me?"sen":pname(c.author)):"")+(c.dur?" · "+auFmt(c.dur):""):driveId(c.url)?"Google Drive · ses":hostOf(c.url);
+function recUI(){const b=document.querySelector('#tools [data-tool="rec"]');if(!b)return;const on=!!REC.mr;b.classList.toggle("rec",on);
+  $("recL").textContent=on?auFmt((Date.now()-REC.t0)/1000)+" · Bitir":"Ses";b.title=on?"Kaydı bitir":"Sesli not kaydet · tekrar bas, bitir"}
+async function recToggle(){if(REC.mr){REC.mr.stop();return}
+  if(!assets||!api||!curBoard()){toast("Ses kaydı burada eklenemiyor",null,true);return}
+  if(!window.MediaRecorder){toast("Bu cihaz ses kaydını desteklemiyor",null,true);return}
+  let st;try{st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+  catch(e){toast("Mikrofona erişilemedi"+(e&&e.name==="NotAllowedError"?": izin verilmedi":""),null,true);return}
+  const mime=["audio/webm;codecs=opus","audio/mp4","audio/ogg;codecs=opus","audio/webm"].find(m=>MediaRecorder.isTypeSupported(m))||"";
+  let mr;try{mr=new MediaRecorder(st,mime?{mimeType:mime,audioBitsPerSecond:64000}:{})}catch(e){st.getTracks().forEach(t=>t.stop());toast("Kayıt başlatılamadı",null,true);return}
+  const board=curBoard(),at=centerWorld();REC.mr=mr;REC.chunks=[];REC.t0=Date.now();
+  mr.ondataavailable=e=>{if(e.data&&e.data.size)REC.chunks.push(e.data)};
+  mr.onstop=async()=>{st.getTracks().forEach(t=>t.stop());clearInterval(REC.timer);const dur=Math.round((Date.now()-REC.t0)/100)/10;const type=(mr.mimeType||mime||"audio/webm").split(";")[0];
+    const blob=new Blob(REC.chunks,{type});REC.mr=null;REC.chunks=[];recUI();
+    if(dur<.8||!blob.size){toast("Kayıt çok kısa");return}
+    toast("Sesli not yükleniyor…");try{const a=await assets.upload(new File([blob],"sesli-not",{type}));const d=new Date();
+      const r=await run(api.add({type:"card",board,kind:"audio",x:Math.round(at.x-140+Math.random()*30),y:Math.round(at.y-40+Math.random()*30),w:280,z:maxZ()+1,
+        text:"Sesli not · "+pad(d.getHours())+":"+pad(d.getMinutes()),assetId:a.id,assetUrl:a.url||null,mime:type,dur,author:CL.me||null,created:Date.now()}));
+      if(r){undoRemove("Sesli not",[r.id]);toast("Sesli not eklendi",null,true)}}catch(e){toast("Sesli not eklenemedi: "+((e&&e.message)||e),null,true)}};
+  mr.start(1000);REC.timer=setInterval(()=>{recUI();if(Date.now()-REC.t0>5*60e3){toast("En fazla 5 dakika · kayıt bitti",null,true);mr.stop()}},500);recUI();toast("Kaydediliyor · bitirmek için tekrar bas",null,true)}
+
+/* ---------- pano şablonları ---------- */
+const BRIEF="Brief\n\nHedef:\nKısıtlar:\nTeslim:";
+const TPLS=[
+  {id:"blank",n:"Boş pano",d:"Sıfırdan başla",f:[]},
+  {id:"env",n:"Ortam",d:"Mekân, atmosfer, environment",f:["Mood","Işık","Malzeme ve doku","Kompozisyon","Mimari ve ölçek","Prop'lar"]},
+  {id:"asset",n:"3D asset",d:"Model, prop, araç",f:["Konsept","Ölçü ve ortografik","Malzeme","Detaylar","Benzer örnekler","Teknik notlar"]},
+  {id:"char",n:"Karakter",d:"Karakter ve yaratık tasarımı",f:["Siluet","Yüz ve ifade","Kostüm","Renk","Poz ve hareket","Malzeme"]},
+  {id:"sound",n:"Ses tasarımı",d:"Atmosfer, efekt, müzik",f:["Atmosfer","Efektler (SFX)","Müzik referansı","Arayüz sesleri","Diyalog ve ses","Kayıtlar"]},
+  {id:"mood",n:"Mood",d:"Genel his ve yön",f:["Ana fikir","Renk","Doku","Işık","Anahtar kelimeler"]}];
+/* yerleşim: üstte brief notu, altında 3 sütun çerçeve; özel şablonlar kendi yerleşimini taşır */
+function tplLayout(tp){if(tp.cards)return tp.cards.map(c=>Object.assign({},c));const out=[],W=520,H=400,G=48;
+  out.push({kind:"note",x:0,y:0,w:W,text:BRIEF,z:2});
+  tp.f.forEach((n,i)=>out.push({kind:"frame",x:(i%3)*(W+G),y:200+Math.floor(i/3)*(H+G+34),w:W,h:H,text:n}));return out}
+function tplSvg(tp){const L=tplLayout(tp);if(!L.length)return `<svg viewBox="0 0 100 60"><rect x="38" y="20" width="24" height="20" rx="3" style="stroke-dasharray:3 3"/></svg>`;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const c of L){const h=c.h||120;x0=Math.min(x0,c.x);y0=Math.min(y0,c.y);x1=Math.max(x1,c.x+(c.w||260));y1=Math.max(y1,c.y+h)}
+  const sw=x1-x0||1,shh=y1-y0||1,k=Math.min(92/sw,52/shh),ox=(100-sw*k)/2,oy=(60-shh*k)/2;
+  return `<svg viewBox="0 0 100 60">${L.map(c=>`<rect class="${c.kind==="note"?"n":""}" x="${(ox+(c.x-x0)*k).toFixed(1)}" y="${(oy+(c.y-y0)*k).toFixed(1)}" width="${((c.w||260)*k).toFixed(1)}" height="${((c.h||120)*k).toFixed(1)}" rx="1.5"/>`).join("")}</svg>`}
+let TP={pid:null,priv:false};
+const myTpls=pid=>S.items.filter(i=>i.type==="tpl"&&i.project===pid).sort((a,b)=>(a.created||0)-(b.created||0));
+function openTpl(pid,priv){if(!api)return;TP={pid,priv};$("tpT").textContent=priv?"Benim panom · şablon seç":"Yeni pano · şablon seç";
+  const own=myTpls(pid);const tile=(tp,cid)=>`<button class="tpl" data-tpl="${esc(cid||tp.id)}">${tplSvg(tp)}<b>${esc(tp.n)}</b><span class="small">${esc(tp.d||"")}</span>${cid&&(tp.by===CL.me||!tp.by||isAdmin(pid)||!isShared(pid))?`<span class="tpx" data-tpdel="${esc(cid)}" title="Şablonu sil" role="button">×</span>`:""}</button>`;
+  $("tpBody").innerHTML=`<div class="tpgrid">${TPLS.map(t=>tile(t)).join("")}</div>`+(own.length?`<div class="tphead">BU PROJENİN ŞABLONLARI</div><div class="tpgrid">${own.map(t=>tile({n:t.name,d:(t.by?pname(t.by)+" · ":"")+t.cards.filter(c=>c.kind==="frame").length+" bölüm",cards:t.cards,by:t.by},t.id)).join("")}</div>`:"");
+  animShow($("tpk"))}
+function closeTpl(){animHide($("tpk"))}
+$("tpClose").onclick=closeTpl;
+$("tpk").addEventListener("click",e=>{if(e.target===$("tpk")){closeTpl();return}
+  const del=e.target.closest("[data-tpdel]");if(del){e.stopPropagation();const id=del.dataset.tpdel;if(del.dataset.armed!=="1"){del.dataset.armed="1";del.textContent="?";setTimeout(()=>{del.dataset.armed="";del.textContent="×"},2500);return}run(api.remove(id)).then(()=>openTpl(TP.pid,TP.priv));return}
+  const b=e.target.closest("[data-tpl]");if(!b)return;const id=b.dataset.tpl;const own=myTpls(TP.pid).find(t=>t.id===id);
+  const tp=own?{id:own.id,n:own.name,cards:own.cards}:TPLS.find(t=>t.id===id);closeTpl();createBoard(TP.pid,TP.priv,tp)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("tpk").hidden)closeTpl()});
+/* panoyu şablon yap: çerçeveler (adlarıyla) ve notlar; görseller ve diğer kartlar alınmaz */
+async function saveTpl(pid,bid){const cs=S.items.filter(i=>i.type==="card"&&i.board===bid&&(i.kind==="frame"||i.kind==="note"));
+  if(!cs.some(c=>c.kind==="frame")){toast("Şablon için panoda en az bir çerçeve olmalı",null,true);return}
+  const b=boards(pid).find(x=>x.id===bid)||{};const name=(prompt("Şablonun adı",(b.name||"Pano")+" şablonu")||"").trim();if(!name)return;
+  const x0=Math.min(...cs.map(c=>c.x)),y0=Math.min(...cs.map(c=>c.y));
+  const cards=cs.map(c=>c.kind==="frame"?{kind:"frame",x:Math.round(c.x-x0),y:Math.round(c.y-y0),w:Math.round(c.w||260),h:Math.round(c.h||300),text:c.text||"Çerçeve"}:{kind:"note",x:Math.round(c.x-x0),y:Math.round(c.y-y0),w:Math.round(c.w||240),text:(c.text||"").slice(0,2000),z:2});
+  await run(api.add({type:"tpl",project:pid,name:name.slice(0,60),cards,by:CL.me||null,created:Date.now()}));
+  toast("Şablon kaydedildi · yeni pano açarken seçebilirsin"+(isShared(pid)?" (ekip de görür)":""),null,true)}
 
 /* ---------- önce / sonra karşılaştırma ---------- */
 const CMP={a:null,b:null,x:.5,m:"slide"};
@@ -2977,8 +3113,8 @@ function demoMode(msg){
 const FS={dir:"",files:new Map()/* projeId → {path,inLib,dirty,saving,timer,again} */,blobs:new Map()/* görsel id → Blob */};
 const tinv=(cmd,args,opt)=>TA.core.invoke(cmd,args,opt);
 const writeBytes=(path,u8)=>tinv("write_bytes",u8,{headers:{path:encodeURIComponent(path)}});
-const IMG_EXT={"image/webp":"webp","image/png":"png","image/jpeg":"jpg","image/gif":"gif","image/svg+xml":"svg"};
-const EXT_IMG={webp:"image/webp",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",svg:"image/svg+xml"};
+const IMG_EXT={"image/webp":"webp","image/png":"png","image/jpeg":"jpg","image/gif":"gif","image/svg+xml":"svg","audio/webm":"weba","audio/mp4":"m4a","audio/ogg":"ogg","audio/mpeg":"mp3"};
+const EXT_IMG={webp:"image/webp",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",svg:"image/svg+xml",weba:"audio/webm",m4a:"audio/mp4",ogg:"audio/ogg",mp3:"audio/mpeg"};
 const SEP=()=>FS.dir.includes("/")&&!FS.dir.includes("\\")?"/":"\\";
 const baseName=p=>p.split(/[\\/]/).pop();
 const dirName=p=>p.slice(0,p.length-baseName(p).length-1);
@@ -3706,7 +3842,7 @@ function kanbanHtml(pid){const msf=S.msf&&milestones(pid).find(m=>m.id===S.msf);
     return `<div class="kcol" data-kst="${st}"><div class="mkh ${st}"><span>${nm}</span><span class="mono">${l.length}</span></div>
       ${st==="todo"?`<form class="add kadd" data-add="kan" autocomplete="off"><input id="kanIn" placeholder="Görev ekle…" maxlength="200"></form>`:""}
       ${l.map(t=>{const cc=commentsOf(t.id).length,m=t.milestone&&S.items.find(i=>i.id===t.milestone);
-        return `<div class="kcard" draggable="true" data-kid="${esc(t.id)}"><button class="kt" data-topen="${esc(t.id)}">${esc(t.title)}</button>
+        return `<div class="kcard" draggable="true" data-kid="${esc(t.id)}">${rboxOf(t)?`<button class="kref" data-topen="${esc(t.id)}" aria-label="Görevi aç">${cropHTML(...rboxOf(t))}</button>`:""}<button class="kt" data-topen="${esc(t.id)}">${esc(t.title)}</button>
         <div class="km">${m?`<span class="kms">${esc(m.name)}</span>`:""}${t.date?`<span class="mono${t.date<TODAY&&st!=="done"?" late":""}">${dShort(t.date)}</span>`:""}${cc?`<span>${CM_IC}${cc}</span>`:""}<span class="sp"></span>${asgBtn(t)}</div></div>`}).join("")}</div>`}).join("")}</div>`}
 let kdrag=null;
 document.addEventListener("dragstart",e=>{const c=e.target.closest&&e.target.closest(".kcard");if(!c)return;kdrag=c.dataset.kid;e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain","")}catch(_){}c.classList.add("dragging")});
@@ -3725,13 +3861,14 @@ function drawDrawer(){const it=S.items.find(i=>i.id===drId);if(!it){if(drId)clos
   if(it.type==="task"){const st=statusOf(it);const ms=milestones(pid);
     head=`<input class="drt" id="drTitle" value="${esc(it.title)}" maxlength="200" aria-label="Görev adı">
       <div class="seg" role="group" aria-label="Durum">${STS.map(([k,n])=>`<button class="${k}" data-dst="${k}" aria-pressed="${st===k}">${n}</button>`).join("")}</div>
+      ${rboxOf(it)?`<div class="drref">${cropHTML(...rboxOf(it))}<button class="mini" data-goto="${esc(rboxOf(it)[0].id)}">Görselde göster</button></div>`:""}
       <div class="drgrid"><span class="small">Kişi</span><span>${sh?asgBtn(it)+`<span class="drn">${it.assignee?esc(pname(it.assignee)):"atanmamış"}</span>`:"—"}</span>
         <span class="small">Tarih</span><span><input type="date" class="field sm" id="drDate" value="${esc(it.date||"")}"></span>
         <span class="small">Hedef</span><span><select class="field sm" id="drMs"><option value="">—</option>${ms.map(m=>`<option value="${esc(m.id)}"${it.milestone===m.id?" selected":""}>${esc(m.name)}</option>`).join("")}</select></span></div>`}
   else if(it.type==="card"){const rv=it.review||{};
     const pins=commentsOf(it.id).filter(c=>c.pin);
     head=`<div class="drimg">${it.kind==="image"?`<div class="pinwrap${sh?" pinable":""}" id="drPin" title="${sh?"Görselde bir noktaya tıkla, oraya yorum bırak":""}"><img src="${esc(imgSrc(it))}" alt="">${pins.map((c,i)=>`<button class="pin" style="left:${c.pin.x*100}%;top:${c.pin.y*100}%" data-pinc="${esc(c.id)}" title="${esc((c.text||"").slice(0,80))}">${i+1}</button>`).join("")}${pinAt?`<span class="pin new" style="left:${pinAt.x*100}%;top:${pinAt.y*100}%">${pins.length+1}</span>`:""}</div>`:it.kind==="audio"?`<div class="drau" data-au="${esc(it.id)}"><div class="auw"><button class="aup" data-aplay aria-label="Çal / duraklat"><svg class="pl" viewBox="0 0 16 16"><path d="M5 3.2v9.6L13 8z" fill="currentColor"/></svg><svg class="pa" viewBox="0 0 16 16"><path d="M5 3.5v9M11 3.5v9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-        <div class="aum"><div class="txt">${esc(it.text||"Ses kaydı")}</div><div class="aubar"><i></i></div><div class="aur"><span class="host">${esc(driveId(it.url)?"Google Drive · ses":hostOf(it.url))}</span><span class="aut mono"></span></div></div></div></div>`:`<div class="drnote">${esc(it.text||it.url||"")}</div>`}</div>
+        <div class="aum"><div class="txt">${esc(it.text||"Ses kaydı")}</div><div class="aubar"><i></i></div><div class="aur"><span class="host">${esc(auHost(it))}</span><span class="aut mono"></span></div></div></div></div>`:`<div class="drnote">${esc(it.text||it.url||"")}</div>`}</div>
       ${sh?`<div class="rvbar">${rvChip(it,true)||`<span class="small">Henüz değerlendirilmedi</span>`}<span class="sp"></span>
         <button class="mini" data-rv="wait">Onay iste</button><button class="mini ok" data-rv="ok">Onayla</button><button class="mini rev" data-rv="rev">Revizyon</button></div>
         ${rv.note?`<div class="rvnote">${esc(rv.note)}</div>`:""}`:""}
@@ -3849,7 +3986,7 @@ const AU={el:null,id:null};
 function auFmt(s){s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
 function auToggle(id){const c=S.items.find(i=>i.id===id);if(!c)return;
   if(AU.id===id&&AU.el){if(AU.el.paused)AU.el.play().catch(auErr);else AU.el.pause();auDraw();return}
-  if(AU.el){AU.el.pause();AU.el.src=""}const a=new Audio();AU.el=a;AU.id=id;a.preload="auto";a.src=audioSrc(c.url);
+  if(AU.el){AU.el.pause();AU.el.src=""}const a=new Audio();AU.el=a;AU.id=id;a.preload="auto";a.src=c.assetId?imgSrc(c):audioSrc(c.url);
   a.ontimeupdate=auDraw;a.onplay=auDraw;a.onpause=auDraw;a.onended=()=>{a.currentTime=0;auDraw()};a.onloadedmetadata=auDraw;a.onerror=()=>auErr();a.play().catch(()=>{});auDraw()}
 function auErr(){const c=S.items.find(i=>i.id===AU.id);AU.id=null;auDraw();
   toast(DKEY()?"Ses çalınamadı. Drive'da dosyayı 'Bağlantıya sahip olan herkes' ile paylaş.":"Ses çalınamadı. Dosyayı 'Bağlantıya sahip olan herkes' ile paylaş; çok büyük dosyalar Drive anahtarı olmadan çalmayabilir.",c?{label:"Drive'da aç",fn:()=>window.open(c.url,"_blank")}:null,true)}

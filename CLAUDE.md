@@ -58,6 +58,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Etiket `card.tags` (sağ tık), aramada `#etiket`; baskın renk `COLR` (yerel hesap, kaydedilmez) ile "mavi" gibi arama.
 - Ekran alıntısı (masaüstü): Ctrl+Alt+W (global-shortcut, `snip` olayı) ya da araç çubuğu "Alıntı" → `snip_start` (Windows ms-screenclip / macOS screencapture) → `clip_seq`/`clip_image` (arboard+png) → açık ya da son panoya eklenir.
 - Ekip bildirimleri `teamNotify` (LS `tnotify`, zil menüsünden): bahsetme/atama/onay/özel mesaj/adın geçtiği mesaj. Kalem basıncı: `draw` kartında `pr` dizisi, `inkOutline` dolu şekil.
+- Kompozisyon katmanı: görsel kartta `guide` (thirds/golden/cross/grid, `GUIDES`/`GPATH`, `guideSync`, sağ tık `guideMenu`).
+- Görselden görev: sağ tık › `openRTask` (`#rtk`, bölge sürükle) → görev `refs:[kart]` + `rbox:{id,x,y,w,h,ar}` (0–1); `cropHTML`/`rboxOf` Kanban kartında, görev satırında ve ayrıntı panelinde kırpılmış önizleme.
+- Sesli not: araç çubuğu "Ses" (`recToggle`, MediaRecorder, en çok 5 dk) → ses kartı `assetId`+`mime`+`dur`+`author` (dosya projede; `auHost`, çalma `imgSrc`). Ses türleri `IMG_EXT`/`EXT_IMG`'de (zip).
+- Pano şablonları: yeni pano = `openTpl` (`#tpk`) → `createBoard(pid,priv,tp)`; hazırlar `TPLS` (Ortam, 3D asset, Karakter, Ses tasarımı, Mood), `tplLayout` (brief notu + 3 sütun çerçeve).
+  Özel şablon: pano sağ tık › "Şablon olarak kaydet" → öğe `type:"tpl"` (`project`, `name`, `cards`: çerçeve+not), projedeki herkes görür; `log_activity` `tpl`'yi atlar.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 - Drive API anahtarı: `public.app_config` (`drive_key`, okuma herkes, yazma `set_app_config` yalnızca proje sahibi), istemcide LS `dkey`; varsa Drive ses/video `googleapis.com/drive/v3/files/<id>?alt=media&key=` ile akış (büyük dosya uyarısına takılmaz). Ses/video eklenince dosya adı çekilir (`mediaName`: Drive API `fields=name`, ya da linkteki dosya adı); adı boş eski kartlara bir kez yazılır (`fillName`). Anahtar uygulamada görünmez; Supabase panelinden `app_config` tablosuna (`key`=`drive_key`) girilir.
 
