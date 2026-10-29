@@ -525,6 +525,19 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 .toast button{border:0;background:var(--accent-ink);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
 /* ortak projeler */
+.acbtn{position:relative}.acbtn.in{color:var(--ink)}
+.acbtn.in svg{display:none}.acav{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:600;margin:0 -3px}
+.acbtn.in::after{content:"";position:absolute;right:5px;bottom:5px;width:7px;height:7px;border-radius:50%;background:var(--t5);box-shadow:0 0 0 2px var(--bar,#111)}
+#acctPop .small{display:block}#acctPop>.small{margin:-4px 0 4px}
+.pkind{display:inline-flex;vertical-align:-2px;margin-left:7px;color:var(--ink-3)}.pkind svg{width:14px;height:14px}
+.pkind.cloud{color:var(--ink-2)}.pkind.shared{color:var(--t5)}
+.npbox{width:min(640px,100%)}.npopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:16px 18px 6px}
+.npo{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:14px;border-radius:12px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink);position:relative;
+  transition:border-color .15s,background .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.npo:hover,.npo:focus-visible{border-color:var(--stroke-2);background:var(--glass-2);transform:translateY(-2px);outline:none}.npo:active{transform:scale(.97)}
+.npo.last{border-color:var(--accent)}.npo b{font-weight:500;font-size:14px}.npo kbd{position:absolute;top:12px;right:12px}
+.npi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--glass-2);color:var(--ink-2)}.npi svg{width:18px;height:18px}
+.npi.cloud{color:var(--ink)}.npi.shared{color:var(--t5)}.npmsg{display:block;padding:4px 18px 16px}
 .acform{display:flex;flex-direction:column;gap:8px}
 .shbtn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:9px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink-2);font-size:12px;margin-left:10px;transition:all .15s}
 .shbtn svg{width:14px;height:14px}.shbtn:hover{color:var(--ink);border-color:var(--stroke-2)}.shbtn.on{color:var(--t5);border-color:color-mix(in srgb,var(--t5) 40%,transparent)}
@@ -572,6 +585,7 @@ body.frameless .app{padding-top:8px}
       </button>
       <button class="ibtn upd" id="updBtn" hidden title="Yeni sürüm hazır"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12.5v-9M4.5 7L8 3.5 11.5 7"/></svg>Güncelle</button>
       <button class="ibtn" id="skBtn" title="Ara (Ctrl+K)" aria-label="Ara"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg></button>
+      <button class="ibtn acbtn" id="acctBtn" hidden aria-expanded="false" aria-controls="acctPop" title="Hesap" aria-label="Hesap"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="5.8" r="2.6"/><path d="M3 13.6c.6-2.5 2.6-3.9 5-3.9s4.4 1.4 5 3.9"/></svg><span class="acav" id="acAv" hidden></span></button>
       <button class="ibtn" id="cfgBtn" aria-expanded="false" aria-controls="cfgPop" title="Ayarlar" aria-label="Ayarlar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.6M8 12.6v1.6M14.2 8h-1.6M3.4 8H1.8M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7L3.6 3.6"/></svg></button>
       <span class="sync" id="sync" title="bağlanıyor"></span>
       <div class="wctl" id="wctl" hidden>
@@ -644,12 +658,17 @@ body.frameless .app{padding-top:8px}
 <div class="fnote" id="fnote" hidden role="dialog" aria-label="Odak notu"><span class="small" id="fnT">Bu odakta ne yaptın?</span>
   <div class="row"><input class="field" id="fnIn" maxlength="140" placeholder="kısa bir not · Enter kaydeder"><button class="btn" id="fnSkip">Geç</button></div></div>
 
-<div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
-  <h3>Ayarlar</h3>
-  <div class="cfgsec" id="acctSec" hidden><span class="small">Ekip hesabı · ortak projeler için</span>
+<div class="pop" id="acctPop" hidden role="dialog" aria-label="Hesap">
+  <h3>Hesap</h3>
+  <span class="small">Bulut ve ortak projeler için. Aynı hesapla PC, iPad ve web'de aynı projeleri görürsün.</span>
+  <div id="acctSec">
     <div id="acctOut" class="acform"><input class="field" id="acEmail" type="email" placeholder="e-posta" autocomplete="email"><input class="field" id="acPass" type="password" placeholder="şifre (en az 6 karakter)" autocomplete="current-password">
       <div class="row"><button class="btn primary" id="acIn" style="flex:1">Giriş yap</button><button class="btn" id="acUp" style="flex:1">Hesap oluştur</button></div><span class="small" id="acMsg"></span></div>
     <div id="acctIn" class="acform" hidden><div class="libpath mono" id="acWho"></div><button class="btn" id="acOut">Çıkış yap</button></div></div>
+</div>
+
+<div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
+  <h3>Ayarlar</h3>
   <button class="sw2" id="sndSw" role="switch" aria-checked="true"><span><b>Sayaç bitiş sesi</b><span class="small">Odak süresi dolunca yumuşak bir çan sesi çalar. <a href="#" id="sndTest">Dinle</a></span></span><span class="tg"></span></button>
   <button class="sw2" id="hqSw" role="switch" aria-checked="false"><span><b>Yüksek kaliteli görseller</b><span class="small" id="hqTxt"></span></span><span class="tg"></span></button>
   <div class="sw2" id="stoBox" style="cursor:default;flex-direction:column;align-items:stretch;gap:8px" hidden>
@@ -671,6 +690,8 @@ body.frameless .app{padding-top:8px}
   <button class="navbtn" id="kbOpen">Klavye kısayolları<span>?</span></button>
 </div>
 
+<div class="sk" id="npk" hidden role="dialog" aria-label="Yeni proje"><div class="skbox npbox"><div class="kbhead"><h2>Yeni proje</h2><button class="btn" id="npClose">Vazgeç <kbd>Esc</kbd></button></div>
+  <div class="npopts" id="npOpts"></div><span class="small npmsg" id="npMsg"></span></div></div>
 <div class="sk" id="shr" hidden role="dialog" aria-label="Paylaşım"><div class="skbox shbox"><div class="kbhead"><h2 id="shrT">Paylaşım</h2><button class="btn" id="shrClose">Kapat <kbd>Esc</kbd></button></div>
   <div class="shbody"><span class="small">Eklediğin kişiler bu projeyi PC'de, iPad'de ya da web'de görüp düzenleyebilir. Değişiklikler herkese anında yansır.</span>
   <div class="row"><input class="field" id="shrIn" type="email" placeholder="ekip arkadaşının e-postası" style="flex:1"><button class="btn primary" id="shrAdd">Davet et</button></div>
@@ -728,9 +749,16 @@ const LS={get(k,d){try{const v=localStorage.getItem("atolye:"+k);return v?JSON.p
 const SB_URL="https://mbhpblbynyaotbblnxyr.supabase.co",SB_KEY="sb_publishable_qLmYiq-gNPR5U2TDbXFC2A_2BE6Xnpt";
 const CLIENT=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 const CL={sb:null,me:null,email:"",pids:new Set(),own:new Set(),items:new Map(),out:new Map(),timers:new Map(),
-  apid:new Map(),fetching:new Set(),online:true,chan:null,base:null,baseAssets:null,raf:0,down:false,cacheT:null};
+  apid:new Map(),mc:new Map(),fetching:new Set(),online:true,chan:null,base:null,baseAssets:null,raf:0,down:false,cacheT:null};
 const cloudAvail=()=>!!window.supabase&&(!!TA||S.mode==="cloud");
 const isCloud=pid=>!!pid&&CL.pids.has(pid);
+const KIND_IC={local:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M3 3.8A.8.8 0 013.8 3h6.9L13 5.3v6.9a.8.8 0 01-.8.8H3.8a.8.8 0 01-.8-.8z"/><path d="M5.5 3v2.6h4V3M5 13V9.6h6V13"/></svg>',
+  cloud:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M4.6 12.5h6.8a2.8 2.8 0 00.4-5.57 3.8 3.8 0 00-7.3-.8A3.2 3.2 0 004.6 12.5z"/></svg>',
+  shared:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="5.8" cy="5.6" r="2.2"/><circle cx="11" cy="6.4" r="1.7"/><path d="M1.8 13c.5-2.1 2-3.3 4-3.3s3.5 1.2 4 3.3M10.2 9.7c1.7 0 3 1 3.6 3"/></svg>'};
+const KIND_TX={local:"Yerel · bu bilgisayarda dosya",cloud:"Bulut · sadece sen, tüm cihazlarında",shared:"Ortak · ekiple düzenleniyor"};
+const projKind=pid=>isShared(pid)?"shared":isCloud(pid)?"cloud":"local";
+function kindIcon(pid){if(!cloudAvail())return "";const k=projKind(pid);return `<span class="pkind ${k}" title="${KIND_TX[k]}">${KIND_IC[k]}</span>`}
+const isShared=pid=>isCloud(pid)&&(CL.mc.get(pid)||1)>1;/* başka üye ya da bekleyen davet var */
 
 const now=new Date();const TODAY=ymd(now);
 const S={items:[],loaded:false,view:LS.get("view","home"),open:LS.get("open",[]),sub:LS.get("sub",{}),sel:TODAY,week:monday(now),cy:now.getFullYear(),cm:now.getMonth(),
@@ -852,11 +880,26 @@ $("tabs").addEventListener("click",e=>{
   if(e.target.closest("[data-newp]")){newProject();return}
   const t=e.target.closest("[data-go]");if(t)go(t.dataset.go);
 });
-async function newProject(){
-  if(!api)return;
-  const ref=await run(api.add({type:"project",name:"Yeni proje",created:Date.now()}));
-  if(ref){S.fresh.add(ref.id);setTimeout(()=>S.fresh.delete(ref.id),10000);S.sub[ref.id]="tasks";go(ref.id);S.renaming="project";renderHead();}
-}
+/* yeni proje: bulut varsa önce tür sorulur (yerel / bulut / ortak) */
+const projKinds=()=>!cloudAvail()?["local"]:S.mode==="cloud"?["cloud","shared"]:["local","cloud","shared"];
+function newProject(){if(!api)return;closePops();const ks=projKinds();if(ks.length<2){createProject(ks[0]);return}
+  const last=ks.includes(LS.get("npLast",""))?LS.get("npLast",""):ks[0];
+  $("npOpts").innerHTML=ks.map((k,i)=>`<button class="npo${k===last?" last":""}" data-np="${k}"><span class="npi ${k}">${KIND_IC[k]}</span><b>${{local:"Yerel",cloud:"Bulut",shared:"Ortak"}[k]}</b>
+    <span class="small">${{local:"Bu bilgisayarda .workshop dosyası. İnternet gerekmez.",cloud:"Sadece sen. PC, iPad ve web'de eşitlenir.",shared:"Ekiple birlikte düzenlenir. Oluşturunca davet edersin."}[k]}</span><kbd>${i+1}</kbd></button>`).join("");
+  $("npMsg").textContent=!CL.me?"Bulut ve ortak projeler için hesabına giriş yapman gerekir.":"";
+  animShow($("npk"));setTimeout(()=>{const b=$("npOpts").querySelector(".last");if(b)b.focus()},60)}
+function closeNP(){animHide($("npk"))}
+async function createProject(kind){closeNP();
+  if(kind!=="local"&&!CL.me){toast("Bulut ve ortak projeler için önce hesabına giriş yap",null,true);openAcct();return}
+  LS.set("npLast",kind);const d={type:"project",name:"Yeni proje",created:Date.now()};
+  const ref=await run(kind==="local"?api.add(d):cNewProject(d));
+  if(!ref)return;S.fresh.add(ref.id);setTimeout(()=>S.fresh.delete(ref.id),10000);S.sub[ref.id]="tasks";go(ref.id);
+  if(kind==="shared"){CL.mc.set(ref.id,1);renameAfterShare=ref.id;setTimeout(()=>openShare(ref.id),250)}else{S.renaming="project";renderHead()}}
+$("npOpts").addEventListener("click",e=>{const b=e.target.closest("[data-np]");if(b)createProject(b.dataset.np)});
+$("npClose").onclick=closeNP;$("npk").addEventListener("click",e=>{if(e.target===$("npk"))closeNP()});
+document.addEventListener("keydown",e=>{if($("npk").hidden||$("npk").classList.contains("closing"))return;
+  if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeNP();return}
+  const k=projKinds()[+e.key-1];if(k){e.preventDefault();createProject(k)}},true);
 document.addEventListener("keyup",e=>{if(e.code==="Space"&&S.space){S.space=false;stage.classList.remove("spacepan")}});
 window.addEventListener("blur",()=>{if(S.space){S.space=false;stage.classList.remove("spacepan")}});
 function setBoardFS(on){
@@ -989,7 +1032,7 @@ function renderHome0(){
     const cs=cardsOfProject(p.id);const imgs=cs.filter(c=>c.kind==="image").sort((a,b)=>(b.created||0)-(a.created||0)).slice(0,3);
     const col=imgs.length?`<div class="collage${imgs.length===1?" one":""}">${imgs.map(c=>`<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`).join("")}</div>`:`<div class="collage none"></div>`;
     return `<div class="pwrap"><button class="pcard" data-go="${esc(p.id)}" style="width:100%">${col}
-      <div class="pb"><div class="pn">${esc(p.name||"Proje")}${isCloud(p.id)?`<span class="pcl" title="Ortak proje">${SYNC_IC.ok}</span>`:""}</div>
+      <div class="pb"><div class="pn">${esc(p.name||"Proje")}${kindIcon(p.id)}</div>
       <div class="pm">${today?`<span class="hot">${today} bugün</span>`:""}<span>${open} açık görev</span><span>${cs.length} referans</span></div></div></button>
       <button class="pdel" data-pdel="${esc(p.id)}" aria-label="Projeyi sil">sil</button></div>`}).join("");
   const todays=all.filter(t=>t.date===TODAY).sort(sortTasks);
@@ -1047,7 +1090,8 @@ $("vHome").addEventListener("contextmenu",e=>{
   const pid=c.dataset.go;const p=proj(pid);
   const it=[{label:"Aç",fn:()=>go(pid)}];
   if(S.mode==="file"&&FS.files.get(pid))it.push({label:"Dosyayı klasörde göster",fn:()=>TA.opener.revealItemInDir(FS.files.get(pid).path)},{label:"Kopyasını dışa aktar…",fn:()=>exportProjectCopy(pid)});
-  if(cloudAvail())it.push({label:isCloud(pid)?"Paylaşım ve üyeler…":"Ekiple paylaş…",fn:()=>shareProject(pid)});
+  if(cloudAvail()){if(!isCloud(pid))it.push({label:"Buluta taşı (sadece ben)",fn:()=>toCloud(pid,false)});
+    it.push({label:isShared(pid)?"Paylaşım ve üyeler…":"Ekiple paylaş…",fn:()=>shareProject(pid)})}
   if(isCloud(pid)&&!CL.own.has(pid))it.push("-",{label:"Projeden ayrıl",danger:true,confirm:"Emin misin? Sende görünmez olur",fn:()=>deleteProject(pid)});
   else it.push("-",{label:"Projeyi sil",danger:true,confirm:isCloud(pid)?"Emin misin? Ekipteki herkes için silinir":S.mode==="file"?"Emin misin? Dosya Geri Dönüşüm Kutusu'na gider":"Emin misin? Her şeyiyle silinir",fn:()=>deleteProject(pid)});
   openCtx(e.clientX,e.clientY,(p&&p.name)||"Proje",it);
@@ -1081,7 +1125,7 @@ function renderHead(){
       right+=`<button class="wk${k===TODAY?" is-today":""}" data-day="${k}" aria-pressed="${k===S.sel}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}"><span class="d">${DSH[d.getDay()]}</span><span class="n">${d.getDate()}</span><span class="c${has?" on":""}"></span></button>`}
     right+=`<button class="arrow" data-wk="1" aria-label="Sonraki hafta">›</button>`;
   }
-  const shb=cloudAvail()?`<button class="shbtn${isCloud(pid)?" on":""}" data-share="${esc(pid)}" title="${isCloud(pid)?"Paylaşım ve üyeler":"Ekiple paylaş"}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="2.4"/><path d="M2 13.2c.5-2.2 2-3.4 4-3.4s3.5 1.2 4 3.4M11 4.2v4M9 6.2h4"/></svg>${isCloud(pid)?"Ortak":"Paylaş"}</button>`:"";
+  const shb=cloudAvail()?`<button class="shbtn${isShared(pid)?" on":""}" data-share="${esc(pid)}" title="${isShared(pid)?"Paylaşım ve üyeler":"Ekiple paylaş"}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="2.4"/><path d="M2 13.2c.5-2.2 2-3.4 4-3.4s3.5 1.2 4 3.4M11 4.2v4M9 6.2h4"/></svg>${isShared(pid)?"Ortak":"Paylaş"}</button>`:"";
   $("phead").innerHTML=`${name}${shb}<nav class="subtabs" aria-label="Proje bölümleri"><span class="stind" aria-hidden="true"></span>${st}</nav><div class="pright">${right}</div>`;
   placeInd(pid);
   if(S.renaming==="project"){const inp=$("pnameIn");inp.focus();inp.select();
@@ -2194,10 +2238,11 @@ $("sk").addEventListener("pointerdown",e=>{if(e.target===$("sk"))closeSearch()})
 
 /* popovers */
 function hidePop(id){animHide($(id))}
-function closePops(){["timerPop","cfgPop"].forEach(hidePop);["timerBtn","cfgBtn"].forEach(id=>$(id).setAttribute("aria-expanded","false"))}
+function closePops(){["timerPop","cfgPop","acctPop"].forEach(hidePop);["timerBtn","cfgBtn","acctBtn"].forEach(id=>$(id).setAttribute("aria-expanded","false"))}
 function togglePop(pop,btn){const el=$(pop);const open=el.hidden||el.classList.contains("closing");closePops();if(open){animShow(el);$(btn).setAttribute("aria-expanded","true")}}
 $("timerBtn").onclick=e=>{e.stopPropagation();togglePop("timerPop","timerBtn")};
 document.addEventListener("pointerdown",e=>{if(!e.target.closest(".pop,#timerBtn,#cfgBtn"))closePops()});
+$("acctBtn").onclick=e=>{e.stopPropagation();drawAcct();togglePop("acctPop","acctBtn")};
 $("cfgBtn").onclick=e=>{e.stopPropagation();drawCfg();togglePop("cfgPop","cfgBtn")};
 
 /* ---------- ayarlar ---------- */
@@ -2224,7 +2269,7 @@ $("stoClean").onclick=async()=>{const btn=$("stoClean");
   btn.disabled=true;const refs=assetRefs();let n=0;
   for(const a of stoOrphans){if(refs.has(a.id))continue;try{const r=await assets.delete(a.id);if(r&&r.deleted)n++}catch(e){if(e&&e.code==="rate_limited")break}}
   btn.disabled=false;toast(n+" kullanılmayan görsel silindi");drawStorage()};
-function drawCfg(){drawStorage();drawLib();drawAcct();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
@@ -2499,7 +2544,7 @@ const docPid=d=>!d?null:d.type==="project"?d.id:d.type==="card"?((projOfBoard(d.
 const cleanItem=(data,id)=>{const v=Object.assign({},data,{id});delete v._cl;return v};
 function cRender(){if(CL.raf)return;CL.raf=requestAnimationFrame(()=>{CL.raf=0;rerender();renderTabs()})}
 function cCacheSave(){clearTimeout(CL.cacheT);CL.cacheT=setTimeout(()=>{if(!CL.me)return;
-  LS.set("cl_cache_"+CL.me,{pids:[...CL.pids],own:[...CL.own],items:[...CL.items.values()].map(strip)})},800)}
+  LS.set("cl_cache_"+CL.me,{pids:[...CL.pids],own:[...CL.own],mc:[...CL.mc],items:[...CL.items.values()].map(strip)})},800)}
 const saveOut=()=>LS.set("cl_out",[...CL.out.values()]);
 
 /* --- gönderim kuyruğu --- */
@@ -2571,6 +2616,8 @@ async function cLoad(){if(!CL.sb||!CL.me)return;
     const rows=[];if(pids.size){for(let from=0;;from+=1000){
       const {data,error}=await CL.sb.from("items").select("id,project_id,data").in("project_id",[...pids]).eq("deleted",false).order("id").range(from,from+999);
       if(error)throw error;rows.push(...data);if(data.length<1000)break}}
+    if(pids.size){const [{data:mm},{data:iv}]=await Promise.all([CL.sb.from("members").select("project_id").in("project_id",[...pids]),CL.sb.from("invites").select("project_id").in("project_id",[...pids])]);
+      CL.mc=new Map();for(const r of [...(mm||[]),...(iv||[])])CL.mc.set(r.project_id,(CL.mc.get(r.project_id)||0)+1)}
     const gone=[...CL.pids].filter(p=>!pids.has(p));CL.pids=pids;CL.own=own;
     const items=rows.map(r=>cleanItem(r.data,r.id));
     /* henüz gönderilmemiş yerel değişiklikler sunucudakini ezer */
@@ -2594,7 +2641,7 @@ function cSubscribe(){if(CL.chan)CL.sb.removeChannel(CL.chan);
       else if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED"){CL.down=true;CL.online=false}renderTabs()})}
 async function cStart(user){if(CL.me===user.id)return;CL.me=user.id;CL.email=user.email||"";
   const c=LS.get("cl_cache_"+CL.me,null);
-  if(c){CL.pids=new Set(c.pids);CL.own=new Set(c.own);cMerge(c.items||[]);cAssetsFor(c.items||[]);renderAll()}
+  if(c){CL.pids=new Set(c.pids);CL.own=new Set(c.own);CL.mc=new Map(c.mc||[]);cMerge(c.items||[]);cAssetsFor(c.items||[]);renderAll()}
   drawAcct();await cLoad();cSubscribe()}
 function cStop(){if(CL.chan)CL.sb.removeChannel(CL.chan);CL.chan=null;
   [...CL.pids].forEach(p=>{if(S.open.includes(p))closeTab(p)});
@@ -2629,10 +2676,11 @@ async function cDropProject(pid){
 
 /* --- paylaş: yerel projeyi buluta taşı, sonra üyeleri yönet --- */
 let shPid=null;
-async function shareProject(pid){
-  if(!CL.sb){toast("Ortak projeler bu sürümde yok",null,true);return}
-  if(!CL.me){toast("Paylaşmak için önce ekip hesabınla giriş yap",null,true);openAcct();return}
-  if(isCloud(pid)){openShare(pid);return}
+async function shareProject(pid){if(await toCloud(pid,true))openShare(pid)}
+async function toCloud(pid,forShare){
+  if(!CL.sb){toast("Bulut bu sürümde yok",null,true);return false}
+  if(!CL.me){toast((forShare?"Paylaşmak":"Buluta taşımak")+" için önce hesabına giriş yap",null,true);openAcct();return false}
+  if(isCloud(pid))return true;
   const p=proj(pid);if(!p)return;
   const its=S.items.filter(i=>i.id===pid||(i.type!=="project"&&itemProject(i)===pid));
   try{toast("Buluta taşınıyor…",null,true);
@@ -2650,24 +2698,29 @@ async function shareProject(pid){
     if(S.mode==="file"){const f=FS.files.get(pid);if(f){clearTimeout(f.timer);FS.files.delete(pid);
       try{if(await tinv("exists",{path:f.path}))await tinv("trash_file",{path:f.path})}catch(_){}LS.set("recents",LS.get("recents",[]).filter(x=>x!==f.path))}
       saveLoose()}
-    renderAll();toast("Proje artık bulutta · ekip arkadaşlarını davet edebilirsin",null,true);openShare(pid)}
-  catch(e){toast("Taşınamadı: "+((e&&e.message)||e)+" · yerel proje olduğu gibi duruyor",null,true)}}
+    CL.mc.set(pid,1);renderAll();toast(forShare?"Proje bulutta · şimdi ekip arkadaşlarını davet et":"Proje artık bulutta · tüm cihazlarında eşitlenir",null,true);return true}
+  catch(e){toast("Taşınamadı: "+((e&&e.message)||e)+" · yerel proje olduğu gibi duruyor",null,true);return false}}
 function openShare(pid){shPid=pid;const p=proj(pid);$("shrT").textContent=(p&&p.name||"Proje")+" · paylaşım";$("shrIn").value="";$("shrMsg").textContent="";
   $("shrLeave").textContent=CL.own.has(pid)?"Projeyi herkes için sil…":"Projeden ayrıl";animShow($("shr"));drawShare();setTimeout(()=>$("shrIn").focus(),60)}
-function closeShare(){animHide($("shr"));shPid=null}
+let renameAfterShare=null;
+function closeShare(){animHide($("shr"));const p=shPid;shPid=null;
+  if(p&&p===renameAfterShare&&curP()===p){renameAfterShare=null;S.renaming="project";renderHead()}}
 async function drawShare(){const pid=shPid;if(!pid)return;const L=$("shrList");L.innerHTML=`<div class="small">yükleniyor…</div>`;
   const [{data:ms},{data:inv}]=await Promise.all([CL.sb.from("members").select("user_id,role").eq("project_id",pid),CL.sb.from("invites").select("email").eq("project_id",pid)]);
   const ids=(ms||[]).map(m=>m.user_id);const {data:pf}=ids.length?await CL.sb.from("profiles").select("id,email").in("id",ids):{data:[]};
   const em=Object.fromEntries((pf||[]).map(x=>[x.id,x.email]));const owner=CL.own.has(pid);if(shPid!==pid)return;
+  const n=(ms||[]).length+(inv||[]).length;if(CL.mc.get(pid)!==n){CL.mc.set(pid,n);cCacheSave();renderAll()}
   L.innerHTML=(ms||[]).map(m=>`<div class="shrow"><span class="shav">${esc((em[m.user_id]||"?")[0].toUpperCase())}</span><span class="n">${esc(em[m.user_id]||"…")}${m.user_id===CL.me?" <i>(sen)</i>":""}</span><span class="small">${m.role==="owner"?"sahibi":"düzenleyebilir"}</span>${owner&&m.role!=="owner"?`<button class="mini" data-rmu="${esc(m.user_id)}">çıkar</button>`:""}</div>`).join("")
     +(inv||[]).map(i=>`<div class="shrow"><span class="shav off">@</span><span class="n">${esc(i.email)}</span><span class="small">kayıt olunca katılacak</span><button class="mini" data-rmi="${esc(i.email)}">iptal</button></div>`).join("")}
 async function shareInvite(){const m=$("shrIn").value.trim();if(!m||!shPid)return;$("shrAdd").disabled=true;
   const {data,error}=await CL.sb.rpc("invite_member",{p:shPid,mail:m});$("shrAdd").disabled=false;
   if(error){$("shrMsg").textContent=/bad_email/.test(error.message)?"Geçerli bir e-posta yaz":"Davet edilemedi: "+error.message;return}
   $("shrIn").value="";$("shrMsg").textContent=data==="added"?m+" eklendi, projeyi hemen görür.":m+" henüz kayıtlı değil. Bu e-postayla Workshop'ta hesap açınca proje ona açılır.";drawShare()}
-function openAcct(){if($("cfgPop").hidden)$("cfgBtn").click();setTimeout(()=>{const s=$("acctSec");if(s){s.scrollIntoView({block:"nearest"});const i=$("acEmail");if(i&&!$("acctOut").hidden)i.focus()}},120)}
-function drawAcct(){const sec=$("acctSec");if(!sec)return;sec.hidden=!cloudAvail();if(sec.hidden)return;
-  $("acctOut").hidden=!!CL.me;$("acctIn").hidden=!CL.me;if(CL.me)$("acWho").textContent=CL.email+(CL.pids.size?` · ${CL.pids.size} ortak proje`:"")}
+function openAcct(){if($("acctPop").hidden)$("acctBtn").click();setTimeout(()=>{const i=$("acEmail");if(i&&!$("acctOut").hidden)i.focus()},120)}
+function drawAcct(){const btn=$("acctBtn");btn.hidden=!cloudAvail();if(btn.hidden)return;
+  $("acctOut").hidden=!!CL.me;$("acctIn").hidden=!CL.me;btn.classList.toggle("in",!!CL.me);
+  $("acAv").hidden=!CL.me;$("acAv").textContent=CL.me?(CL.email[0]||"?").toUpperCase():"";btn.title=CL.me?"Hesap · "+CL.email:"Hesap · giriş yap";
+  if(CL.me){const n=CL.pids.size,sh=[...CL.pids].filter(isShared).length;$("acWho").textContent=CL.email+(n?` · ${n} bulut projesi${sh?`, ${sh} ortak`:""}`:"")}}
 const AUTH_TR=m=>/invalid login/i.test(m)?"E-posta ya da şifre hatalı":/not confirmed/i.test(m)?"E-postanı henüz onaylamadın: gelen kutundaki bağlantıya tıkla":/already registered|already been registered/i.test(m)?"Bu e-postayla zaten hesap var, giriş yap":/at least 6|weak/i.test(m)?"Şifre en az 6 karakter olmalı":/rate limit/i.test(m)?"Çok fazla deneme, biraz bekle":/fetch|network/i.test(m)?"Bağlantı yok":m;
 async function acct(kind){const email=$("acEmail").value.trim(),password=$("acPass").value;const msg=$("acMsg");
   if(!email||!password){msg.textContent="E-posta ve şifre gerekli";return}msg.textContent=kind==="up"?"Hesap oluşturuluyor…":"Giriş yapılıyor…";
