@@ -577,6 +577,24 @@ button:disabled{cursor:var(--cur)}
 .rv{font-size:10.5px;padding:2px 8px;border-radius:6px;background:rgb(13 14 16 / .78);white-space:nowrap}.rv.wait{color:var(--t2)}.rv.ok{color:var(--t5)}.rv.rev{color:#E6A3B4}
 .rv.big{font-size:12px;padding:4px 10px;background:var(--glass-2)}
 .card[data-rv="wait"] .badges span:nth-last-child(1),.card .badges span{transition:none}
+/* referans dizini */
+.rdir{position:absolute;left:0;top:0;bottom:0;width:224px;box-sizing:border-box;padding:16px 10px 16px 14px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;scrollbar-width:thin;border-right:1px solid var(--stroke)}
+#sBoard.dir{left:224px}body.boardfs .rdir{display:none}body.boardfs #sBoard.dir{left:0}
+.rdg{display:flex;flex-direction:column;gap:2px}
+.rdh{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:0 10px 5px;display:flex;align-items:center;gap:6px}
+.rdh.rdmine{color:#C9B48A}.rdh .lk{width:11px;height:11px}
+.rdb{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:var(--ink-2);border-radius:8px;padding:7px 10px;text-align:left;font-size:13px;transition:background .15s,transform .25s cubic-bezier(.34,1.56,.64,1),border-color .15s}
+.rdb span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.rdb .mono{font-size:11px;color:var(--ink-3)}
+.rdb:hover{background:var(--glass-2);color:var(--ink)}.rdb.on{background:var(--glass-2);color:var(--ink);border-color:var(--stroke)}
+.rdb.drop{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);transform:scale(1.03)}
+.rdempty{font-size:12px;color:var(--ink-3);line-height:1.5;padding:2px 10px}
+.rdnew{display:flex;gap:6px}.rdnew button{flex:1;border:1px dashed var(--stroke-2);background:transparent;color:var(--ink-2);border-radius:8px;padding:7px 4px;font-size:12px;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.rdnew button.rdmine{border-color:rgb(228 196 133 / .4);color:#C9A35E}.rdnew button:hover{transform:translateY(-1px)}.rdnew button:active{transform:scale(.95)}
+:root[data-theme="light"] .rdh.rdmine,:root[data-theme="light"] .rdnew button.rdmine{color:#8A6A2C}
+.pill.name.priv{display:inline-flex;align-items:center;gap:6px;color:#E4C485;border-color:rgb(228 196 133 / .35)}.pill.name.priv .lk{width:12px;height:12px}
+:root[data-theme="light"] .pill.name.priv{color:#8A6A2C}
+.rdpick{display:none}
+@media (max-width:760px){.rdir{display:none}#sBoard.dir{left:0}.rdpick{display:inline-flex}}
 .tvbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px 0}.tvbar .afbar{margin:0}.tvbar .sp{flex:1}
 .pvb{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:1px 6px;border-radius:5px;border:1px solid var(--stroke);color:var(--ink-3)}
 .pvb.team{border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent)}
@@ -804,6 +822,7 @@ body.frameless .app{padding-top:8px}
         <div class="sub" id="sHub" hidden></div>
         <div class="sub" id="sTasks"></div>
         <div class="sub" id="sCal" hidden></div>
+        <aside class="rdir" id="rdir" hidden aria-label="Panolar"></aside>
         <div class="sub" id="sBoard" hidden>
           <div class="stage" id="stage"><div class="world" id="world"></div></div>
           <div class="marquee" id="marquee" hidden></div>
@@ -959,7 +978,7 @@ const LS={get(k,d){try{const v=localStorage.getItem("atolye:"+k);return v?JSON.p
 const SB_URL="https://mbhpblbynyaotbblnxyr.supabase.co",SB_KEY="sb_publishable_qLmYiq-gNPR5U2TDbXFC2A_2BE6Xnpt";
 const CLIENT=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 const CL={sb:null,me:null,email:"",pids:new Set(),own:new Set(),items:new Map(),out:new Map(),timers:new Map(),
-  apid:new Map(),mc:new Map(),msgs:new Map(),chatTo:new Map(),notifs:[],prof:new Map(),people:new Map(),act:new Map(),pres:new Map(),here:new Map(),fetching:new Set(),online:true,chan:null,base:null,baseAssets:null,raf:0,down:false,cacheT:null};
+  apid:new Map(),apre:new Map(),mc:new Map(),msgs:new Map(),chatTo:new Map(),notifs:[],prof:new Map(),people:new Map(),act:new Map(),pres:new Map(),here:new Map(),fetching:new Set(),online:true,chan:null,base:null,baseAssets:null,raf:0,down:false,cacheT:null};
 const cloudAvail=()=>!!window.supabase&&(!!TA||S.mode==="cloud");
 const isCloud=pid=>!!pid&&CL.pids.has(pid);
 const KIND_IC={local:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M3 3.8A.8.8 0 013.8 3h6.9L13 5.3v6.9a.8.8 0 01-.8.8H3.8a.8.8 0 01-.8-.8z"/><path d="M5.5 3v2.6h4V3M5 13V9.6h6V13"/></svg>',
@@ -1013,6 +1032,12 @@ function boards(pid){
   return bs;
 }
 const boardIds=pid=>new Set(boards(pid).map(b=>b.id));
+/* ortak projede kişiye özel panolar (board.private; kartları da özel, veritabanında yalnızca sahibi görür) */
+const privB=bid=>{const b=S.items.find(i=>i.id===bid&&i.type==="board");return !!(b&&b.private)};
+const teamBoards=pid=>boards(pid).filter(b=>!b.private);
+const myBoards=pid=>boards(pid).filter(b=>b.private);
+const refBoard=pid=>{const l=S.lastB&&S.lastB[pid];return l&&boards(pid).some(b=>b.id===l)?l:mainBoard(pid)};
+const LOCK_IC='<svg class="lk" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.8"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>';
 const tasksOf=pid=>S.items.filter(i=>i.type==="task"&&projOf(i)===pid);
 /* ortak projede: özel görev (yalnızca sahibi görür, veritabanı RLS) ve ekip görevi */
 const teamOf=pid=>tasksOf(pid).filter(t=>!t.private);
@@ -1337,8 +1362,9 @@ function renderHead(){
   const bs=boards(pid);
   let name=S.renaming==="project"?`<input class="pname-in" id="pnameIn" maxlength="60" value="${esc(p.name||"")}" aria-label="Proje adı">`:`<button class="pname" id="pname" title="Yeniden adlandırmak için tıkla">${esc(p.name||"Proje")}</button>`;
   let st=isShared(pid)?`<button class="st" data-sub="hub" aria-selected="${s==="hub"}">Merkez</button><button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevlerim</button><button class="st" data-sub="team" aria-selected="${s==="team"}">Ekip</button>`:`<button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevler</button>`;
-  st+=bs.map(b=>`<button class="st" data-sub="b:${esc(b.id)}" aria-selected="${s==="b:"+b.id}">${esc(b.name||"Pano")}</button>`).join("");
-  st+=`<button class="st plus" data-newb title="Yeni pano">+ pano</button><button class="st" data-sub="cal" aria-selected="${s==="cal"}">Takvim</button>`;
+  if(isShared(pid))st+=`<button class="st" data-sub="b:${esc(refBoard(pid))}" aria-selected="${s.startsWith("b:")}">Referanslar</button>`;
+  else st+=bs.map(b=>`<button class="st" data-sub="b:${esc(b.id)}" aria-selected="${s==="b:"+b.id}">${esc(b.name||"Pano")}</button>`).join("")+`<button class="st plus" data-newb title="Yeni pano">+ pano</button>`;
+  st+=`<button class="st" data-sub="cal" aria-selected="${s==="cal"}">Takvim</button>`;
   let right="";
   if(s==="tasks"||s==="hub"){const hub=s==="hub";const ts=hub?teamOf(pid):isShared(pid)?tasksOf(pid).filter(isMineT):tasksOf(pid);const ms=hub?milestones(pid):[];
     right=`<button class="arrow" data-wk="-1" aria-label="Önceki hafta">‹</button>`;
@@ -1379,6 +1405,7 @@ function renderSub(){
   const s=subOf(curP());const key=curP()+":"+s;
   if(S.shownSub!==key){S.shownSub=key;const el=s==="hub"?$("sHub"):s==="tasks"||s==="team"?$("sTasks"):s==="cal"?$("sCal"):$("sBoard");
     requestAnimationFrame(()=>{el.classList.remove("enter");void el.offsetWidth;el.classList.add("enter");el.addEventListener("animationend",()=>el.classList.remove("enter"),{once:true})})}
+  const dir=isShared(curP())&&s.startsWith("b:");$("rdir").hidden=!dir;$("sBoard").classList.toggle("dir",dir);if(dir)renderDir();
   $("sHub").hidden=s!=="hub";$("sTasks").hidden=s!=="tasks"&&s!=="team";$("sCal").hidden=s!=="cal";$("sBoard").hidden=!s.startsWith("b:");
   if(s==="hub")renderHub();else if(s==="tasks")renderTasks();else if(s==="team")renderTeam();else if(s==="cal")renderCal();else renderBoard();drawChatBadge();
 }
@@ -1465,14 +1492,14 @@ function fit(){const cs=cards(curBoard()),ks=inks(curBoard());const v=view();if(
   v.z=z;v.x=(r.width-(x1-x0)*z)/2-x0*z;v.y=(r.height-60-(y1-y0)*z)/2-y0*z;applyView();saveView()}
 let lastBoard=null;
 function renderBoard(){
-  const bid=curBoard();const b=boards(curP()).find(x=>x.id===bid);if(!b)return;
+  const bid=curBoard();const b=boards(curP()).find(x=>x.id===bid);if(!b)return;S.lastB=S.lastB||{};S.lastB[curP()]=bid;
   if(lastBoard!==bid){world.innerHTML='<svg class="ink" id="ink" xmlns="http://www.w3.org/2000/svg"></svg>';lastBoard=bid;ink=null}
   if(S.renaming!=="board"){
-    $("bbar").innerHTML=`<button class="pill name" id="bname" title="Yeniden adlandır">${esc(b.name||"Pano")}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
+    $("bbar").innerHTML=(isShared(curP())?`<button class="pill rdpick" id="rdpick">Panolar ▾</button>`:"")+`<button class="pill name${b.private?" priv":""}" id="bname" title="${b.private?"Yalnızca sen görüyorsun · ":""}Yeniden adlandır">${b.private?LOCK_IC:""}${esc(b.name||"Pano")}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
       `<button class="pill" id="bpng" title="Panonun tamamını PNG ya da PDF olarak indir">Dışa aktar</button>`+
       "";
   }
-  applyView();syncCards();
+  applyView();syncCards();if(!$("rdir").hidden)renderDir();
 }
 function cardHTML(c){
   const x='<button class="cx" data-cdel aria-label="Kartı sil">×</button><span class="rs" data-rs></span>';
@@ -1620,6 +1647,10 @@ function endPointer(e){
   if(d.mode==="fresize"){if(!d.moved)return;const c=S.items.find(i=>i.id===d.id);const w=Math.round(parseFloat(d.el.style.width)),h=Math.round(parseFloat(d.el.style.height));
     undoPatch("Boyut",[[d.id,{w:d.w0,h:d.h0}]]);if(c){c.w=w;c.h=h}run(api.update(d.id,{w,h}));return}
   if(d.mode==="move"){
+    const dropEl=d.moved&&!$("rdir").hidden&&document.elementFromPoint(e.clientX,e.clientY);const drop=dropEl&&dropEl.closest&&dropEl.closest("[data-rdb]");
+    document.querySelectorAll(".rdb.drop").forEach(x=>x.classList.remove("drop"));
+    if(drop&&drop.dataset.rdb!==curBoard()){for(const o of d.items){o.c.x=o.x0;o.c.y=o.y0}for(const o of d.ks)o.g.removeAttribute("transform");clearGuides();syncCards();
+      dropToBoard([...d.items.map(o=>o.c.id),...d.ks.map(o=>o.k.id)],drop.dataset.rdb);return}
     if(!d.moved){if(d.copy)copyHex(d.copy);if(d.clickId)selOnly(d.clickId);syncCards();return}
     clearGuides();const ddx=Math.round(d.dx),ddy=Math.round(d.dy);
     undoPatch(d.items.length+d.ks.length>1?"Taşıma":"Taşıma",[...d.items.map(o=>[o.c.id,{x:o.x0,y:o.y0}]),...d.ks.map(o=>[o.k.id,{pts:(o.k.pts||[]).slice()}])]);
@@ -1744,12 +1775,61 @@ function deleteBoard(pid,id){
 $("phead").addEventListener("contextmenu",e=>{
   const t=e.target.closest('.st[data-sub^="b:"]');if(!t)return;e.preventDefault();
   const pid=curP(),id=t.dataset.sub.slice(2);const b=boards(pid).find(x=>x.id===id);if(!b)return;
+  if(isShared(pid)){boardMenu(pid,curBoard()||id,e.clientX,e.clientY);return}
   const main=b.virtual||id===mainBoard(pid);
   const go2=()=>{S.sub[pid]="b:"+id;S.selSet.clear();save();renderProject()};
   const items=[{label:"Aç",fn:go2},{label:"Yeniden adlandır",fn:()=>{go2();startBoardRename()}}];
   if(!main)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
   openCtx(e.clientX,e.clientY,main?(b.name||"Pano")+" · ana pano silinemez":(b.name||"Pano"),items);
 });
+/* ---------- Referans dizini (ortak projeler): ekip panoları + benim panolarım ---------- */
+function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filter(c=>c.kind!=="frame").length;
+  const row=b=>`<button class="rdb${b.id===cur?" on":""}" data-rdb="${esc(b.id)}"><span>${esc(b.name||"Pano")}</span><span class="mono">${n(b)}</span></button>`;const mine=myBoards(pid);
+  $("rdir").innerHTML=`<div class="rdg"><span class="rdh">Ekip panoları</span>${teamBoards(pid).map(row).join("")}</div>
+    <div class="rdg"><span class="rdh rdmine">${LOCK_IC}Benim panolarım</span>${mine.length?mine.map(row).join(""):`<span class="rdempty">Yalnızca senin gördüğün panolar: keşif, deneme, ham referans. Hazır olanı ekip panosunun adına sürükle.</span>`}</div>
+    <div class="rdnew"><button data-rdnew="team">+ Ekip panosu</button><button class="rdmine" data-rdnew="me">+ Benim</button></div>`}
+function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
+function boardMenu(pid,id,x,y){const b=boards(pid).find(v=>v.id===id);if(!b)return;const main=b.virtual||id===mainBoard(pid);
+  const go2=()=>{S.sub[pid]="b:"+id;S.selSet.clear();save();renderProject()};
+  const items=[{label:"Aç",fn:go2},{label:"Yeniden adlandır",fn:()=>{go2();startBoardRename()}}];
+  if(b.private)items.push({label:"Ekibe aç (herkes görür)",fn:()=>openBoardToTeam(pid,id)});
+  if(!main)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
+  openCtx(x,y,(b.private?"Yalnızca sen · ":"")+(main?(b.name||"Pano")+" · ana pano":(b.name||"Pano")),items)}
+$("rdir").addEventListener("click",e=>{const pid=curP();
+  const r=e.target.closest("[data-rdb]");if(r){S.sub[pid]="b:"+r.dataset.rdb;S.selSet.clear();save();renderProject();return}
+  const nb=e.target.closest("[data-rdnew]");if(nb)newBoard(pid,nb.dataset.rdnew==="me")});
+$("rdir").addEventListener("contextmenu",e=>{const r=e.target.closest("[data-rdb]");if(!r)return;e.preventDefault();boardMenu(curP(),r.dataset.rdb,e.clientX,e.clientY)});
+document.addEventListener("pointermove",e=>{if(!drag||drag.mode!=="move"||$("rdir").hidden)return;const el=document.elementFromPoint(e.clientX,e.clientY);const r=el&&el.closest&&el.closest("[data-rdb]");
+  document.querySelectorAll(".rdb.drop").forEach(x=>{if(x!==r)x.classList.remove("drop")});if(r&&r.dataset.rdb!==curBoard())r.classList.add("drop")});
+function sendItems(ids){const pid=curP();const tb=teamBoards(pid);if(!tb.length)return [];
+  return [{head:true,label:"Ekip panosuna gönder"},...tb.map(b=>({label:"→ "+(b.name||"Pano"),fn:()=>sendToBoard(ids,b.id,false)})),
+    ...(tb.length===1?[{label:"→ "+(tb[0].name||"Pano")+" · buradan kaldır",fn:()=>sendToBoard(ids,tb[0].id,true)}]:[])]}
+/* özel görselin dosyası ekip klasörüne kopyalanır (aynı kimlikle) */
+async function pubAsset(pid,c){if(!c.ap||!c.assetId)return;const {error}=await CL.sb.storage.from("assets").copy(pid+"/"+c.ap+c.assetId,pid+"/"+c.assetId);
+  if(error&&!/exist|duplicate/i.test(error.message||""))throw error}
+async function sendToBoard(ids,tb,rm){const pid=curP();if(!isCloud(pid))return;const src=ids.map(id=>S.items.find(i=>i.id===id)).filter(c=>c&&c.type==="card");if(!src.length)return;
+  /* hedefte boş bir yere, göreli düzen korunarak */
+  const there=S.items.filter(i=>i.type==="card"&&i.board===tb&&i.kind!=="draw");const right=there.length?Math.max(...there.map(c=>(c.x||0)+(c.w||240)))+80:0;
+  const bx=Math.min(...src.map(c=>c.kind==="draw"?Math.min(...(c.pts||[0]).filter((_,i)=>!(i%2))):(c.x||0)));const dx=right-bx;
+  try{for(const c of src){await pubAsset(pid,c);const {id,private:_p,ap:_a,review:_r,...d}=c;const n=Object.assign(JSON.parse(JSON.stringify(d)),{board:tb,created:Date.now()});
+      if(n.kind==="draw")n.pts=(n.pts||[]).map((v,i)=>i%2?v:r1(v+dx));else n.x=(n.x||0)+dx;
+      await api.add(n);if(c.assetId)CL.apre.set(c.assetId,"")}
+    if(rm){for(const c of src){await api.remove(c.id);if(c.ap&&c.assetId)CL.sb.storage.from("assets").remove([pid+"/"+c.ap+c.assetId]).catch(()=>{})}}
+    const b=boards(pid).find(x=>x.id===tb);toast(`${src.length} kart “${b&&b.name||"ekip"}” panosuna gönderildi`,{label:"Git",fn:()=>{S.sub[pid]="b:"+tb;save();renderProject()}})}
+  catch(e){toast("Gönderilemedi: "+(e&&e.message||e),null,true)}}
+function dropToBoard(ids,tb){const pid=curP();const from=curBoard();
+  if(privB(from)&&!privB(tb))return sendToBoard(ids,tb,false);
+  if(!privB(from)&&privB(tb)){toast("Ekip kartları özel panoya taşınmaz; kopyası için sağ tık › Kopyasını oluştur sonra sürükle",null,true);return}
+  /* aynı türden panolar arasında taşı */
+  const list=ids.map(id=>S.items.find(i=>i.id===id)).filter(Boolean);undoPatch("Panoya taşı",list.map(c=>[c.id,{board:from}]));
+  for(const c of list){c.board=tb;run(api.update(c.id,{board:tb}))}S.selSet.clear();syncCards();renderDir();toast(list.length+" kart taşındı")}
+async function openBoardToTeam(pid,id){const cs=S.items.filter(i=>i.type==="card"&&i.board===id);
+  try{for(const c of cs){await pubAsset(pid,c);if(c.assetId)CL.apre.set(c.assetId,"");await api.update(c.id,{private:false,ap:null})}await api.update(id,{private:false});toast("Pano ekibe açıldı · herkes görür",null,true)}
+  catch(e){toast("Açılamadı: "+(e&&e.message||e),null,true)}}
+$("bbar").addEventListener("click",e=>{const p=e.target.closest("#rdpick");if(!p)return;const pid=curP();const r=p.getBoundingClientRect();
+  openCtx(r.left,r.bottom+4,"Panolar",[{head:true,label:"Ekip panoları"},...teamBoards(pid).map(b=>({label:b.name||"Pano",fn:()=>{S.sub[pid]="b:"+b.id;save();renderProject()}})),
+    {head:true,label:"Benim panolarım"},...myBoards(pid).map(b=>({label:b.name||"Pano",fn:()=>{S.sub[pid]="b:"+b.id;save();renderProject()}})),"-",
+    {label:"+ Ekip panosu",fn:()=>newBoard(pid,false)},{label:"+ Benim panom",fn:()=>newBoard(pid,true)}])});
 function startBoardRename(){
   const pid=curP();const b=boards(pid).find(x=>x.id===curBoard());if(!b)return;S.renaming="board";
   $("bbar").innerHTML=`<span class="pill name"><input id="bnameIn" maxlength="40" value="${esc(b.name||"")}" aria-label="Pano adı"></span>`;
@@ -1789,9 +1869,10 @@ stage.addEventListener("contextmenu",e=>{
   if(c.kind==="image")items.push({label:"Odak görünümü",fn:()=>openLB(c.id)},{label:c.gray?"Gri tonu kapat  ·  G":"Gri ton  ·  G",fn:()=>toggleImg("gray",[c.id])},{label:c.flip?"Çevirmeyi kapat  ·  H":"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[c.id])},{label:"Renk paleti çıkar",fn:()=>makePalette(c)});
   if(c.kind==="frame"||c.kind==="note"||c.kind==="link"||c.kind==="audio")items.push({label:c.kind==="frame"?"Yeniden adlandır":c.kind==="audio"?"Adını düzenle":"Düzenle",fn:()=>startEdit(id,c.kind==="frame"||c.kind==="audio")});
   if(c.kind==="image")items.push({label:c.note?"Notu düzenle":"Not ekle",fn:()=>openImgNote(c.id)});
-  if(isShared(curP())&&REFK.includes(c.kind))items.push({label:"Yorumlar ve onay…"+(commentsOf(c.id).length?`  ·  ${commentsOf(c.id).length}`:""),fn:()=>openDrawer(c.id)},{label:c.review&&c.review.state==="wait"?"Onay isteğini geri çek":"Onay iste",fn:()=>run(api.update(c.id,{review:c.review&&c.review.state==="wait"?null:{state:"wait",by:CL.me,at:Date.now()}}))});
+  if(isShared(curP())&&REFK.includes(c.kind)&&!c.private)items.push({label:"Yorumlar ve onay…"+(commentsOf(c.id).length?`  ·  ${commentsOf(c.id).length}`:""),fn:()=>openDrawer(c.id)},{label:c.review&&c.review.state==="wait"?"Onay isteğini geri çek":"Onay iste",fn:()=>run(api.update(c.id,{review:c.review&&c.review.state==="wait"?null:{state:"wait",by:CL.me,at:Date.now()}}))});
   if(c.kind==="image")items.splice(1,0,{label:"Düzenle (çiz, kırp, döndür)  ·  Enter",fn:()=>openEditor(c.id)});
   if(c.kind==="frame")items.push({label:"Çerçeveyi PNG indir",fn:()=>exportPNG(withFrameContents(new Set([id])),c.text||"Çerçeve")},{label:"Çerçeveyi PDF indir",fn:()=>exportPDF(withFrameContents(new Set([id])),c.text||"Çerçeve")});
+  if(c.private)items.push(...sendItems([id]));
   if(c.kind!=="draw")items.push({label:"Kopyasını oluştur  ·  Ctrl+D",fn:()=>duplicateSel([id])});
   if(c.kind!=="draw")items.push({label:c.locked?"Kilidi aç  ·  L":"Kilitle  ·  L",fn:()=>toggleLock([id])});
   if(S.selSet.size>1)items.push({label:"Seçimi çerçevele  ·  Ctrl+G",fn:frameSelection});
@@ -2032,6 +2113,7 @@ function multiItems(){
     {label:"Izgaraya diz",fn:arrangeSel},{label:"Seçimi çerçevele  ·  Ctrl+G",fn:frameSelection},{label:"Kopyasını oluştur  ·  Ctrl+D",fn:()=>duplicateSel()}];
   if(hasImg)it.push({label:"Gri ton  ·  G",fn:()=>toggleImg("gray",[...S.selSet])},{label:"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[...S.selSet])});
   it.push({label:"Seçimi PNG indir",fn:()=>exportPNG(withFrameContents(S.selSet),"Seçim")},{label:"Seçimi PDF indir",fn:()=>exportPDF(withFrameContents(S.selSet),"Seçim")},{label:"Kilitle / kilidi aç  ·  L",fn:()=>toggleLock([...S.selSet])});
+  if(privB(curBoard()))it.push("-",...sendItems([...S.selSet]));
   it.push("-",{label:`Seçileni sil (${S.selSet.size})`,danger:true,fn:deleteSelected});return it;
 }
 function arrangeSel(){
@@ -2809,7 +2891,8 @@ function wrapApi(){if(CL.base)return;CL.base=api;CL.baseAssets=assets;
     add:async d=>{
       if(d.type==="project"&&S.mode==="cloud")return cNewProject(d);
       const pid=docPid(d);if(!isCloud(pid))return CL.base.add(d);
-      const v=Object.assign(JSON.parse(JSON.stringify(d)),{id:fid()});S.items.push(v);cPush(v,pid);rerender();return {id:v.id}},
+      const v=Object.assign(JSON.parse(JSON.stringify(d)),{id:fid()});
+      if(v.type==="card"&&privB(v.board)){v.private=true;if(v.assetId&&CL.apre.get(v.assetId))v.ap=CL.apre.get(v.assetId)}S.items.push(v);cPush(v,pid);rerender();return {id:v.id}},
     update:async(id,p)=>{const v=S.items.find(i=>i.id===id);const pid=v&&(v.type==="project"?v.id:itemProject(v));
       if(!isCloud(pid))return CL.base.update(id,p);
       Object.assign(v,JSON.parse(JSON.stringify(p)));cPush(v,pid);rerender()},
@@ -2823,11 +2906,11 @@ function wrapApi(){if(CL.base)return;CL.base=api;CL.baseAssets=assets;
   };
   assets={
     upload:async f=>{const pid=curP();if(!isCloud(pid)){if(CL.baseAssets)return CL.baseAssets.upload(f);throw new Error("görsel deposu yok")}
-      const id=fid()+fid();const {error}=await CL.sb.storage.from("assets").upload(pid+"/"+id,f,{contentType:f.type||"image/webp",upsert:true});
+      const id=fid()+fid();const pre=privB(curBoard())?"p/"+CL.me+"/":"";const {error}=await CL.sb.storage.from("assets").upload(pid+"/"+pre+id,f,{contentType:f.type||"image/webp",upsert:true});
       if(error)throw new Error(/fetch|network/i.test(error.message)?"bağlantı yok, görsel yüklenemedi":error.message);
-      BLOB.set(id,URL.createObjectURL(f));CL.apid.set(id,pid);return {id,url:null,sizeBytes:f.size,contentType:f.type}},
+      BLOB.set(id,URL.createObjectURL(f));CL.apid.set(id,pid);CL.apre.set(id,pre);return {id,url:null,sizeBytes:f.size,contentType:f.type}},
     list:async()=>CL.baseAssets?CL.baseAssets.list():{assets:[],usage:{files:0,bytes:0,maxFiles:0,maxBytes:1}},
-    delete:async id=>{const pid=CL.apid.get(id);if(pid){CL.apid.delete(id);await CL.sb.storage.from("assets").remove([pid+"/"+id]);return {deleted:true}}
+    delete:async id=>{const pid=CL.apid.get(id);if(pid){CL.apid.delete(id);await CL.sb.storage.from("assets").remove([pid+"/"+id,pid+"/p/"+CL.me+"/"+id]);return {deleted:true}}
       return CL.baseAssets?CL.baseAssets.delete(id):{deleted:false}}
   };
 }
@@ -2840,12 +2923,12 @@ function lsApi(){const save=()=>LS.set("wloose",S.items.filter(i=>!CL.items.has(
     remove:async id=>{S.items=S.items.filter(i=>i.id!==id);save();rerender()}}}
 
 /* --- görseller: indir, cihazda önbellekle --- */
-async function cAsset(pid,id){if(!id||BLOB.has(id)||CL.fetching.has(id)||!CL.sb)return;CL.fetching.add(id);CL.apid.set(id,pid);
-  const path=pid+"/"+id,key="https://workshop-cache.local/"+path;
+async function cAsset(pid,id,pre){if(!id||BLOB.has(id)||CL.fetching.has(id)||!CL.sb)return;CL.fetching.add(id);CL.apid.set(id,pid);CL.apre.set(id,pre||"");
+  const path=pid+"/"+(pre||"")+id,key="https://workshop-cache.local/"+path;
   try{let blob=null,cache=null;try{cache=await caches.open("ws-assets");const r=await cache.match(key);if(r)blob=await r.blob()}catch(_){}
     if(!blob){const {data,error}=await CL.sb.storage.from("assets").download(path);if(error)throw error;blob=data;try{if(cache)await cache.put(key,new Response(blob))}catch(_){}}
     BLOB.set(id,URL.createObjectURL(blob));cRender()}catch(_){}finally{CL.fetching.delete(id)}}
-function cAssetsFor(list){for(const v of list)if(v.assetId){const pid=v.type==="card"?docPid(v):null;if(pid)cAsset(pid,v.assetId)}}
+function cAssetsFor(list){for(const v of list)if(v.assetId){const pid=v.type==="card"?docPid(v):null;if(pid)cAsset(pid,v.assetId,v.ap)}}
 
 /* --- yükleme ve anlık değişiklikler --- */
 function cMerge(items){const ids=new Set(items.map(v=>v.id));
@@ -2871,7 +2954,7 @@ function onRemote(p){const r=p.new&&p.new.id?p.new:null;
   if(CL.out.has(r.id)||CL.timers.has(r.id))return;/* bizde daha yenisi bekliyor */
   if(r.deleted){if(CL.items.has(r.id)){S.items=S.items.filter(i=>i.id!==r.id);CL.items.delete(r.id);cRender()}actQueue(r.project_id);return}
   const v=cleanItem(r.data,r.id);const k=S.items.findIndex(i=>i.id===r.id);if(k>-1)S.items[k]=v;else S.items.push(v);CL.items.set(v.id,v);
-  if(v.assetId)cAsset(r.project_id,v.assetId);cCacheSave();cRender();actQueue(r.project_id)}
+  if(v.assetId)cAsset(r.project_id,v.assetId,v.ap);cCacheSave();cRender();actQueue(r.project_id)}
 function cSubscribe(){if(CL.chan)CL.sb.removeChannel(CL.chan);
   CL.chan=CL.sb.channel("ws-"+CLIENT)
     .on("postgres_changes",{event:"*",schema:"public",table:"items"},onRemote)
@@ -3075,7 +3158,7 @@ function drawHere(){
   const pid=curP();const box=$("hereBox");
   if(box&&pid){const l=CL.here.get(pid)||[];box.innerHTML=l.filter(h=>h.w||h.v).map(h=>`<span class="hp${h.v?" inv":""}" title="${esc(pname(h.u))} · ${esc(h.v?"sesli odada":h.w==="hub"?"Merkez":h.w==="tasks"?"Görevlerim":h.w==="team"?"Ekip":h.w==="cal"?"Takvim":"panoda")}">${avatar(h.u)}</span>`).join("");
     document.querySelectorAll(".subtabs .st .hd").forEach(x=>x.remove());
-    for(const h of l){const st=document.querySelector(`.subtabs .st[data-sub="${CSS.escape(h.w||"")}"]`);if(st)st.insertAdjacentHTML("beforeend",`<span class="hd" style="--c:${pcol(h.u)}" title="${esc(pname(h.u))}"></span>`)}}
+    for(const h of l){const st=document.querySelector((h.w||"").startsWith("b:")?'.subtabs .st[data-sub^="b:"]':`.subtabs .st[data-sub="${CSS.escape(h.w||"")}"]`);if(st)st.insertAdjacentHTML("beforeend",`<span class="hd" style="--c:${pcol(h.u)}" title="${esc(pname(h.u))}"></span>`)}}
   document.querySelectorAll(".pcard[data-go]").forEach(c=>{const l=CL.here.get(c.dataset.go)||[];const ph=c.querySelector(".phere");if(ph)ph.innerHTML=l.slice(0,4).map(h=>avatar(h.u)).join("")})}
 
 /* --- proje panosu (hedef, teslim, linkler) --- */
@@ -3128,8 +3211,8 @@ function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";rend
   else msH=`<div class="empty">Henüz hedef yok. Teslim tarihi olan bir kilometre taşı ekle; görevleri ona bağlayınca ilerleme burada görünür.</div>`;
   const col=st=>{const ts=all.filter(t=>statusOf(t)===st&&asgPass(t));return `<div class="mk"><div class="mkh ${st}"><span>${STN[st]}</span><span class="mono">${ts.length}</span></div>
     ${ts.map(t=>`<button class="mkc" data-topen="${esc(t.id)}"><span>${esc(t.title)}</span>${t.assignee?avatar(t.assignee):""}</button>`).join("")}</div>`};
-  const refs=cardsOfProject(pid).filter(c=>c.kind==="image"||c.kind==="audio").sort((a,b)=>((b.review&&b.review.state==="wait")-(a.review&&a.review.state==="wait"))||(b.created||0)-(a.created||0)).slice(0,10);
-  const wait=cardsOfProject(pid).filter(c=>c.review&&c.review.state==="wait").length;
+  const refs=cardsOfProject(pid).filter(c=>(c.kind==="image"||c.kind==="audio")&&!c.private).sort((a,b)=>((b.review&&b.review.state==="wait")-(a.review&&a.review.state==="wait"))||(b.created||0)-(a.created||0)).slice(0,10);
+  const wait=cardsOfProject(pid).filter(c=>!c.private&&c.review&&c.review.state==="wait").length;
   $("sHub").innerHTML=`<div class="scroll"><div class="hubw"><div class="hub">
     <section class="block hb"><div class="bhead"><h2>Sıradaki hedef</h2><button class="mini" data-msadd>+ kilometre taşı</button></div>${msH}
       <form class="msform" id="msForm" hidden autocomplete="off"><input class="field" name="n" placeholder="ör. Greybox teslimi" maxlength="60" required><input class="field" name="d" type="date"><button class="btn primary" type="submit">Ekle</button></form></section>
