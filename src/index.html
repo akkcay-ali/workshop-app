@@ -610,6 +610,7 @@ body.frameless .app{padding-top:8px}
 
 <div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
   <h3>Ayarlar</h3>
+  <button class="sw2" id="sndSw" role="switch" aria-checked="true"><span><b>Sayaç bitiş sesi</b><span class="small">Odak süresi dolunca yumuşak bir çan sesi çalar. <a href="#" id="sndTest">Dinle</a></span></span><span class="tg"></span></button>
   <button class="sw2" id="hqSw" role="switch" aria-checked="false"><span><b>Yüksek kaliteli görseller</b><span class="small" id="hqTxt"></span></span><span class="tg"></span></button>
   <div class="sw2" id="stoBox" style="cursor:default;flex-direction:column;align-items:stretch;gap:8px" hidden>
     <span><b>Depolama</b><span class="small" id="stoTxt">hesaplanıyor…</span></span>
@@ -1996,8 +1997,14 @@ const tLeft=()=>TM.endAt?Math.max(0,Math.ceil((TM.endAt-Date.now())/1000)):TM.le
 const fmt=s=>pad(Math.floor(s/60))+":"+pad(s%60);
 function tSave(){LS.set("timer",TM)}
 function ensureAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){}}
-function chime(){if(!actx)return;try{const t0=actx.currentTime;[[784,0],[1046,.22],[1318,.44]].forEach(([f,dt])=>{const o=actx.createOscillator(),g=actx.createGain();o.type="sine";o.frequency.value=f;
-  g.gain.setValueAtTime(0,t0+dt);g.gain.linearRampToValueAtTime(.18,t0+dt+.02);g.gain.exponentialRampToValueAtTime(.001,t0+dt+1.1);o.connect(g).connect(actx.destination);o.start(t0+dt);o.stop(t0+dt+1.2)})}catch(e){}}
+/* bitiş sesi: dosya yok, tamamen kodla üretilen yumuşak çan (lisans gerekmez) */
+const sndOn=()=>LS.get("snd",true);
+function bell(t,f,vol){const out=actx.createGain();out.gain.value=vol;out.connect(actx.destination);
+  [[1,1,2.6],[2,.42,1.6],[2.76,.28,1.1],[5.4,.12,.6]].forEach(([r,a,d])=>{const o=actx.createOscillator(),g=actx.createGain();o.type="sine";o.frequency.value=f*r;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(a,t+.008);g.gain.exponentialRampToValueAtTime(.0008,t+d);o.connect(g).connect(out);o.start(t);o.stop(t+d+.05)})}
+function chime(force){if(!force&&!sndOn())return;ensureAudio();if(!actx)return;
+  try{const t0=actx.currentTime+.05;for(let k=0;k<3;k++){bell(t0+k*1.1,880,.32);bell(t0+k*1.1+.18,1318.5,.24)}}catch(e){}}
+document.addEventListener("pointerdown",()=>{if(TM.endAt&&!actx)ensureAudio()},{capture:true});
 function tStart(){ensureAudio();if(tLeft()<=0)TM.left=TM.dur;TM.endAt=Date.now()+tLeft()*1000;tSave();drawTimer()}
 function tPause(){TM.left=tLeft();TM.endAt=null;tSave();drawTimer()}
 function tReset(){TM.endAt=null;TM.left=TM.dur;tSave();drawTimer()}
@@ -2109,8 +2116,9 @@ $("stoClean").onclick=async()=>{const btn=$("stoClean");
   btn.disabled=true;const refs=assetRefs();let n=0;
   for(const a of stoOrphans){if(refs.has(a.id))continue;try{const r=await assets.delete(a.id);if(r&&r.deleted)n++}catch(e){if(e&&e.code==="rate_limited")break}}
   btn.disabled=false;toast(n+" kullanılmayan görsel silindi");drawStorage()};
-function drawCfg(){drawStorage();drawLib();const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
+$("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
   run(api.set("settings",Object.assign({},c,{type:"settings",hq:v})));drawCfg();toast(v?"Görseller yüksek kalitede eklenecek":"Görseller optimize edilerek eklenecek")};
 const KB=[
