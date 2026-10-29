@@ -89,7 +89,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
              radial-gradient(45% 50% at 92% 88%, var(--glow2), transparent 70%),
              radial-gradient(35% 35% at 70% 20%, var(--glow3), transparent 70%)}
 button,input,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
+button{cursor:var(--cur-pt)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .glass{background:var(--glass);border:1px solid var(--stroke);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
@@ -323,7 +323,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 @media (max-width:560px){.cell{min-height:52px;padding:5px}.cell .ct{display:none}}
 
 /* board */
-.stage{position:absolute;inset:0;background-color:var(--canvas);background-image:radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px);touch-action:none;cursor:default;overflow:hidden}
+.stage{position:absolute;inset:0;background-color:var(--canvas);background-image:radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px);touch-action:none;cursor:var(--cur);overflow:hidden}
 .stage.spacepan{cursor:grab}
 .stage.zooming{cursor:zoom-in}
 .marquee{position:absolute;border:1px solid var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent);border-radius:3px;pointer-events:none;z-index:4}
@@ -332,7 +332,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 .stage.panning{cursor:grabbing}
 .stage.over{box-shadow:inset 0 0 0 2px var(--accent)}
 .world{position:absolute;left:0;top:0;transform-origin:0 0}
-.card{position:absolute;border-radius:10px;cursor:default;user-select:none;-webkit-user-select:none}
+.card{position:absolute;border-radius:10px;cursor:var(--cur);user-select:none;-webkit-user-select:none}
 .card.sel{outline:2px solid var(--accent);outline-offset:3px}
 .card.k-image{background:var(--glass-2);border:1px solid var(--stroke);overflow:hidden;box-shadow:0 14px 34px -14px rgb(0 0 0 / .7)}
 .card.k-image img{display:block;width:100%;height:auto;pointer-events:none}
@@ -373,7 +373,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 /* ink (çizim katmanı) */
 .tool[aria-pressed="true"]{background:var(--glass-3);color:var(--ink)}
 .tool.ic{padding:7px 8px}
-.stage.drawing,.stage.erase{cursor:crosshair}
+.stage.drawing,.stage.erase{cursor:var(--cur-x)}
 .ink{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:10000000}
 .ink path{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .ink .hit{stroke:transparent;pointer-events:none}
@@ -456,7 +456,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 .kr kbd{margin-left:3px;color:var(--ink);font-size:11px}
 .stage,.pcard,.card,.card img{-webkit-touch-callout:none}
 .card.locked .cx,.card.locked .rs{display:none!important}
-.card.k-frame.locked .fl{cursor:default}
+.card.k-frame.locked .fl{cursor:var(--cur)}
 .wkrow{display:grid;grid-template-columns:minmax(0,1fr) 90px auto;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:6px 4px;border-radius:8px}
 .wkrow:hover{background:var(--glass-2)}
 .wkrow .n{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -488,7 +488,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   background-image:radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px);background-size:24px 24px}
 .edwrap{position:relative;box-shadow:0 20px 60px -20px rgb(0 0 0 / .9);touch-action:none}
 .edwrap canvas{display:block;width:100%;height:100%}
-.edwrap #edov{position:absolute;inset:0;cursor:crosshair}
+.edwrap #edov{position:absolute;inset:0;cursor:var(--cur-x)}
 .ed .tools,.ed .inkbar{position:fixed}
 .edcrop{position:fixed;left:50%;bottom:calc(66px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);display:flex;gap:6px;z-index:6;padding:6px;border-radius:12px;background:var(--bar);border:1px solid var(--stroke-2)}
 .fmin{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
@@ -525,6 +525,13 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   background:var(--ink);color:var(--accent-ink);font-size:13px;font-weight:500;z-index:60;box-shadow:0 12px 30px -10px rgb(0 0 0 / .7);max-width:calc(100% - 32px)}
 .toast button{border:0;background:var(--accent-ink);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
+/* imleç: uygulama paletinde ok, tıklanabilirde turkuaz */
+:root{--cur:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%203%20L5%2019.2%20L9.4%2015%20L12.4%2021.2%20L15.3%2019.9%20L12.3%2013.8%20L18.4%2013.6%20Z%22%20fill%3D%22%23D7DEF5%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 5 3, default;--cur-pt:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%203%20L5%2019.2%20L9.4%2015%20L12.4%2021.2%20L15.3%2019.9%20L12.3%2013.8%20L18.4%2013.6%20Z%22%20fill%3D%22%2393CDD6%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 5 3, pointer;--cur-x:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cg%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M12%203v6M12%2015v6M3%2012h6M15%2012h6%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%223.5%22/%3E%3Cpath%20d%3D%22M12%203v6M12%2015v6M3%2012h6M15%2012h6%22%20stroke%3D%22%23D7DEF5%22%20stroke-width%3D%221.6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.6%22%20fill%3D%22%23D7DEF5%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%221%22/%3E%3C/g%3E%3C/svg%3E") 12 12, crosshair}
+:root[data-theme="light"]{--cur:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%203%20L5%2019.2%20L9.4%2015%20L12.4%2021.2%20L15.3%2019.9%20L12.3%2013.8%20L18.4%2013.6%20Z%22%20fill%3D%22%231C2233%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 5 3, default;--cur-pt:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M5%203%20L5%2019.2%20L9.4%2015%20L12.4%2021.2%20L15.3%2019.9%20L12.3%2013.8%20L18.4%2013.6%20Z%22%20fill%3D%22%233E5BD6%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 5 3, pointer;--cur-x:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cg%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M12%203v6M12%2015v6M3%2012h6M15%2012h6%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%223.5%22/%3E%3Cpath%20d%3D%22M12%203v6M12%2015v6M3%2012h6M15%2012h6%22%20stroke%3D%22%231C2233%22%20stroke-width%3D%221.6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.6%22%20fill%3D%22%231C2233%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221%22/%3E%3C/g%3E%3C/svg%3E") 12 12, crosshair}
+html,body{cursor:var(--cur)}
+button,a[href],summary,label[for],select,[data-go],[data-np],[data-af],[data-assign],.check,.chip,.opt,.pcard,.tab,.st,.thm{cursor:var(--cur-pt)}
+button:disabled{cursor:var(--cur)}
+
 /* logo */
 .wmark{width:18px;height:16px;flex:0 0 auto}
 .tab.home .wmark{width:16px;height:15px;margin-right:1px}
@@ -703,7 +710,7 @@ body.frameless .app{padding-top:8px}
   <h3>Ayarlar</h3>
   <button class="sw2" id="sndSw" role="switch" aria-checked="true"><span><b>Sayaç bitiş sesi</b><span class="small">Odak süresi dolunca yumuşak bir çan sesi çalar. <a href="#" id="sndTest">Dinle</a></span></span><span class="tg"></span></button>
   <button class="sw2" id="hqSw" role="switch" aria-checked="false"><span><b>Yüksek kaliteli görseller</b><span class="small" id="hqTxt"></span></span><span class="tg"></span></button>
-  <div class="sw2" id="stoBox" style="cursor:default;flex-direction:column;align-items:stretch;gap:8px" hidden>
+  <div class="sw2" id="stoBox" style="cursor:var(--cur);flex-direction:column;align-items:stretch;gap:8px" hidden>
     <span><b>Depolama</b><span class="small" id="stoTxt">hesaplanıyor…</span></span>
     <div class="progress"><i id="stoBar" style="width:0%"></i></div>
     <button class="btn" id="stoClean" hidden></button>
@@ -1274,7 +1281,7 @@ function renderBoard(){
   const bid=curBoard();const b=boards(curP()).find(x=>x.id===bid);if(!b)return;
   if(lastBoard!==bid){world.innerHTML='<svg class="ink" id="ink" xmlns="http://www.w3.org/2000/svg"></svg>';lastBoard=bid;ink=null}
   if(S.renaming!=="board"){
-    $("bbar").innerHTML=`<button class="pill name" id="bname" title="Yeniden adlandır">${esc(b.name||"Pano")}</button><span class="pill" style="cursor:default">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
+    $("bbar").innerHTML=`<button class="pill name" id="bname" title="Yeniden adlandır">${esc(b.name||"Pano")}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
       `<button class="pill" id="bpng" title="Panonun tamamını PNG ya da PDF olarak indir">Dışa aktar</button>`+
       "";
   }
@@ -2044,7 +2051,7 @@ function edOverlay(){const x=edov.getContext("2d");x.clearRect(0,0,edov.width,ed
     x.strokeStyle="#fff";x.lineWidth=Math.max(1,1.5/ED.ds);x.setLineDash([6/ED.ds,4/ED.ds]);x.strokeRect(a,b,c-a,d-b);x.setLineDash([])}}
 function renderEdBar(){document.querySelectorAll("#edtools [data-et]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.et===ED.tool));
   const on=["pen","arrow","rect"].includes(ED.tool);$("edink").hidden=!on;if(on)$("edink").innerHTML=inkbarHTML(ED.tool);
-  $("edcrop").hidden=!(ED.tool==="crop"&&ED.crop);edov.style.cursor="crosshair"}
+  $("edcrop").hidden=!(ED.tool==="crop"&&ED.crop);edov.style.cursor="var(--cur-x)"}
 $("edink").addEventListener("click",e=>{const c=e.target.closest("[data-ic]");if(c)IK.color=c.dataset.ic;const w=e.target.closest("[data-iw]");if(w)IK.w=+w.dataset.iw;
   const sm=e.target.closest("[data-ism]");if(sm)IK.sm=+sm.dataset.ism;LS.set("ink",IK);renderEdBar()});
 async function openEditor(id){
