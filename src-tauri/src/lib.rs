@@ -235,6 +235,16 @@ fn fatal(msg: &str, _webview: bool) {
 
 const WEBVIEW_MSG: &str = "Bu bilgisayarda Microsoft Edge WebView2 bulunamadı ya da çalışmıyor. Workshop'un arayüzü için gerekli.\n\nİndirme sayfasını açayım mı? Oradan \"Evergreen Standalone Installer – x64\" dosyasını indirip kur, sonra Workshop'u yeniden aç.\n\nİnternetsiz kurulum için Workshop sürümler sayfasındaki \"offline-setup\" dosyasını da kullanabilirsin.";
 
+/// Pencereyi gizlendiği yerden (simge alanı) geri getir.
+#[cfg(desktop)]
+fn show_main(app: &AppHandle) {
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.show();
+        let _ = w.unminimize();
+        let _ = w.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Beklenmeyen bir çökme olursa en azından nedenini göster
@@ -290,6 +300,43 @@ pub fn run() {
     let res = builder
         .setup(|_app| {
             // kısayol başka bir uygulamada kullanılıyorsa sessizce geç
+            // Simge alanı (saatin yanı): × pencereyi buraya gizler. Tık = aç, sağ tık = menü.
+            #[cfg(desktop)]
+            {
+                use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+                use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+                use tauri::Emitter;
+                let open = MenuItem::with_id(_app, "show", "Workshop'u aç", true, None::<&str>)?;
+                let quit = MenuItem::with_id(_app, "quit", "Çıkış", true, None::<&str>)?;
+                let sep = PredefinedMenuItem::separator(_app)?;
+                let menu = Menu::with_items(_app, &[&open, &sep, &quit])?;
+                let mut tray = TrayIconBuilder::with_id("main")
+                    .tooltip("Workshop")
+                    .menu(&menu)
+                    .show_menu_on_left_click(false)
+                    .on_menu_event(|app, ev| match ev.id().as_ref() {
+                        "show" => show_main(app),
+                        "quit" => {
+                            // arayüz bekleyen kayıtları bitirip kapanır; yanıt vermezse 6 sn sonra zorla çık
+                            let _ = app.emit("tray-quit", ());
+                            let h = app.clone();
+                            std::thread::spawn(move || {
+                                std::thread::sleep(std::time::Duration::from_secs(6));
+                                h.exit(0);
+                            });
+                        }
+                        _ => {}
+                    })
+                    .on_tray_icon_event(|tray, ev| {
+                        if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = ev {
+                            show_main(tray.app_handle());
+                        }
+                    });
+                if let Some(icon) = _app.default_window_icon() {
+                    tray = tray.icon(icon.clone());
+                }
+                tray.build(_app)?;
+            }
             #[cfg(desktop)]
             {
                 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};

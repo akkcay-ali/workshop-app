@@ -35,7 +35,9 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   sohbet `public.messages` (genel/özel, her pazartesi silinir: `private.prune_messages`).
 - Sesli oda: WebRTC kişiden kişiye (`V` nesnesi), sinyal `proj:<pid>` kanalında broadcast `rtc`, odadakiler presence `v:true`.
   Bağlantı "perfect negotiation" (iki taraf teklif yapabilir). Ekran paylaşımı: tek paylaşan (presence `s`), kalite `SQ`
-  (1080p30/720p30/720p60/Düşük, `vQ`), izleyici penceresi `#scr` (varsayılan büyük, `scrQ` gerçek çözünürlük/fps/hız; paylaşanda `vsQ` + sınır nedeni). Ekran için codec: ekran kartı kodlayabiliyorsa o (`hwCodecs`, mediaCapabilities powerEfficient), yoksa VP9 > H264 > VP8 (`prefCodec`); göstergede ekran kartı/işlemci, karşı SDP'ye `x-google-start-bitrate=2500` (`fastStart`). Ses/üst çubuk: kulaklık düğmesi `#voiceBtn` + `#voicePop`.
+  (1080p30/720p30/720p60/Düşük, `vQ`), izleyici penceresi `#scr` (varsayılan büyük, `scrQ` gerçek çözünürlük/fps/hız; paylaşanda `vsQ` + sınır nedeni). Ekran için codec: ekran kartı kodlayabiliyorsa o (`hwCodecs`, mediaCapabilities powerEfficient), yoksa VP9 > H264 > VP8 (`prefCodec`); göstergede ekran kartı/işlemci, karşı SDP'ye `x-google-start-bitrate=2500` (`fastStart`). Ses ve yayın merkezi: sağ kenar sekmesi `#voiceBtn.vtab` (odadakilerin avatarları) → sağda açılıp kapanan panel `#voicePop.vhub` (`vhOpen`, LS `vhub`); panel açıkken yayın panelde önizlenir (`#vhPrev`, `drawPrev`), büyük pencere `#scr` yalnızca "Büyük izle" ile (`S.scrPop`, `.scr.withhub`).
+  Gürültü engelleme: Normal (tarayıcı) / Güçlü (RNNoise, LS `vNs`): `micStream` → `rnnWrap` (AudioWorklet 48 kHz; worklet `#rnnW`, wasm base64 `#rnnB`, @sapphi-red/web-noise-suppressor 0.3.5); Güçlüde tarayıcının engellemesi kapanır.
+- Canlı imleçler: broadcast `cur` (`curSend` ~12/sn, yalnızca aynı sayfada biri varsa; `curTick` çizer, `#curs`). Panoda pano koordinatı, diğer sayfalarda sayfaya göre (x oran, y px + scroll). Sayfa anahtarı `subOf(pid)` (pano `b:<id>`).
   TURN: edge function `turn-ice` (anahtarlar `CF_TURN_KEY_ID`, `CF_TURN_TOKEN`: function secret ya da Vault → `public.turn_secrets()`; yoksa yalnızca STUN). macOS mikrofon izni `src-tauri/Info.plist`.
 - Görevler (ortak projede): sekmeler Merkez · Görevlerim (`tasks`: özel + bana atanan) · Ekip (`team`: Kanban, özel hariç) · panolar · Takvim.
   Özel görev = `data.private` + satırda `items.private_to` (RLS: yalnızca sahibi okur/yazar; akış ve bildirim tetikleyicileri atlar).
@@ -63,7 +65,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Web (Pages) de aynı giriş ekranını gösterir; hesapsız modda yerel projeler tarayıcıda (öğeler localStorage `wloose`, görseller IndexedDB `ws-local` → `idbAssets`).
 - İlk açılış: giriş ekranı `#welcome` (`maybeWelcome`, LS `welcome` = `acct`|`guest`); hesapsız devam = çevrimdışı, bir daha sorulmaz, giriş sağ üstten. Girişsizken ses/bildirim düğmeleri gizli.
 - iPad/dokunmatik (`NOKBD`, `html.nokbd`): `kbd`, `.kbonly`, kısayol yardımı gizli; menü etiketlerindeki "· Ctrl+…" (`kbStrip`) ve parantez içi açıklamalar (`kbStrip`), bildirimlerdeki kısayol ipuçları atılır. Panoda iki parmakla dokun = geri al, üç parmak = yinele (`TT`); araç çubuğunda geri al/yinele düğmeleri (`.touchonly`). Uzun basma = sağ tık (dizin satırları ve proje sekmeleri dahil). Web ana ekrana eklenebilir (`manifest.webmanifest`, `apple-touch-icon.png`).
-- Pencere × düğmesi görev çubuğuna küçültür; çıkış: × üzerinde sağ tık › Uygulamadan çık ya da Ctrl+Q (`onCloseRequested` bekleyen kayıtları bitirir).
+- Pencere × düğmesi simge alanına (saatin yanı, tray) gizler (`w.hide()`); tray: tık = aç, sağ tık menü Aç/Çıkış (`lib.rs` `TrayIconBuilder`, `tray-quit` olayı, 6 sn sonra zorla çıkış). Çıkış ayrıca × üzerinde sağ tık ya da Ctrl+Q (`onCloseRequested` bekleyen kayıtları bitirir).
 
 ## Derleme
 - Masaüstü derlemesi yalnızca `src-tauri/tauri.conf.json` değişince (sürüm artışı) çalışır.
