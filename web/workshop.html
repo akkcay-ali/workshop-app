@@ -228,7 +228,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 
 /* project */
 .phead{display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;padding:16px clamp(16px,3vw,28px) 12px;border-bottom:1px solid var(--stroke)}
-.pname{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(19px,2.4vw,24px);line-height:1.2;letter-spacing:-.01em;cursor:text;border:0;background:none;padding:0;text-align:left;max-width:100%;overflow-wrap:anywhere}
+.pname{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(19px,2.4vw,24px);line-height:1.2;letter-spacing:-.01em;cursor:var(--cur);color:var(--ink);border:0;background:none;padding:0;text-align:left;max-width:100%;overflow-wrap:anywhere}
 .pname-in{font-family:var(--f-display);font-size:clamp(19px,2.4vw,24px);border:0;border-bottom:1px solid var(--stroke-2);background:transparent;outline:none;padding:0;width:min(360px,100%)}
 .subtabs{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--field);border:1px solid var(--stroke);overflow-x:auto;max-width:100%;scrollbar-width:none}
 .subtabs::-webkit-scrollbar{display:none}
@@ -1338,16 +1338,18 @@ $("ctx").addEventListener("click",e=>{
   closeCtx();it.fn();
 });
 $("vHome").addEventListener("contextmenu",e=>{
-  const c=e.target.closest(".pcard[data-go]");if(!c)return;e.preventDefault();
-  const pid=c.dataset.go;const p=proj(pid);
-  const it=[{label:"Aç",fn:()=>go(pid)}];
+  const c=e.target.closest(".pcard[data-go]");if(!c)return;e.preventDefault();projMenu(c.dataset.go,e.clientX,e.clientY)});
+/* proje adı yalnızca sağ tık menüsünden değişir (sekme ya da ana sayfa kartı) */
+$("tabs").addEventListener("contextmenu",e=>{const t=e.target.closest('.tab[data-go]:not([data-go="home"])');if(!t)return;e.preventDefault();projMenu(t.dataset.go,e.clientX,e.clientY)});
+function projMenu(pid,x,y){const p=proj(pid);if(!p)return;
+  const it=[{label:"Aç",fn:()=>go(pid)},{label:"Yeniden adlandır",fn:()=>{go(pid);S.renaming="project";renderHead()}}];
   if(S.mode==="file"&&FS.files.get(pid))it.push({label:"Dosyayı klasörde göster",fn:()=>TA.opener.revealItemInDir(FS.files.get(pid).path)},{label:"Kopyasını dışa aktar…",fn:()=>exportProjectCopy(pid)});
   if(cloudAvail()){if(!isCloud(pid))it.push({label:"Buluta taşı (sadece ben)",fn:()=>toCloud(pid,false)});
     it.push({label:isShared(pid)?"Paylaşım ve üyeler…":"Ekiple paylaş…",fn:()=>shareProject(pid)})}
   if(isCloud(pid)&&!CL.own.has(pid))it.push("-",{label:"Projeden ayrıl",danger:true,confirm:"Emin misin? Sende görünmez olur",fn:()=>deleteProject(pid)});
   else it.push("-",{label:"Projeyi sil",danger:true,confirm:isCloud(pid)?"Emin misin? Ekipteki herkes için silinir":S.mode==="file"?"Emin misin? Dosya Geri Dönüşüm Kutusu'na gider":"Emin misin? Her şeyiyle silinir",fn:()=>deleteProject(pid)});
-  openCtx(e.clientX,e.clientY,(p&&p.name)||"Proje",it);
-});
+  openCtx(x,y,(p&&p.name)||"Proje",it);
+}
 document.addEventListener("pointerdown",e=>{if(!$("ctx").hidden&&!e.target.closest("#ctx"))closeCtx();if(!$("refpick").hidden&&!e.target.closest("#refpick,[data-refpick]"))animHide($("refpick"))});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCtx();animHide($("refpick"))}});
 window.addEventListener("blur",closeCtx);window.addEventListener("resize",()=>{closeCtx();animHide($("refpick"))});
@@ -1366,7 +1368,7 @@ function renderProject(){renderHead();renderSub()}
 function renderHead(){
   const pid=curP();const p=proj(pid)||{name:"…"};const s=subOf(pid);
   const bs=boards(pid);
-  let name=S.renaming==="project"?`<input class="pname-in" id="pnameIn" maxlength="60" value="${esc(p.name||"")}" aria-label="Proje adı">`:`<button class="pname" id="pname" title="Yeniden adlandırmak için tıkla">${esc(p.name||"Proje")}</button>`;
+  let name=S.renaming==="project"?`<input class="pname-in" id="pnameIn" maxlength="60" value="${esc(p.name||"")}" aria-label="Proje adı">`:`<h2 class="pname" id="pname" title="Adını değiştirmek için üstteki sekmeye sağ tıkla">${esc(p.name||"Proje")}</h2>`;
   let st=isShared(pid)?`<button class="st" data-sub="hub" aria-selected="${s==="hub"}">Merkez</button><button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevlerim</button><button class="st" data-sub="team" aria-selected="${s==="team"}">Ekip</button>`:`<button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevler</button>`;
   if(isShared(pid))st+=`<button class="st" data-sub="b:${esc(refBoard(pid))}" aria-selected="${s.startsWith("b:")}">Referanslar</button>`;
   else st+=bs.map(b=>`<button class="st" data-sub="b:${esc(b.id)}" aria-selected="${s==="b:"+b.id}">${esc(b.name||"Pano")}</button>`).join("")+`<button class="st plus" data-newb title="Yeni pano">+ pano</button>`;
@@ -1391,7 +1393,6 @@ function renderHead(){
 }
 $("phead").addEventListener("click",e=>{
   const pid=curP();
-  if(e.target.closest("#pname")){S.renaming="project";renderHead();return}
   const sb=e.target.closest("[data-sub]");if(sb){if(document.body.classList.contains("boardfs"))setBoardFS(false);S.sub[pid]=sb.dataset.sub;S.selSet.clear();save();renderProject();return}
   if(e.target.closest("[data-newb]")){run(api.add({type:"board",project:pid,name:"Yeni pano",order:Date.now()}).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}));return}
   const d=e.target.closest("[data-day]");if(d){S.sel=d.dataset.day;renderProject();return}
