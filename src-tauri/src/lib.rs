@@ -154,8 +154,43 @@ fn initial_files() -> Vec<String> {
     workshop_args(&std::env::args().collect::<Vec<_>>())
 }
 
+/// Açılış hatası: sessizce kapanmak yerine nedenini söyleyen bir Windows penceresi.
+/// `webview` doğruysa WebView2 indirme sayfasını açmayı önerir.
+#[cfg(windows)]
+fn fatal(msg: &str, webview: bool) {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{MessageBoxW, IDYES, MB_ICONERROR, MB_OK, MB_YESNO};
+    let w = |s: &str| s.encode_utf16().chain(std::iter::once(0)).collect::<Vec<u16>>();
+    let text = w(msg);
+    let title = w("Workshop açılamadı");
+    let flags = if webview { MB_YESNO | MB_ICONERROR } else { MB_OK | MB_ICONERROR };
+    let r = unsafe { MessageBoxW(std::ptr::null_mut(), text.as_ptr(), title.as_ptr(), flags) };
+    if webview && r == IDYES {
+        let _ = std::process::Command::new("explorer.exe")
+            .arg("https://developer.microsoft.com/microsoft-edge/webview2/")
+            .spawn();
+    }
+}
+#[cfg(not(windows))]
+fn fatal(msg: &str, _webview: bool) {
+    eprintln!("Workshop açılamadı: {msg}");
+}
+
+const WEBVIEW_MSG: &str = "Bu bilgisayarda Microsoft Edge WebView2 bulunamadı ya da çalışmıyor. Workshop'un arayüzü için gerekli.\n\nİndirme sayfasını açayım mı? Oradan \"Evergreen Standalone Installer – x64\" dosyasını indirip kur, sonra Workshop'u yeniden aç.\n\nİnternetsiz kurulum için Workshop sürümler sayfasındaki \"offline-setup\" dosyasını da kullanabilirsin.";
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Beklenmeyen bir çökme olursa en azından nedenini göster
+    std::panic::set_hook(Box::new(|info| {
+        fatal(&format!("Beklenmeyen bir hata oluştu:\n\n{info}"), false);
+    }));
+    #[cfg(windows)]
+    {
+        if tauri::webview_version().is_err() {
+            fatal(WEBVIEW_MSG, true);
+            return;
+        }
+    }
+
     let mut builder = tauri::Builder::default();
 
     // Uygulama zaten açıkken başka bir .workshop dosyasına çift tıklanırsa
@@ -166,6 +201,7 @@ pub fn run() {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             let files = workshop_args(&args);
             if let Some(w) = app.get_webview_window("main") {
+                let _ = w.show();
                 let _ = w.unminimize();
                 let _ = w.set_focus();
             }
@@ -179,7 +215,7 @@ pub fn run() {
             .plugin(tauri_plugin_process::init());
     }
 
-    builder
+    let res = builder
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
@@ -194,6 +230,10 @@ pub fn run() {
             trash_file,
             initial_files
         ])
-        .run(tauri::generate_context!())
-        .expect("Workshop başlatılamadı");
+        .run(tauri::generate_context!());
+    if let Err(e) = res {
+        let m = e.to_string();
+        let wv = m.to_lowercase().contains("webview");
+        fatal(&if wv { format!("{WEBVIEW_MSG}\n\nAyrıntı: {m}") } else { format!("Workshop başlatılamadı:\n\n{m}") }, wv);
+    }
 }

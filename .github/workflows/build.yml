@@ -64,7 +64,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: "Workshop v__VERSION__"
-          releaseBody: "Windows kurulumu: aşağıdaki **Workshop_…_x64-setup.exe** dosyasını indirip çalıştır."
+          releaseBody: "Windows kurulumu: aşağıdaki **Workshop_…_x64-setup.exe** dosyasını indirip çalıştır. İnternet yoksa ya da uygulama hiç açılmıyorsa (WebView2 eksik) **…_x64-offline-setup.exe** dosyasını kullan."
           releaseDraft: false
           prerelease: false
           args: --bundles nsis
@@ -75,3 +75,18 @@ jobs:
           name: workshop-windows-setup
           path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
+
+      # İnternetsiz kurulum: WebView2 kurulumun içine gömülü (büyük dosya, güncelleme için kullanılmaz).
+      # Derlenmiş uygulama yeniden kullanılır, yalnızca paketlenir.
+      - name: İnternetsiz kurulumu (WebView2 gömülü) sürüme ekle
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $v = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          npm run tauri build -- --bundles nsis --config src-tauri/tauri.offline.conf.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $src = Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe | Select-Object -First 1
+          $dst = "Workshop_${v}_x64-offline-setup.exe"
+          Copy-Item $src.FullName $dst
+          gh release upload "v$v" $dst --clobber

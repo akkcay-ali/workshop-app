@@ -61,6 +61,8 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Kendi kendini güncelleme: `tauri-plugin-updater`, uç nokta `releases/latest/download/latest.json` (depo herkese açık olmalı).
   İmza için depo secret'ları gerekir: `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
   Açık anahtar `tauri.conf.json > plugins.updater.pubkey` içinde; anahtar değişirse eski kurulumlar güncellenemez.
+- Release'e ek olarak `…_x64-offline-setup.exe` (WebView2 gömülü, `src-tauri/tauri.offline.conf.json`, güncelleme imzası yok) yüklenir.
+- Açılış hatası sessiz kalmaz: `lib.rs` `fatal()` Windows mesaj kutusu; WebView2 yoksa (`tauri::webview_version`) indirme sayfasını önerir; panic kancası da aynı kutuyu gösterir.
 - macOS derlemesi elle tetiklenir (`mac.yml`). iOS derlemesi Mac'te yapılır (README).
 
 ## Kullanıcı tercihleri
