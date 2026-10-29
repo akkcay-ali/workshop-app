@@ -533,6 +533,12 @@ button:disabled{cursor:var(--cur)}
 .wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
 #updSec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 /* merkez (ortak proje ana sayfası) */
+.hb.fixh{height:380px;display:flex;flex-direction:column;box-sizing:border-box}
+.hb.fixh .actlist{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;margin-right:-8px;padding-right:6px}
+.hb.fixh .mkgrid{flex:1;min-height:0}.hb.fixh .mk{overflow-y:auto;scrollbar-width:thin;min-height:0}
+@media (max-width:980px){.hb.fixh{height:auto;max-height:440px}}
+.card .badges .bcm{pointer-events:auto;cursor:var(--cur-pt);background:color-mix(in srgb,var(--accent) 45%,rgb(0 0 0 / .55));transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.card .badges .bcm:hover{transform:scale(1.08)}
 .hubw{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
 @media (max-width:1180px){.hubw{grid-template-columns:minmax(0,1fr)}}
 .hub{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
@@ -1094,6 +1100,9 @@ document.addEventListener("keydown",e=>{
     if((e.ctrlKey||e.metaKey)&&e.code==="KeyD"){e.preventDefault();duplicateSel();return}
     if(e.key==="Enter"&&S.selSet.size===1){const c=S.items.find(i=>i.id===[...S.selSet][0]);if(c&&c.kind==="image"){e.preventDefault();openEditor(c.id);return}}
     if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.code==="KeyL"){e.preventDefault();toggleLock([...S.selSet]);return}
+    if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.code==="KeyN"||e.code==="KeyC")&&S.selSet.size===1){const c=S.items.find(i=>i.id===[...S.selSet][0]);
+      if(c&&e.code==="KeyN"&&c.kind==="image"){e.preventDefault();openImgNote(c.id);return}
+      if(c&&e.code==="KeyC"&&isShared(curP())&&REFK.includes(c.kind)){e.preventDefault();openDrawer(c.id);return}}
     if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.code==="KeyG"||e.code==="KeyH")){e.preventDefault();toggleImg(e.code==="KeyG"?"gray":"flip",[...S.selSet]);return}
     if(!e.ctrlKey&&!e.metaKey&&!e.altKey){const t={KeyV:"select",KeyP:"pen",KeyA:"arrow",KeyR:"rect",KeyF:"frame",KeyE:"erase"}[e.code];if(t){e.preventDefault();setTool(t);return}}
   }
@@ -1439,8 +1448,8 @@ function syncCards(){
       el.querySelector(".pal").innerHTML=(c.colors||[]).map(h=>`<button class="psw" data-hex="${esc(h)}" style="background:${esc(h)};color:${lum(h)>.55?"#18191C":"#F2F3F5"}" title="Kopyala">${esc(h.toUpperCase())}</button>`).join("")}}
     el.classList.toggle("sel",S.selSet.has(c.id));el.classList.toggle("locked",!!c.locked);
     {const rvt=isShared(curP())&&c.review&&c.review.state?{wait:"onay bekliyor",ok:"onaylandı",rev:"revizyon"}[c.review.state]:null,ncm=isShared(curP())?commentsOf(c.id).length:0;
-     el.dataset.rv=rvt?c.review.state:"";const bs=[c.locked&&"kilitli",c.ext&&"web",rvt,ncm&&ncm+" yorum"].filter(Boolean);let bd=el.querySelector(":scope > .badges");
-     if(bs.length){if(!bd){bd=document.createElement("span");bd.className="badges";el.appendChild(bd)}const h=bs.map(x=>`<span>${x}</span>`).join("");if(bd.innerHTML!==h)bd.innerHTML=h}else if(bd)bd.remove()}
+     el.dataset.rv=rvt?c.review.state:"";const bs=[c.locked&&"kilitli",c.ext&&"web",rvt,ncm&&{cm:ncm}].filter(Boolean);let bd=el.querySelector(":scope > .badges");
+     if(bs.length){if(!bd){bd=document.createElement("span");bd.className="badges";el.appendChild(bd)}const h=bs.map(x=>typeof x==="object"?`<span class="bcm" data-cmopen data-nodrag title="Yorumları aç (C)">${x.cm} yorum</span>`:`<span>${x}</span>`).join("");if(bd.innerHTML!==h)bd.innerHTML=h}else if(bd)bd.remove()}
     if(c.kind==="image"){const img=el.querySelector("img");const s=imgSrc(c);if(img.getAttribute("src")!==s)img.setAttribute("src",s);el.classList.toggle("gray",!!c.gray);el.classList.toggle("flip",!!c.flip)}
     const txt=el.querySelector(".txt");
     if(txt&&S.editing!==c.id){const val=c.kind==="audio"?(c.text||"Ses kaydı"):c.kind==="link"?(c.text||hostOf(c.url)||c.url):(c.text||"");if(txt.textContent!==val)txt.textContent=val}
@@ -2460,7 +2469,7 @@ const KB=[
   ["Pano · araçlar",[["Seç / taşı","V"],["Kalem","P"],["Ok","A"],["Dikdörtgen","R"],["Çerçeve","F"],["Silgi","E"]]],
   ["Pano · seçim",[["Kutuyla seç","sürükle"],["Seçime ekle / çıkar","Shift tık"],["Hepsini seç","Ctrl A"],["Seçimi çerçevele","Ctrl G"],["Sil","Delete"],["Kopyasını oluştur","Ctrl D"],["Geri al","Ctrl Z"],["Yinele","Ctrl Shift Z"],["Kilitle / kilidi aç","L"]]],
   ["Pano · görünüm",[["Panoyu tam ekran yap / çık","Ctrl Space"],["Kaydır","Space sürükle"],["Kaydır","orta tuş sürükle"],["Kaydır","tekerlek"],["Yakınlaş / uzaklaş","Ctrl tekerlek"],["Sürükleyerek zoom","Ctrl orta tuş sürükle"]]],
-  ["Pano · kartlar",[["Yeni not","boş yere çift tık"],["Notu / çerçeve adını düzenle","çift tık"],["Görseli tam ekran aç","görsele çift tık"],["Gri ton","G"],["Yatay çevir","H"],["Görsel, link ya da metin yapıştır","Ctrl V"],["Bağlam menüsü","sağ tık · iPad'de uzun bas"],["Web'den görsel","tarayıcıdan sürükle"]]],
+  ["Pano · kartlar",[["Görsele not yaz","görsel seçiliyken N"],["Yorumlar ve onay (ortak proje)","kart seçiliyken C"],["Yeni not","boş yere çift tık"],["Notu / çerçeve adını düzenle","çift tık"],["Görseli tam ekran aç","görsele çift tık"],["Gri ton","G"],["Yatay çevir","H"],["Görsel, link ya da metin yapıştır","Ctrl V"],["Bağlam menüsü","sağ tık · iPad'de uzun bas"],["Web'den görsel","tarayıcıdan sürükle"]]],
   ["Pano · hizalama",[["Kılavuzlara yapışmadan taşı","Alt sürükle"],["Hizala, dağıt, boyut eşitle","2+ kart seç → alt çubuk"],["Tıklanan karta göre eşitle","sağ tık"]]],
   ["Görsel düzenleyici",[["Aç","Enter · ✎ · sağ tık"],["Kalem / ok / dikdörtgen","P A R"],["Kırp","C · Enter"],["Geri al / yinele","Ctrl Z · Ctrl Shift Z"],["Kaydet","Ctrl S"],["Kapat","Esc"]]],
   ["Odak görünümü",[["Önceki / sonraki görsel","← →"],["Ekrana sığdır","0"],["Gerçek boyut","1"],["Gri ton / çevir","G H"],["Yakınlaş","tekerlek"],["Kapat","Esc"]]],
@@ -3060,7 +3069,7 @@ function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";rend
       <div class="mslist">${ms.filter(m=>m!==next).slice(0,3).map(m=>`<button class="msrow" data-ms="${esc(m.id)}"><span>${esc(m.name||"Hedef")}</span><span class="mono">${m.date?dShort(m.date):"—"}</span></button>`).join("")}</div>`}
   else msH=`<div class="empty">Henüz hedef yok. Teslim tarihi olan bir kilometre taşı ekle; görevleri ona bağlayınca ilerleme burada görünür.</div>`;
   const col=st=>{const ts=all.filter(t=>statusOf(t)===st&&asgPass(t));return `<div class="mk"><div class="mkh ${st}"><span>${STN[st]}</span><span class="mono">${ts.length}</span></div>
-    ${ts.slice(0,st==="done"?2:3).map(t=>`<button class="mkc" data-topen="${esc(t.id)}"><span>${esc(t.title)}</span>${t.assignee?avatar(t.assignee):""}</button>`).join("")}${ts.length>(st==="done"?2:3)?`<span class="small">+${ts.length-(st==="done"?2:3)}</span>`:""}</div>`};
+    ${ts.map(t=>`<button class="mkc" data-topen="${esc(t.id)}"><span>${esc(t.title)}</span>${t.assignee?avatar(t.assignee):""}</button>`).join("")}</div>`};
   const refs=cardsOfProject(pid).filter(c=>c.kind==="image"||c.kind==="audio").sort((a,b)=>((b.review&&b.review.state==="wait")-(a.review&&a.review.state==="wait"))||(b.created||0)-(a.created||0)).slice(0,10);
   const wait=cardsOfProject(pid).filter(c=>c.review&&c.review.state==="wait").length;
   $("sHub").innerHTML=`<div class="scroll"><div class="hubw"><div class="hub">
@@ -3070,9 +3079,9 @@ function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";rend
       ${mine.length?`<div class="mine">${mine.slice(0,6).map(t=>`<button class="minr" data-topen="${esc(t.id)}">${stPill(statusOf(t))}<span class="t">${esc(t.title)}</span><span class="small">${commentsOf(t.id).length?commentsOf(t.id).length+" yorum":t.date?(t.date===TODAY?"bugün":dShort(t.date)):"tarihsiz"}</span></button>`).join("")}</div>`
         :`<div class="empty">Sana atanmış açık görev yok.</div>`}</section>
     ${briefBlock(pid).replace('class="block brief"','class="block brief hb"')}
-    <section class="block hb span2"><div class="bhead"><h2>İş akışı</h2><button class="mini" data-kanban>Panoyu aç →</button></div>
+    <section class="block hb span2 fixh"><div class="bhead"><h2>İş akışı</h2><button class="mini" data-kanban>Panoyu aç →</button></div>
       ${asgBar(pid)}<div class="mkgrid">${STS.map(s=>col(s[0])).join("")}</div></section>
-    <section class="block hb"><div class="bhead"><h2>Son hareketler</h2></div><div class="actlist" id="actList"></div></section>
+    <section class="block hb fixh"><div class="bhead"><h2>Son hareketler</h2></div><div class="actlist" id="actList"></div></section>
     <section class="block hb span3"><div class="bhead"><h2>Referanslar</h2><span class="count">${wait?wait+" onay bekliyor":""}</span></div>
       ${refs.length?`<div class="hrefs">${refs.map(c=>`<button class="href" data-copen="${esc(c.id)}">${c.kind==="audio"?`<span class="hau">${AU_IC}<span>${esc(c.text||"Ses")}</span></span>`:`<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`}${rvChip(c)}${commentsOf(c.id).length?`<span class="hcc">${commentsOf(c.id).length}</span>`:""}</button>`).join("")}</div>`
         :`<div class="empty">Panolara görsel ya da ses eklendikçe burada görünür.</div>`}</section>
@@ -3166,7 +3175,8 @@ $("drw").addEventListener("click",e=>{
   const r=e.target.closest("[data-rv]");if(r){setReview(r.dataset.rv);return}
   const d=e.target.closest("[data-cmdel]");if(d){run(api.remove(d.dataset.cmdel));return}
   const g=e.target.closest("[data-goto]");if(g){const c=S.items.find(i=>i.id===g.dataset.goto);closeDrawer();if(c){S.sub[curP()]="b:"+c.board;save();S.selSet=new Set([c.id]);renderProject();centerOn(c)}}});
-document.addEventListener("click",e=>{const t=e.target.closest("[data-topen]");if(t){e.preventDefault();openDrawer(t.dataset.topen)}});
+document.addEventListener("click",e=>{const t=e.target.closest("[data-topen]");if(t){e.preventDefault();openDrawer(t.dataset.topen);return}
+  const c=e.target.closest("[data-cmopen]");if(c){e.stopPropagation();const card=c.closest(".card");if(card)openDrawer(card.dataset.id)}});
 
 /* ---------- Bildirim kutusu ---------- */
 const NTX={mention:"senden bahsetti",comment:"görevine yorum yaptı",assign:"sana bir görev atadı",review:"incelemeye gönderdi",reqok:"onay istiyor",approved:"referansını onayladı",revise:"revizyon istedi"};
