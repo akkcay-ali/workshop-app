@@ -63,7 +63,8 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Açık anahtar `tauri.conf.json > plugins.updater.pubkey` içinde; anahtar değişirse eski kurulumlar güncellenemez.
 - Release'e ek olarak `…_x64-offline-setup.exe` (WebView2 gömülü, `src-tauri/tauri.offline.conf.json`, güncelleme imzası yok) yüklenir.
 - Açılış hatası sessiz kalmaz: `lib.rs` `fatal()` Windows mesaj kutusu; WebView2 yoksa (`tauri::webview_version`) indirme sayfasını önerir; panic kancası da aynı kutuyu gösterir.
-- macOS derlemesi elle tetiklenir (`mac.yml`). iOS derlemesi Mac'te yapılır (README).
+- macOS derlemesi elle tetiklenir (`mac.yml`).
+- iPad: `ios.yml` (elle) GitHub macOS makinesinde `tauri ios init/build` + TestFlight'a `altool` ile yükler. Kimlik `com.akkcay.workshop` (`tauri.ios.conf.json`), `Info.ios.plist` (mikrofon, şifreleme beyanı, Dosyalar). Secret'lar: `APPLE_DEVELOPMENT_TEAM`, `APPLE_API_ISSUER`, `APPLE_API_KEY`, `APPLE_API_KEY_P8`. Masaüstüne özel izinler `capabilities/desktop.json`.
 
 ## Kullanıcı tercihleri
 - Doğrudan, sade çözümler; riskler baştan söylenir.
