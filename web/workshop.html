@@ -1782,7 +1782,8 @@ function deleteBoard(pid,id){const lb=boards(pid).find(x=>x.id===id);if(lb&&lb.l
 $("phead").addEventListener("contextmenu",e=>{
   const t=e.target.closest('.st[data-sub^="b:"]');if(!t)return;e.preventDefault();
   const pid=curP(),id=t.dataset.sub.slice(2);const b=boards(pid).find(x=>x.id===id);if(!b)return;
-  boardMenu(pid,isShared(pid)?(curBoard()||id):id,e.clientX,e.clientY);
+  if(isShared(pid))return; /* ortak projede "Panolar" sekmesinin menüsü yok; panolar soldaki listeden yönetilir */
+  boardMenu(pid,id,e.clientX,e.clientY);
 });
 /* ---------- Referans dizini (ortak projeler): ekip panoları + benim panolarım ---------- */
 function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filter(c=>c.kind!=="frame").length;
