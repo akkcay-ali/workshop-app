@@ -2143,13 +2143,23 @@ function toggleLock(ids){
 }
 
 /* ---------- iki parmakla dokun = geri al, üç parmakla = yinele (iPad, Procreate gibi) ---------- */
-const TT={pts:new Map(),t0:0,max:0,moved:false};
-stage.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch")return;if(!TT.pts.size){TT.t0=performance.now();TT.max=0;TT.moved=false}
-  TT.pts.set(e.pointerId,{x:e.clientX,y:e.clientY});TT.max=Math.max(TT.max,TT.pts.size)},true);
-stage.addEventListener("pointermove",e=>{const p=TT.pts.get(e.pointerId);if(p&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>14)TT.moved=true},true);
-const ttEnd=e=>{if(!TT.pts.delete(e.pointerId)||TT.pts.size)return;
-  if(e.type==="pointerup"&&!TT.moved&&TT.max>=2&&performance.now()-TT.t0<380){lpCancel();if(TT.max===2)undo();else redo()}};
-stage.addEventListener("pointerup",ttEnd,true);stage.addEventListener("pointercancel",ttEnd,true);
+/* iOS Safari çoklu dokunuşta pointer olaylarını iptal edebiliyor; bu yüzden touch olayları sayılır */
+const TT={st:new Map(),t0:0,max:0,moved:false};
+const ttFire=()=>{lpCancel();if(TT.max===2)undo();else redo()};
+if("ontouchstart" in window){
+  stage.addEventListener("touchstart",e=>{if(!TT.st.size&&e.touches.length===e.changedTouches.length){TT.t0=performance.now();TT.max=0;TT.moved=false}
+    for(const t of e.changedTouches)TT.st.set(t.identifier,{x:t.clientX,y:t.clientY});TT.max=Math.max(TT.max,e.touches.length)},{capture:true,passive:true});
+  stage.addEventListener("touchmove",e=>{for(const t of e.changedTouches){const p=TT.st.get(t.identifier);if(p&&Math.hypot(t.clientX-p.x,t.clientY-p.y)>16)TT.moved=true}},{capture:true,passive:true});
+  const tEnd=e=>{for(const t of e.changedTouches)TT.st.delete(t.identifier);if(e.touches.length)return;TT.st.clear();
+    if(!TT.moved&&TT.max>=2&&performance.now()-TT.t0<450)ttFire()};
+  stage.addEventListener("touchend",tEnd,{capture:true,passive:true});stage.addEventListener("touchcancel",tEnd,{capture:true,passive:true});
+}else{
+  const P=new Map();
+  stage.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch")return;if(!P.size){TT.t0=performance.now();TT.max=0;TT.moved=false}P.set(e.pointerId,{x:e.clientX,y:e.clientY});TT.max=Math.max(TT.max,P.size)},true);
+  stage.addEventListener("pointermove",e=>{const p=P.get(e.pointerId);if(p&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>16)TT.moved=true},true);
+  const pEnd=e=>{if(!P.delete(e.pointerId)||P.size)return;if(e.type==="pointerup"&&!TT.moved&&TT.max>=2&&performance.now()-TT.t0<450)ttFire()};
+  stage.addEventListener("pointerup",pEnd,true);stage.addEventListener("pointercancel",pEnd,true);
+}
 
 /* ---------- uzun basma = sağ tık (iPad) ---------- */
 let lp=null;
