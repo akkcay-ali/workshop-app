@@ -26,6 +26,9 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - İstemci: `CL` nesnesi, `wrapApi()` api/assets çağrılarını projeye göre yönlendirir (`isCloud(pid)`).
   `cloudOnly()` = GitHub Pages sürümü (window.claude yok, supabase-js var). claude.ai artifact'ında bulut kapalı.
 - `src/vendor/supabase.js` (supabase-js UMD) build-frontend ile eklenir.
+- Ekip (yalnızca ortak = üye/davet >1): görev `assignee`, `public.activity` (items tetikleyicisi `private.log_activity`
+  ekle/düzenle/bitir/ata/sil kaydı), varlık kanalı `proj:<pid>` (özel, `realtime.messages` RLS), proje `brief` alanı,
+  `profiles.name` görünen ad.
 
 ## Derleme
 - Masaüstü derlemesi yalnızca `src-tauri/tauri.conf.json` değişince (sürüm artışı) çalışır.

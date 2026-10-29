@@ -524,6 +524,29 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   background:var(--ink);color:var(--accent-ink);font-size:13px;font-weight:500;z-index:60;box-shadow:0 12px 30px -10px rgb(0 0 0 / .7);max-width:calc(100% - 32px)}
 .toast button{border:0;background:var(--accent-ink);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
+/* ekip */
+.av{--c:var(--t1);width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;flex:0 0 auto;font-size:10.5px;font-weight:600;line-height:1;
+  background:color-mix(in srgb,var(--c) 30%,var(--surface));color:var(--c);border:1px solid color-mix(in srgb,var(--c) 55%,transparent)}
+.av.lg{width:26px;height:26px;font-size:12px}
+.asg{display:inline-flex;align-items:center;border:0;background:none;padding:0;margin-right:6px;vertical-align:middle;color:var(--ink-3);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.asg:hover{transform:scale(1.15);color:var(--ink)}.asg.none svg{width:16px;height:16px;opacity:.55}.asg.none:hover svg{opacity:1}
+.task .meta{align-items:center}
+.afbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:2px 0 6px}
+.afc{border:1px solid var(--stroke);background:transparent;border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--ink-3);transition:all .15s}
+.afc:hover{color:var(--ink)}.afc.on{background:var(--glass-2);border-color:var(--stroke-2);color:var(--ink)}
+.afsep{width:1px;height:16px;background:var(--stroke);margin:0 2px}
+.afp{border:0;background:none;padding:2px;border-radius:50%;opacity:.6;transition:all .2s cubic-bezier(.34,1.56,.64,1)}.afp:hover{opacity:1;transform:scale(1.1)}.afp.on{opacity:1;box-shadow:0 0 0 2px var(--accent)}
+.actlist{display:flex;flex-direction:column;gap:2px}
+.act{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:10px;align-items:start;width:100%;text-align:left;border:0;background:transparent;padding:7px 4px;border-radius:8px;color:var(--ink-2);font-size:12.5px;line-height:1.4}
+.act:hover{background:var(--glass-2)}.act b{color:var(--ink);font-weight:500}.act .aw{font-size:11px;color:var(--ink-3);font-family:var(--f-mono);white-space:nowrap}
+.aimgs{display:flex;gap:4px;margin-top:5px}.aimgs img{width:38px;height:38px;object-fit:cover;border-radius:6px;border:1px solid var(--stroke)}
+.here{display:flex;align-items:center;margin-left:10px}.here .hp{margin-left:-5px;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}.here .hp:first-child{margin-left:0}
+.here .av{width:24px;height:24px;font-size:11px;box-shadow:0 0 0 2px var(--surface)}.here .hp:hover{transform:translateY(-2px)}
+@media (prefers-reduced-motion:no-preference){.here .hp{animation:popIn .42s linear both}}
+.st .hd{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c);margin-left:5px;vertical-align:2px;box-shadow:0 0 0 1.5px var(--surface)}
+.phere{display:flex;gap:2px;float:right;margin-top:-1px}.phere .av{width:18px;height:18px;font-size:9.5px}
+.brief textarea{width:100%;resize:none;border:1px solid transparent;background:transparent;color:var(--ink);font:inherit;font-size:13px;line-height:1.55;padding:6px 8px;margin:0 -8px;border-radius:8px;min-height:22px;box-sizing:content-box}
+.brief textarea:hover{border-color:var(--stroke)}.brief textarea:focus{outline:none;border-color:var(--stroke-2);background:var(--glass)}
 /* ortak projeler */
 .acbtn{position:relative}.acbtn.in{color:var(--ink)}
 .acbtn.in svg{display:none}.acav{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:600;margin:0 -3px}
@@ -664,7 +687,8 @@ body.frameless .app{padding-top:8px}
   <div id="acctSec">
     <div id="acctOut" class="acform"><input class="field" id="acEmail" type="email" placeholder="e-posta" autocomplete="email"><input class="field" id="acPass" type="password" placeholder="şifre (en az 6 karakter)" autocomplete="current-password">
       <div class="row"><button class="btn primary" id="acIn" style="flex:1">Giriş yap</button><button class="btn" id="acUp" style="flex:1">Hesap oluştur</button></div><span class="small" id="acMsg"></span></div>
-    <div id="acctIn" class="acform" hidden><div class="libpath mono" id="acWho"></div><button class="btn" id="acOut">Çıkış yap</button></div></div>
+    <div id="acctIn" class="acform" hidden><div class="libpath mono" id="acWho"></div>
+      <label class="small" for="acName">Görünen ad · ekip seni böyle görür</label><input class="field" id="acName" maxlength="40" placeholder="ör. Ali"><button class="btn" id="acOut">Çıkış yap</button></div></div>
 </div>
 
 <div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
@@ -749,7 +773,7 @@ const LS={get(k,d){try{const v=localStorage.getItem("atolye:"+k);return v?JSON.p
 const SB_URL="https://mbhpblbynyaotbblnxyr.supabase.co",SB_KEY="sb_publishable_qLmYiq-gNPR5U2TDbXFC2A_2BE6Xnpt";
 const CLIENT=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 const CL={sb:null,me:null,email:"",pids:new Set(),own:new Set(),items:new Map(),out:new Map(),timers:new Map(),
-  apid:new Map(),mc:new Map(),fetching:new Set(),online:true,chan:null,base:null,baseAssets:null,raf:0,down:false,cacheT:null};
+  apid:new Map(),mc:new Map(),prof:new Map(),people:new Map(),act:new Map(),pres:new Map(),here:new Map(),fetching:new Set(),online:true,chan:null,base:null,baseAssets:null,raf:0,down:false,cacheT:null};
 const cloudAvail=()=>!!window.supabase&&(!!TA||S.mode==="cloud");
 const isCloud=pid=>!!pid&&CL.pids.has(pid);
 const KIND_IC={local:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M3 3.8A.8.8 0 013.8 3h6.9L13 5.3v6.9a.8.8 0 01-.8.8H3.8a.8.8 0 01-.8-.8z"/><path d="M5.5 3v2.6h4V3M5 13V9.6h6V13"/></svg>',
@@ -944,7 +968,7 @@ function taskRow(t,o={}){
   return `<div class="task${t.done?" done":""}">
     <button class="check" role="checkbox" aria-checked="${!!t.done}" data-toggle="${t.id}" aria-label="Tamamlandı"></button>
     <div><div class="tt">${esc(t.title)}</div>
-      <div class="meta">${t.time?`<span class="time">${esc(t.time)}</span>`:""}${late&&o.showLate?`<span class="late">${parse(t.date).getDate()} ${MSH[parse(t.date).getMonth()]}</span>`:""}${tagH(t.tag)}${t.rep?`<span class="fmin">↻ ${REP[t.rep]||""}</span>`:""}${t.focus||TM.task===t.id?`<span class="fmin${TM.task===t.id?" on":""}">${TM.task===t.id?"odakta":""}${t.focus&&TM.task===t.id?" · ":""}${t.focus?fmtMin(t.focus):""}</span>`:""}${o.home?"":refThumbs(t)}</div></div>
+      <div class="meta">${isShared(projOf(t))?asgBtn(t):""}${t.time?`<span class="time">${esc(t.time)}</span>`:""}${late&&o.showLate?`<span class="late">${parse(t.date).getDate()} ${MSH[parse(t.date).getMonth()]}</span>`:""}${tagH(t.tag)}${t.rep?`<span class="fmin">↻ ${REP[t.rep]||""}</span>`:""}${t.focus||TM.task===t.id?`<span class="fmin${TM.task===t.id?" on":""}">${TM.task===t.id?"odakta":""}${t.focus&&TM.task===t.id?" · ":""}${t.focus?fmtMin(t.focus):""}</span>`:""}${o.home?"":refThumbs(t)}</div></div>
     <div class="acts">${o.pull?`<button class="mini" data-move="${t.id}" data-to="${S.sel}">${S.sel===TODAY?"bugüne al":"bu güne al"}</button>`:""}
       ${!o.pull&&!o.home&&!t.done?`<button class="mini" data-move="${t.id}" data-to="${ymd(addDays(parse(t.date||S.sel),1))}">yarına</button>`:""}
       ${!t.done&&TM.task!==t.id?`<button class="mini" data-focus="${t.id}">odak</button>`:""}${o.home?"":`<button class="mini" data-rep="${t.id}">tekrar</button>`}${o.home?"":`<button class="mini" data-refpick="${t.id}">referans</button>`}<button class="mini danger" data-tdel="${t.id}">sil</button></div></div>`;
@@ -1024,7 +1048,7 @@ function weekBlock(){
       const pn=id=>{const p=projects().find(x=>x.id===id);return p?p.name||"Proje":""};
       return `<div class="fnl"><span class="small">Odak notları</span>${ns.map(f=>`<div><b title="${esc(f.note)}">${esc(f.note)}</b><span class="small">${esc([pn(f.project),fmtMin(f.mins||0)].filter(Boolean).join(" · "))}</span></div>`).join("")}</div>`})()}</div>`;
 }
-function renderHome(){renderHome0();if(S.mode==="cloud"&&!CL.me)$("vHome").insertAdjacentHTML("afterbegin",`<div class="cbanner"><span><b>Workshop web</b><span class="small" style="display:block;margin-top:3px">Ortak projelerini görmek ve yeni proje açmak için ekip hesabınla giriş yap.</span></span><button class="btn primary" data-acct>Giriş yap</button></div>`)}
+function renderHome(){renderHome0();drawHere();presTrack();if(S.mode==="cloud"&&!CL.me)$("vHome").insertAdjacentHTML("afterbegin",`<div class="cbanner"><span><b>Workshop web</b><span class="small" style="display:block;margin-top:3px">Ortak projelerini görmek ve yeni proje açmak için ekip hesabınla giriş yap.</span></span><button class="btn primary" data-acct>Giriş yap</button></div>`)}
 function renderHome0(){
   const ps=projects();const all=S.items.filter(i=>i.type==="task");
   const cardsHtml=ps.map(p=>{
@@ -1033,9 +1057,9 @@ function renderHome0(){
     const col=imgs.length?`<div class="collage${imgs.length===1?" one":""}">${imgs.map(c=>`<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`).join("")}</div>`:`<div class="collage none"></div>`;
     return `<div class="pwrap"><button class="pcard" data-go="${esc(p.id)}" style="width:100%">${col}
       <div class="pb"><div class="pn">${esc(p.name||"Proje")}${kindIcon(p.id)}</div>
-      <div class="pm">${today?`<span class="hot">${today} bugün</span>`:""}<span>${open} açık görev</span><span>${cs.length} referans</span></div></div></button>
+      <div class="phere"></div><div class="pm">${today?`<span class="hot">${today} bugün</span>`:""}<span>${open} açık görev</span><span>${cs.length} referans</span></div></div></button>
       <button class="pdel" data-pdel="${esc(p.id)}" aria-label="Projeyi sil">sil</button></div>`}).join("");
-  const todays=all.filter(t=>t.date===TODAY).sort(sortTasks);
+  const todays=all.filter(t=>t.date===TODAY&&!(t.assignee&&t.assignee!==CL.me&&isShared(projOf(t)))).sort(sortTasks);
   const late=all.filter(t=>!t.done&&t.date&&t.date<TODAY).length;
   let grouped="";
   for(const p of ps){const ts=todays.filter(t=>projOf(t)===p.id);if(!ts.length)continue;
@@ -1126,7 +1150,8 @@ function renderHead(){
     right+=`<button class="arrow" data-wk="1" aria-label="Sonraki hafta">›</button>`;
   }
   const shb=cloudAvail()?`<button class="shbtn${isShared(pid)?" on":""}" data-share="${esc(pid)}" title="${isShared(pid)?"Paylaşım ve üyeler":"Ekiple paylaş"}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="2.4"/><path d="M2 13.2c.5-2.2 2-3.4 4-3.4s3.5 1.2 4 3.4M11 4.2v4M9 6.2h4"/></svg>${isShared(pid)?"Ortak":"Paylaş"}</button>`:"";
-  $("phead").innerHTML=`${name}${shb}<nav class="subtabs" aria-label="Proje bölümleri"><span class="stind" aria-hidden="true"></span>${st}</nav><div class="pright">${right}</div>`;
+  const here=isShared(pid)?`<div class="here" id="hereBox"></div>`:"";if(isShared(pid)&&!CL.pres.has(pid))presSync();
+  $("phead").innerHTML=`${name}${shb}${here}<nav class="subtabs" aria-label="Proje bölümleri"><span class="stind" aria-hidden="true"></span>${st}</nav><div class="pright">${right}</div>`;drawHere();presTrack();
   placeInd(pid);
   if(S.renaming==="project"){const inp=$("pnameIn");inp.focus();inp.select();
     const done=ok=>{if(S.renaming!=="project")return;S.renaming=null;const v=inp.value.trim();
@@ -1161,7 +1186,7 @@ function renderSub(){
 
 /* tasks */
 function renderTasks(){
-  const pid=curP();const sd=parse(S.sel);const all=tasksOf(pid);
+  const pid=curP();const sd=parse(S.sel);const shared=isShared(pid);const all=tasksOf(pid).filter(t=>!shared||asgPass(t));
   const day=all.filter(t=>t.date===S.sel).sort(sortTasks);const done=day.filter(t=>t.done).length;
   const late=all.filter(t=>!t.done&&t.date&&t.date<TODAY).sort((a,b)=>a.date.localeCompare(b.date));
   const later=all.filter(t=>!t.date&&!t.done).sort((a,b)=>(a.created||0)-(b.created||0));
@@ -1172,10 +1197,11 @@ function renderTasks(){
       <div class="bhead"><div class="dayh"><span class="d">${rel}</span><span class="count">${sd.getDate()} ${MONTHS[sd.getMonth()]}</span></div><span class="count">${day.length?done+"/"+day.length+" tamam":""}</span></div>
       ${day.length?`<div class="progress"><i style="width:${Math.round(done/day.length*100)}%"></i></div>`:""}
       <form class="add" data-add="day" autocomplete="off"><input id="dayIn" placeholder="Görev ekle…" maxlength="200" aria-label="Görev ekle"><button class="btn" type="submit">Ekle</button></form>
-      <div class="hint">Saat ve etiket yazabilirsin: <code>14:30 Işık pass #sahne</code></div>
+      <div class="hint">Saat ve etiket yazabilirsin: <code>14:30 Işık pass #sahne</code></div>${shared?asgBar(pid):""}
       <div class="list">${day.length?day.map(t=>taskRow(t)).join(""):`<div class="empty">Bu gün için görev yok.</div>`}</div>
     </div></div>
     <div class="col">
+      ${shared?briefBlock(pid)+`<div class="block"><div class="bhead"><h2>Son hareketler</h2></div><div class="actlist" id="actList"></div></div>`:""}
       ${late.length?`<div class="block"><div class="bhead"><h2>Gecikenler</h2><span class="count">${late.length}</span></div><div class="list">${late.map(t=>taskRow(t,{pull:true,showLate:true})).join("")}</div></div>`:""}
       <div class="block"><div class="bhead"><h2>Sonra</h2><span class="count">${later.length||""}</span></div>
         <form class="add" data-add="later" autocomplete="off"><input id="laterIn" placeholder="Tarihsiz bir iş bırak…" maxlength="200" aria-label="Sonraya ekle"><button class="btn" type="submit">Ekle</button></form>
@@ -1184,11 +1210,13 @@ function renderTasks(){
         ${refs.length?`<div class="thumbs">${refs.map(c=>c.kind==="image"?`<button class="thumb" data-goto="${c.id}" aria-label="Panoda aç"><img src="${esc(imgSrc(c))}" alt="" loading="lazy"></button>`
           :`<button class="thumb note" data-goto="${c.id}">${esc((c.text||"").slice(0,90))}</button>`).join("")}</div>`:`<div class="empty">Panoya eklediğin son görseller ve notlar burada görünür.</div>`}</div>
     </div></div></div>`;
+  if(shared){fitBrief();drawAct(pid);loadAct(pid)}
 }
 $("sTasks").addEventListener("submit",e=>{
   e.preventDefault();if(!api)return;const f=e.target;const inp=f.querySelector("input");if(!inp.value.trim())return;
   const p=parseTask(inp.value);
-  run(api.add({type:"task",project:curP(),title:p.title,time:p.time,tag:p.tag,date:f.dataset.add==="day"?S.sel:"",done:false,created:Date.now()}));
+  const af=isShared(curP())?asgF(curP()):"all";const asg=af==="me"?CL.me:af!=="all"&&af!=="none"?af:null;
+  run(api.add(Object.assign({type:"task",project:curP(),title:p.title,time:p.time,tag:p.tag,date:f.dataset.add==="day"?S.sel:"",done:false,created:Date.now()},asg?{assignee:asg}:{})));
   const id=inp.id;inp.value="";setTimeout(()=>{const el=$(id);if(el)el.focus()},0);
 });
 $("sTasks").addEventListener("click",e=>{
@@ -2544,12 +2572,12 @@ const docPid=d=>!d?null:d.type==="project"?d.id:d.type==="card"?((projOfBoard(d.
 const cleanItem=(data,id)=>{const v=Object.assign({},data,{id});delete v._cl;return v};
 function cRender(){if(CL.raf)return;CL.raf=requestAnimationFrame(()=>{CL.raf=0;rerender();renderTabs()})}
 function cCacheSave(){clearTimeout(CL.cacheT);CL.cacheT=setTimeout(()=>{if(!CL.me)return;
-  LS.set("cl_cache_"+CL.me,{pids:[...CL.pids],own:[...CL.own],mc:[...CL.mc],items:[...CL.items.values()].map(strip)})},800)}
+  LS.set("cl_cache_"+CL.me,{pids:[...CL.pids],own:[...CL.own],mc:[...CL.mc],prof:[...CL.prof],people:[...CL.people],items:[...CL.items.values()].map(strip)})},800)}
 const saveOut=()=>LS.set("cl_out",[...CL.out.values()]);
 
 /* --- gönderim kuyruğu --- */
 function cPush(v,pid,del){const id=v.id;
-  CL.out.set(id,{id,project_id:pid,data:del?{_cl:CLIENT}:Object.assign(strip(v),{_cl:CLIENT}),deleted:!!del});saveOut();
+  CL.out.set(id,{id,project_id:pid,data:Object.assign(strip(v),{_cl:CLIENT}),deleted:!!del});saveOut();
   clearTimeout(CL.timers.get(id));CL.timers.set(id,setTimeout(()=>{CL.timers.delete(id);cFlush()},del?0:350));
   if(!del)CL.items.set(id,v);else CL.items.delete(id);cCacheSave();renderTabs()}
 let cFlushing=false;
@@ -2558,7 +2586,7 @@ async function cFlush(){if(cFlushing||!CL.sb||!CL.me)return;cFlushing=true;
       const {error}=await CL.sb.from("items").upsert(rows);
       if(error){if(!error.code||/fetch|network|load failed/i.test(error.message||"")){CL.online=false;break}
         rows.forEach(r=>{SY.err.set(r.project_id,Date.now());CL.out.delete(r.id)});saveOut();toast("Buluta kaydedilemedi: "+error.message,null,true);break}
-      rows.forEach(r=>{if(CL.out.get(r.id)===r)CL.out.delete(r.id)});CL.online=true;saveOut()}
+      rows.forEach(r=>{if(CL.out.get(r.id)===r)CL.out.delete(r.id);actQueue(r.project_id)});CL.online=true;saveOut()}
     /* üyeliği bitmiş projelerin bekleyenleri atılır */
     for(const [id,r] of CL.out)if(!CL.pids.has(r.project_id)&&CL.pids.size)CL.out.delete(id);
   }catch(e){CL.online=false}finally{cFlushing=false;renderTabs()}}
@@ -2616,23 +2644,22 @@ async function cLoad(){if(!CL.sb||!CL.me)return;
     const rows=[];if(pids.size){for(let from=0;;from+=1000){
       const {data,error}=await CL.sb.from("items").select("id,project_id,data").in("project_id",[...pids]).eq("deleted",false).order("id").range(from,from+999);
       if(error)throw error;rows.push(...data);if(data.length<1000)break}}
-    if(pids.size){const [{data:mm},{data:iv}]=await Promise.all([CL.sb.from("members").select("project_id").in("project_id",[...pids]),CL.sb.from("invites").select("project_id").in("project_id",[...pids])]);
-      CL.mc=new Map();for(const r of [...(mm||[]),...(iv||[])])CL.mc.set(r.project_id,(CL.mc.get(r.project_id)||0)+1)}
+    await cPeople(pids);
     const gone=[...CL.pids].filter(p=>!pids.has(p));CL.pids=pids;CL.own=own;
     const items=rows.map(r=>cleanItem(r.data,r.id));
     /* henüz gönderilmemiş yerel değişiklikler sunucudakini ezer */
     for(const r of CL.out.values()){const k=items.findIndex(v=>v.id===r.id);if(r.deleted){if(k>-1)items.splice(k,1)}else{const v=cleanItem(r.data,r.id);if(k>-1)items[k]=v;else items.push(v)}}
     cMerge(items);gone.forEach(p=>{if(S.open.includes(p))closeTab(p)});
-    CL.online=true;cCacheSave();cAssetsFor(items);renderAll();cFlush()}
+    CL.online=true;cCacheSave();cAssetsFor(items);renderAll();cFlush();presSync();presTrack(true)}
   catch(e){CL.online=false;renderTabs()}}
 function onRemote(p){const r=p.new&&p.new.id?p.new:null;
   if(p.eventType==="DELETE"){const id=p.old&&p.old.id;if(id&&CL.items.has(id)){S.items=S.items.filter(i=>i.id!==id);CL.items.delete(id);cRender()}return}
   if(!r||!CL.pids.has(r.project_id))return;
   if(r.data&&r.data._cl===CLIENT)return;/* kendi değişikliğimiz */
   if(CL.out.has(r.id)||CL.timers.has(r.id))return;/* bizde daha yenisi bekliyor */
-  if(r.deleted){if(CL.items.has(r.id)){S.items=S.items.filter(i=>i.id!==r.id);CL.items.delete(r.id);cRender()}return}
+  if(r.deleted){if(CL.items.has(r.id)){S.items=S.items.filter(i=>i.id!==r.id);CL.items.delete(r.id);cRender()}actQueue(r.project_id);return}
   const v=cleanItem(r.data,r.id);const k=S.items.findIndex(i=>i.id===r.id);if(k>-1)S.items[k]=v;else S.items.push(v);CL.items.set(v.id,v);
-  if(v.assetId)cAsset(r.project_id,v.assetId);cCacheSave();cRender()}
+  if(v.assetId)cAsset(r.project_id,v.assetId);cCacheSave();cRender();actQueue(r.project_id)}
 function cSubscribe(){if(CL.chan)CL.sb.removeChannel(CL.chan);
   CL.chan=CL.sb.channel("ws-"+CLIENT)
     .on("postgres_changes",{event:"*",schema:"public",table:"items"},onRemote)
@@ -2641,9 +2668,9 @@ function cSubscribe(){if(CL.chan)CL.sb.removeChannel(CL.chan);
       else if(st==="CHANNEL_ERROR"||st==="TIMED_OUT"||st==="CLOSED"){CL.down=true;CL.online=false}renderTabs()})}
 async function cStart(user){if(CL.me===user.id)return;CL.me=user.id;CL.email=user.email||"";
   const c=LS.get("cl_cache_"+CL.me,null);
-  if(c){CL.pids=new Set(c.pids);CL.own=new Set(c.own);CL.mc=new Map(c.mc||[]);cMerge(c.items||[]);cAssetsFor(c.items||[]);renderAll()}
+  if(c){CL.pids=new Set(c.pids);CL.own=new Set(c.own);CL.mc=new Map(c.mc||[]);CL.prof=new Map(c.prof||[]);CL.people=new Map(c.people||[]);cMerge(c.items||[]);cAssetsFor(c.items||[]);renderAll()}
   drawAcct();await cLoad();cSubscribe()}
-function cStop(){if(CL.chan)CL.sb.removeChannel(CL.chan);CL.chan=null;
+function cStop(){if(CL.chan)CL.sb.removeChannel(CL.chan);CL.chan=null;for(const ch of CL.pres.values())CL.sb.removeChannel(ch);CL.pres.clear();CL.here.clear();presLast="";
   [...CL.pids].forEach(p=>{if(S.open.includes(p))closeTab(p)});
   S.items=S.items.filter(i=>!CL.items.has(i.id));CL.items.clear();CL.pids.clear();CL.own.clear();CL.out.clear();saveOut();
   CL.me=null;CL.email="";renderAll();drawAcct()}
@@ -2707,10 +2734,10 @@ function closeShare(){animHide($("shr"));const p=shPid;shPid=null;
   if(p&&p===renameAfterShare&&curP()===p){renameAfterShare=null;S.renaming="project";renderHead()}}
 async function drawShare(){const pid=shPid;if(!pid)return;const L=$("shrList");L.innerHTML=`<div class="small">yükleniyor…</div>`;
   const [{data:ms},{data:inv}]=await Promise.all([CL.sb.from("members").select("user_id,role").eq("project_id",pid),CL.sb.from("invites").select("email").eq("project_id",pid)]);
-  const ids=(ms||[]).map(m=>m.user_id);const {data:pf}=ids.length?await CL.sb.from("profiles").select("id,email").in("id",ids):{data:[]};
+  const ids=(ms||[]).map(m=>m.user_id);const {data:pf}=ids.length?await CL.sb.from("profiles").select("id,email,name").in("id",ids):{data:[]};(pf||[]).forEach(x=>CL.prof.set(x.id,x));
   const em=Object.fromEntries((pf||[]).map(x=>[x.id,x.email]));const owner=CL.own.has(pid);if(shPid!==pid)return;
-  const n=(ms||[]).length+(inv||[]).length;if(CL.mc.get(pid)!==n){CL.mc.set(pid,n);cCacheSave();renderAll()}
-  L.innerHTML=(ms||[]).map(m=>`<div class="shrow"><span class="shav">${esc((em[m.user_id]||"?")[0].toUpperCase())}</span><span class="n">${esc(em[m.user_id]||"…")}${m.user_id===CL.me?" <i>(sen)</i>":""}</span><span class="small">${m.role==="owner"?"sahibi":"düzenleyebilir"}</span>${owner&&m.role!=="owner"?`<button class="mini" data-rmu="${esc(m.user_id)}">çıkar</button>`:""}</div>`).join("")
+  const n=(ms||[]).length+(inv||[]).length;if(CL.mc.get(pid)!==n){CL.mc.set(pid,n);cCacheSave();presSync();renderAll()}
+  L.innerHTML=(ms||[]).map(m=>`<div class="shrow">${avatar(m.user_id,"lg")}<span class="n">${esc(pname(m.user_id))}${m.user_id===CL.me?" <i>(sen)</i>":""} <i>${esc(em[m.user_id]||"")}</i></span><span class="small">${m.role==="owner"?"sahibi":"düzenleyebilir"}</span>${owner&&m.role!=="owner"?`<button class="mini" data-rmu="${esc(m.user_id)}">çıkar</button>`:""}</div>`).join("")
     +(inv||[]).map(i=>`<div class="shrow"><span class="shav off">@</span><span class="n">${esc(i.email)}</span><span class="small">kayıt olunca katılacak</span><button class="mini" data-rmi="${esc(i.email)}">iptal</button></div>`).join("")}
 async function shareInvite(){const m=$("shrIn").value.trim();if(!m||!shPid)return;$("shrAdd").disabled=true;
   const {data,error}=await CL.sb.rpc("invite_member",{p:shPid,mail:m});$("shrAdd").disabled=false;
@@ -2720,6 +2747,7 @@ function openAcct(){if($("acctPop").hidden)$("acctBtn").click();setTimeout(()=>{
 function drawAcct(){const btn=$("acctBtn");btn.hidden=!cloudAvail();if(btn.hidden)return;
   $("acctOut").hidden=!!CL.me;$("acctIn").hidden=!CL.me;btn.classList.toggle("in",!!CL.me);
   $("acAv").hidden=!CL.me;$("acAv").textContent=CL.me?(CL.email[0]||"?").toUpperCase():"";btn.title=CL.me?"Hesap · "+CL.email:"Hesap · giriş yap";
+  if(CL.me&&document.activeElement!==$("acName"))$("acName").value=(CL.prof.get(CL.me)||{}).name||"";
   if(CL.me){const n=CL.pids.size,sh=[...CL.pids].filter(isShared).length;$("acWho").textContent=CL.email+(n?` · ${n} bulut projesi${sh?`, ${sh} ortak`:""}`:"")}}
 const AUTH_TR=m=>/database error saving new user|signup_not_allowed/i.test(m)?"Bu e-posta davetli değil. Hesap açabilmek için bir projeye davet edilmen gerekiyor.":/invalid login/i.test(m)?"E-posta ya da şifre hatalı":/not confirmed/i.test(m)?"E-postanı henüz onaylamadın: gelen kutundaki bağlantıya tıkla":/already registered|already been registered/i.test(m)?"Bu e-postayla zaten hesap var, giriş yap":/at least 6|weak/i.test(m)?"Şifre en az 6 karakter olmalı":/rate limit/i.test(m)?"Çok fazla deneme, biraz bekle":/fetch|network/i.test(m)?"Bağlantı yok":m;
 async function acct(kind){const email=$("acEmail").value.trim(),password=$("acPass").value;const msg=$("acMsg");
@@ -2740,6 +2768,105 @@ $("shrClose").onclick=closeShare;$("shr").addEventListener("click",async e=>{
 $("shrLeave").onclick=e=>{const b=e.currentTarget;if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent=CL.own.has(shPid)?"Emin misin? Herkes için silinir":"Emin misin?";setTimeout(()=>{b.dataset.armed="";if(shPid)b.textContent=CL.own.has(shPid)?"Projeyi herkes için sil…":"Projeden ayrıl"},4000);return}
   b.dataset.armed="";const pid=shPid,own=CL.own.has(pid);closeShare();closeTab(pid);run(cDropProject(pid)).then(()=>toast(own?"Proje silindi":"Projeden ayrıldın",null,true))};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("shr").hidden)closeShare()});
+
+/* =====================================================================
+   EKİP (yalnızca ortak projeler): kişiler, görev atama, son hareketler,
+   şu an kim burada, proje panosu
+   ===================================================================== */
+const cap1=s=>s?s[0].toLocaleUpperCase("tr")+s.slice(1):s;
+function pname(id){if(id===CL.me&&!CL.prof.get(id))return "Sen";const p=CL.prof.get(id);if(!p)return "…";return p.name||cap1((p.email||"").split("@")[0].split(/[._-]/)[0])||"…"}
+const pcol=id=>{let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))|0;return `var(--t${1+Math.abs(h)%6})`};
+const avatar=(id,cls="")=>`<span class="av ${cls}" style="--c:${pcol(id)}" title="${esc(pname(id))}">${esc((pname(id)[0]||"?").toLocaleUpperCase("tr"))}</span>`;
+const people=pid=>CL.people.get(pid)||[];
+async function cPeople(pids){if(!pids.size){CL.people=new Map();return}
+  const [{data:mm},{data:iv}]=await Promise.all([CL.sb.from("members").select("project_id,user_id,role").in("project_id",[...pids]),CL.sb.from("invites").select("project_id").in("project_id",[...pids])]);
+  CL.people=new Map();CL.mc=new Map();for(const m of mm||[]){if(!CL.people.has(m.project_id))CL.people.set(m.project_id,[]);CL.people.get(m.project_id).push({id:m.user_id,role:m.role})}
+  for(const r of [...(mm||[]),...(iv||[])])CL.mc.set(r.project_id,(CL.mc.get(r.project_id)||0)+1);
+  const ids=[...new Set((mm||[]).map(m=>m.user_id).concat(CL.me))];
+  const {data:pf}=await CL.sb.from("profiles").select("id,email,name").in("id",ids);for(const p of pf||[])CL.prof.set(p.id,p)}
+
+/* --- görünen ad --- */
+async function saveMyName(){const v=$("acName").value.trim().slice(0,40);const me=CL.prof.get(CL.me)||{id:CL.me,email:CL.email,name:""};if(v===me.name)return;
+  const {error}=await CL.sb.from("profiles").update({name:v}).eq("id",CL.me);if(error){toast("Ad kaydedilemedi: "+error.message,null,true);return}
+  CL.prof.set(CL.me,Object.assign({},me,{name:v}));cCacheSave();renderAll();presTrack(true);toast("Görünen ad: "+(v||pname(CL.me)),null,true)}
+
+/* --- görev atama --- */
+function assignMenu(tid,x,y){const t=S.items.find(i=>i.id===tid);if(!t)return;const pid=projOf(t);
+  const it=people(pid).map(m=>({label:pname(m.id)+(m.id===CL.me?" (sen)":"")+(t.assignee===m.id?"  ✓":""),fn:()=>run(api.update(tid,{assignee:m.id}))}));
+  if(t.assignee)it.push("-",{label:"Atamayı kaldır",fn:()=>run(api.update(tid,{assignee:null}))});
+  openCtx(x,y,"Kime atansın?",it)}
+const asgBtn=t=>`<button class="asg${t.assignee?"":" none"}" data-assign="${t.id}" title="${t.assignee?esc(pname(t.assignee))+" · değiştir":"Kişiye ata"}">${t.assignee?avatar(t.assignee):`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="7" cy="5.8" r="2.4"/><path d="M2.6 13.2c.5-2.2 2.2-3.4 4.4-3.4M12 9.5v4M10 11.5h4"/></svg>`}</button>`;
+/* filtre: all | me | none | <kullanıcı> */
+const asgF=pid=>S.af&&S.af[pid]||"all";
+function asgPass(t){const f=asgF(projOf(t));return f==="all"||(f==="me"?t.assignee===CL.me:f==="none"?!t.assignee:t.assignee===f)}
+function asgBar(pid){const f=asgF(pid);const ch=(v,l)=>`<button class="afc${f===v?" on":""}" data-af="${esc(v)}">${l}</button>`;
+  return `<div class="afbar">${ch("all","Hepsi")}${ch("me","Bana atanan")}${ch("none","Atanmamış")}<span class="afsep"></span>${people(pid).filter(m=>m.id!==CL.me).map(m=>`<button class="afp${f===m.id?" on":""}" data-af="${esc(m.id)}" title="${esc(pname(m.id))}">${avatar(m.id)}</button>`).join("")}</div>`}
+
+/* --- son hareketler --- */
+const ago=ts=>{const s=(Date.now()-ts)/1000;if(s<60)return "şimdi";if(s<3600)return Math.floor(s/60)+" dk";if(s<86400)return Math.floor(s/3600)+" sa";
+  const d=new Date(ts);return s<172800?"dün":d.getDate()+" "+MSH[d.getMonth()]};
+let actT=null;
+async function loadAct(pid,force){if(!isShared(pid)||!CL.sb)return;const c=CL.act.get(pid);if(!force&&c&&Date.now()-c.at<15000)return;
+  const {data,error}=await CL.sb.from("activity").select("item_id,user_id,at,verb,type,kind,title,board,asset").eq("project_id",pid).order("at",{ascending:false}).limit(60);
+  if(error)return;CL.act.set(pid,{at:Date.now(),rows:data||[]});
+  const miss=[...new Set((data||[]).flatMap(r=>[r.user_id,r.verb==="assign"?r.kind:null]).filter(u=>u&&!CL.prof.has(u)))];
+  const known=new Set(people(pid).map(m=>m.id));if((data||[]).some(r=>r.user_id&&!known.has(r.user_id)))await cPeople(CL.pids);
+  if(miss.length){const {data:pf}=await CL.sb.from("profiles").select("id,email,name").in("id",miss);(pf||[]).forEach(x=>CL.prof.set(x.id,x))}
+  drawAct(pid)}
+function actQueue(pid){if(!isShared(pid)||curP()!==pid)return;clearTimeout(actT);actT=setTimeout(()=>loadAct(pid,true),1800)}
+function actDesc(r){const v=r.verb,T=`<b>${esc(r.title||"")}</b>`;
+  const bn=b=>{const x=S.items.find(i=>i.id===b);return x?x.name||"Pano":b&&String(b).startsWith("main")?"Referanslar":"pano"};
+  if(r.type==="task")return {k:"t"+v+r.item_id,t:{add:`${T} görevini ekledi`,done:`${T} görevini bitirdi`,edit:`${T} görevini düzenledi`,del:`${T} görevini sildi`,assign:r.kind?`${T} görevini atadı → <b>${esc(r.kind===CL.me?"sana":pname(r.kind))}</b>`:`${T} görevinin atamasını kaldırdı`}[v],go:v==="del"?null:r.item_id};
+  if(r.type==="card"){const w=esc(bn(r.board)),kd={image:"görsel",note:"not",link:"link",frame:"çerçeve",ink:"çizim"}[r.kind]||"kart";
+    if(v==="add")return {k:"cadd"+r.board+r.kind,t:n=>`${n>1?n+" ":""}${kd} ekledi · ${w}`,b:r.board,img:r.kind==="image"&&r.asset?{assetId:r.asset}:null};
+    if(v==="del")return {k:"cdel"+r.board,t:n=>`${n>1?n+" ":""}${n>1?"kart":kd} sildi · ${w}`,b:r.board};
+    return {k:"cedit"+r.board,t:`panoda düzenleme yaptı · ${w}`,b:r.board}}
+  if(r.type==="board")return {k:"b"+v+r.item_id,t:{add:`${T} panosunu açtı`,edit:`${T} panosunu güncelledi`,del:`${T} panosunu sildi`}[v]||"",b:v==="del"?null:r.item_id};
+  if(r.type==="project")return {k:"p"+v,t:v==="add"?"projeyi oluşturdu":"projeyi güncelledi"};
+  return null}
+function drawAct(pid){const el=$("actList");if(!el||curP()!==pid)return;const c=CL.act.get(pid);if(!c){el.innerHTML=`<div class="empty">yükleniyor…</div>`;return}
+  const groups=[];for(const r of c.rows){const a=actDesc(r);if(!a||!a.t)continue;const ts=Date.parse(r.at);
+    const g=groups[groups.length-1];if(g&&g.u===r.user_id&&g.k===a.k&&g.ts-ts<15*60000){g.n++;if(a.img&&g.imgs.length<4)g.imgs.push(a.img);continue}
+    groups.push(Object.assign({u:r.user_id,ts,n:1,imgs:a.img?[a.img]:[]},a))}
+  el.innerHTML=groups.length?groups.slice(0,10).map(g=>`<button class="act" ${g.go&&S.items.some(i=>i.id===g.go)?`data-actgo="${esc(g.go)}"`:g.b?`data-actb="${esc(g.b)}"`:""}>${avatar(g.u)}
+    <span class="at"><b>${esc(g.u===CL.me?"Sen":pname(g.u))}</b> ${typeof g.t==="function"?g.t(g.n):g.t}${g.imgs.length?`<span class="aimgs">${g.imgs.map(i=>imgSrc(i)?`<img src="${esc(imgSrc(i))}" alt="">`:"").join("")}</span>`:""}</span>
+    <span class="aw">${ago(g.ts)}</span></button>`).join(""):`<div class="empty">Henüz hareket yok.</div>`}
+
+/* --- şu an kim burada (Supabase presence, özel kanal proj:<pid>) --- */
+let presLast="";
+function presSync(){if(!CL.sb||!CL.me)return;const want=new Set([...CL.pids].filter(isShared));
+  for(const [pid,ch] of CL.pres)if(!want.has(pid)){CL.sb.removeChannel(ch);CL.pres.delete(pid);CL.here.delete(pid)}
+  for(const pid of want){if(CL.pres.has(pid))continue;
+    const ch=CL.sb.channel("proj:"+pid,{config:{private:true,presence:{key:CL.me}}});CL.pres.set(pid,ch);
+    ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere()})
+      .subscribe(s=>{if(s==="SUBSCRIBED"){presLast="";presTrack()}})}}
+function presTrack(force){if(!CL.me)return;const pid=curP();const w=pid?subOf(pid):"";const key=(pid||"")+"|"+w+"|"+pname(CL.me);if(!force&&key===presLast)return;presLast=key;
+  for(const [p,ch] of CL.pres){try{if(p===pid)ch.track({w,n:pname(CL.me),t:Date.now()});else ch.untrack()}catch(_){}}}
+function drawHere(){
+  const pid=curP();const box=$("hereBox");
+  if(box&&pid){const l=CL.here.get(pid)||[];box.innerHTML=l.map(h=>`<span class="hp" title="${esc(pname(h.u))} · ${esc(h.w==="tasks"?"Görevler":h.w==="cal"?"Takvim":"panoda")}">${avatar(h.u)}</span>`).join("");
+    document.querySelectorAll(".subtabs .st .hd").forEach(x=>x.remove());
+    for(const h of l){const st=document.querySelector(`.subtabs .st[data-sub="${CSS.escape(h.w||"")}"]`);if(st)st.insertAdjacentHTML("beforeend",`<span class="hd" style="--c:${pcol(h.u)}" title="${esc(pname(h.u))}"></span>`)}}
+  document.querySelectorAll(".pcard[data-go]").forEach(c=>{const l=CL.here.get(c.dataset.go)||[];const ph=c.querySelector(".phere");if(ph)ph.innerHTML=l.slice(0,4).map(h=>avatar(h.u)).join("")})}
+
+/* --- proje panosu (hedef, teslim, linkler) --- */
+let briefT=null;
+function briefBlock(pid){const p=proj(pid)||{};return `<div class="block brief"><div class="bhead"><h2>Proje panosu</h2><span class="count">${p.briefBy?esc(pname(p.briefBy))+" · "+ago(p.briefAt||0):"herkes düzenleyebilir"}</span></div>
+  <textarea id="briefIn" rows="1" maxlength="2000" placeholder="Hedef, teslim tarihi, önemli linkler…">${esc(p.brief||"")}</textarea></div>`}
+function fitBrief(){const t=$("briefIn");if(t){t.style.height="auto";t.style.height=Math.min(320,t.scrollHeight+2)+"px"}}
+
+/* --- olaylar --- */
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-assign]");if(a){e.stopPropagation();const r=a.getBoundingClientRect();assignMenu(a.dataset.assign,r.left,r.bottom+4);return}
+  const f=e.target.closest("[data-af]");if(f){const pid=curP();S.af=S.af||{};S.af[pid]=asgF(pid)===f.dataset.af?"all":f.dataset.af;renderTasks();return}
+  const g=e.target.closest("[data-actgo]");if(g){const t=S.items.find(i=>i.id===g.dataset.actgo);if(t){if(t.date){S.sel=t.date;S.week=monday(parse(t.date))}S.sub[curP()]="tasks";save();renderProject()}return}
+  const b=e.target.closest("[data-actb]");if(b){S.sub[curP()]="b:"+b.dataset.actb;save();renderProject();return}
+},true);
+document.addEventListener("focusin",e=>{if(e.target.id==="briefIn")S.editing=true});
+document.addEventListener("focusout",e=>{if(e.target.id==="briefIn"){S.editing=false;const pid=curP();clearTimeout(briefT);saveBrief(pid,e.target.value);setTimeout(rerender,0)}});
+document.addEventListener("input",e=>{if(e.target.id==="briefIn"){fitBrief();const pid=curP(),v=e.target.value;clearTimeout(briefT);briefT=setTimeout(()=>saveBrief(pid,v),900)}});
+function saveBrief(pid,v){const p=proj(pid);if(!p||(p.brief||"")===v)return;run(api.update(pid,{brief:v,briefBy:CL.me,briefAt:Date.now()}))}
+$("acName").addEventListener("change",saveMyName);$("acName").addEventListener("keydown",e=>{if(e.key==="Enter")e.target.blur()});
 
 function rerender(){
   if(drag||S.renaming){if(boardVisible())syncCards();return}
