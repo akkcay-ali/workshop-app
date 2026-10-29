@@ -575,7 +575,12 @@ button:disabled{cursor:var(--cur)}
 #sBoard.dir{left:224px}body.boardfs .rdir{display:none}body.boardfs #sBoard.dir{left:0}
 .rdg{display:flex;flex-direction:column;gap:2px}
 .rdh{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:0 10px 5px;display:flex;align-items:center;gap:6px}
-.rdh.rdmine{color:#C9B48A}.rdh .lk{width:11px;height:11px}
+.rdh.rdmine{color:#C9B48A}.rdh .lk{width:11px;height:11px;flex:0 0 auto}.rdh>span{flex:1}
+.rdadd{width:22px;height:22px;display:grid;place-items:center;border:1px solid transparent;border-radius:7px;background:transparent;color:inherit;padding:0;margin:-4px -4px -4px 0;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .15s,border-color .15s}
+.rdadd svg{width:13px;height:13px}.rdadd:hover{background:var(--glass-2);border-color:var(--stroke);color:var(--ink);transform:scale(1.12) rotate(90deg)}.rdadd:active{transform:scale(.9)}
+.rdl{display:grid;place-items:center;color:var(--ink-3);margin-left:auto}.rdl .lk{width:11px;height:11px}.rdb .rdl+.mono{margin-left:6px}
+.rdtip{font-size:11px;color:var(--ink-3);padding:0 10px;margin-top:auto;opacity:.8}
+.pill.name.lkd{display:inline-flex;align-items:center;gap:6px}.pill.name.lkd>.lk:last-child{width:11px;height:11px;opacity:.7}
 .rdb{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:var(--ink-2);border-radius:8px;padding:7px 10px;text-align:left;font-size:13px;transition:background .15s,transform .25s cubic-bezier(.34,1.56,.64,1),border-color .15s}
 .rdb span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.rdb .mono{font-size:11px;color:var(--ink-3)}
 .rdb:hover{background:var(--glass-2);color:var(--ink)}.rdb.on{background:var(--glass-2);color:var(--ink);border-color:var(--stroke)}
@@ -1030,6 +1035,7 @@ const privB=bid=>{const b=S.items.find(i=>i.id===bid&&i.type==="board");return !
 const teamBoards=pid=>boards(pid).filter(b=>!b.private);
 const myBoards=pid=>boards(pid).filter(b=>b.private);
 const refBoard=pid=>{const l=S.lastB&&S.lastB[pid];return l&&boards(pid).some(b=>b.id===l)?l:mainBoard(pid)};
+const PRIV_IC='<svg class="lk" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="5.6" r="2.6"/><path d="M3 14c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/></svg>';
 const LOCK_IC='<svg class="lk" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.8"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>';
 const tasksOf=pid=>S.items.filter(i=>i.type==="task"&&projOf(i)===pid);
 /* ortak projede: özel görev (yalnızca sahibi görür, veritabanı RLS) ve ekip görevi */
@@ -1488,7 +1494,7 @@ function renderBoard(){
   const bid=curBoard();const b=boards(curP()).find(x=>x.id===bid);if(!b)return;S.lastB=S.lastB||{};S.lastB[curP()]=bid;
   if(lastBoard!==bid){world.innerHTML='<svg class="ink" id="ink" xmlns="http://www.w3.org/2000/svg"></svg>';lastBoard=bid;ink=null}
   if(S.renaming!=="board"){
-    $("bbar").innerHTML=(isShared(curP())?`<button class="pill rdpick" id="rdpick">Panolar ▾</button>`:"")+`<button class="pill name${b.private?" priv":""}" id="bname" title="${b.private?"Yalnızca sen görüyorsun · ":""}Yeniden adlandır">${b.private?LOCK_IC:""}${esc(b.name||"Pano")}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
+    $("bbar").innerHTML=(isShared(curP())?`<button class="pill rdpick" id="rdpick">Panolar ▾</button>`:"")+`<button class="pill name${b.private?" priv":""}${b.locked?" lkd":""}" id="bname" title="${b.private?"Yalnızca sen görüyorsun · ":""}${b.locked?"Kilitli · sağ tıkla kilidi aç":"Yeniden adlandır"}">${b.private?PRIV_IC:""}${esc(b.name||"Pano")}${b.locked?LOCK_IC:""}</button><span class="pill" style="cursor:var(--cur)">${cards(bid).filter(c=>c.kind!=="frame").length} kart</span>`+
       `<button class="pill" id="bpng" title="Panonun tamamını PNG ya da PDF olarak indir">Dışa aktar</button>`+
       "";
   }
@@ -1759,7 +1765,7 @@ $("tools").addEventListener("click",e=>{
 });
 function deleteCard(id){const c=S.items.find(i=>i.id===id);if(!c)return;const doc=Object.assign({},c);S.selSet.delete(id);run(api.remove(id));const u=undoRestore("Silme",[doc]);toast("Kart silindi",{fn:()=>runUndo(u)})}
 world.addEventListener("click",e=>{const x=e.target.closest("[data-cdel]");if(x)deleteCard(x.closest(".card").dataset.id);const ed=e.target.closest("[data-cedit]");if(ed)openEditor(ed.closest(".card").dataset.id)});
-function deleteBoard(pid,id){
+function deleteBoard(pid,id){const lb=boards(pid).find(x=>x.id===id);if(lb&&lb.locked){toast("Pano kilitli · silmek için önce kilidi aç",null,true);return}
   const cs=S.items.filter(i=>i.type==="card"&&i.board===id);
   cs.forEach(c=>{if(c.assetId&&assets&&!S.items.some(o=>o.id!==c.id&&o.board!==id&&o.assetId===c.assetId))assets.delete(c.assetId).catch(()=>{})});
   run(Promise.all(cs.map(c=>api.remove(c.id))).then(()=>api.remove(id)));
@@ -1768,26 +1774,27 @@ function deleteBoard(pid,id){
 $("phead").addEventListener("contextmenu",e=>{
   const t=e.target.closest('.st[data-sub^="b:"]');if(!t)return;e.preventDefault();
   const pid=curP(),id=t.dataset.sub.slice(2);const b=boards(pid).find(x=>x.id===id);if(!b)return;
-  if(isShared(pid)){boardMenu(pid,curBoard()||id,e.clientX,e.clientY);return}
-  const main=b.virtual||id===mainBoard(pid);
-  const go2=()=>{S.sub[pid]="b:"+id;S.selSet.clear();save();renderProject()};
-  const items=[{label:"Aç",fn:go2},{label:"Yeniden adlandır",fn:()=>{go2();startBoardRename()}}];
-  if(!main)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
-  openCtx(e.clientX,e.clientY,main?(b.name||"Pano")+" · ana pano silinemez":(b.name||"Pano"),items);
+  boardMenu(pid,isShared(pid)?(curBoard()||id):id,e.clientX,e.clientY);
 });
 /* ---------- Referans dizini (ortak projeler): ekip panoları + benim panolarım ---------- */
 function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filter(c=>c.kind!=="frame").length;
-  const row=b=>`<button class="rdb${b.id===cur?" on":""}" data-rdb="${esc(b.id)}"><span>${esc(b.name||"Pano")}</span><span class="mono">${n(b)}</span></button>`;const mine=myBoards(pid);
-  $("rdir").innerHTML=`<div class="rdg"><span class="rdh">Ekip panoları</span>${teamBoards(pid).map(row).join("")}</div>
-    <div class="rdg"><span class="rdh rdmine">${LOCK_IC}Benim panolarım</span>${mine.length?mine.map(row).join(""):`<span class="rdempty">Yalnızca senin gördüğün panolar: keşif, deneme, ham referans. Hazır olanı ekip panosunun adına sürükle.</span>`}</div>
-    <div class="rdnew"><button data-rdnew="team">+ Ekip panosu</button><button class="rdmine" data-rdnew="me">+ Benim</button></div>`}
+  const row=b=>`<button class="rdb${b.id===cur?" on":""}" data-rdb="${esc(b.id)}"><span>${esc(b.name||"Pano")}</span>${b.locked?`<span class="rdl" title="Kilitli">${LOCK_IC}</span>`:""}<span class="mono">${n(b)}</span></button>`;const mine=myBoards(pid);
+  const add=(k,t)=>`<button class="rdadd" data-rdnew="${k}" title="${t}" aria-label="${t}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></button>`;
+  $("rdir").innerHTML=`<div class="rdg"><div class="rdh"><span>Ekip panoları</span>${add("team","Yeni ekip panosu")}</div>${teamBoards(pid).map(row).join("")}</div>
+    <div class="rdg"><div class="rdh rdmine">${PRIV_IC}<span>Benim panolarım</span>${add("me","Yalnızca senin göreceğin yeni pano")}</div>${mine.length?mine.map(row).join(""):`<span class="rdempty">Yalnızca senin gördüğün panolar: keşif, deneme, ham referans. Hazır olanı ekip panosunun adına sürükle.</span>`}</div>
+    <span class="rdtip">Sağ tık: kilitle, adını değiştir, sil</span>`}
 function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
+/* kilitli pano: adı değişmez, silinemez (kartlar düzenlenebilir) */
+function lockBoard(pid,b){const v=!b.locked;if(b.virtual)run(api.set(b.id,{type:"board",project:pid,name:b.name||"Referanslar",order:0,locked:v}));else run(api.update(b.id,{locked:v}));
+  toast(v?"Pano kilitlendi · silinemez, adı değişmez":"Kilit açıldı",null,true)}
 function boardMenu(pid,id,x,y){const b=boards(pid).find(v=>v.id===id);if(!b)return;const main=b.virtual||id===mainBoard(pid);
   const go2=()=>{S.sub[pid]="b:"+id;S.selSet.clear();save();renderProject()};
-  const items=[{label:"Aç",fn:go2},{label:"Yeniden adlandır",fn:()=>{go2();startBoardRename()}}];
-  if(b.private)items.push({label:"Ekibe aç (herkes görür)",fn:()=>openBoardToTeam(pid,id)});
-  if(!main)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
-  openCtx(x,y,(b.private?"Yalnızca sen · ":"")+(main?(b.name||"Pano")+" · ana pano":(b.name||"Pano")),items)}
+  const items=[{label:"Aç",fn:go2}];
+  if(!b.locked)items.push({label:"Yeniden adlandır",fn:()=>{go2();startBoardRename()}});
+  items.push({label:b.locked?"Kilidi aç":"Kilitle (silinmez, adı değişmez)",fn:()=>lockBoard(pid,b)});
+  if(b.private&&isShared(pid))items.push({label:"Ekibe aç (herkes görür)",fn:()=>openBoardToTeam(pid,id)});
+  if(!main&&!b.locked)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
+  openCtx(x,y,(b.locked?"Kilitli · ":"")+(b.private?"Yalnızca sen · ":"")+(main?(b.name||"Pano")+" · ana pano":(b.name||"Pano")),items)}
 $("rdir").addEventListener("click",e=>{const pid=curP();
   const r=e.target.closest("[data-rdb]");if(r){S.sub[pid]="b:"+r.dataset.rdb;S.selSet.clear();save();renderProject();return}
   const nb=e.target.closest("[data-rdnew]");if(nb)newBoard(pid,nb.dataset.rdnew==="me")});
@@ -1824,7 +1831,7 @@ $("bbar").addEventListener("click",e=>{const p=e.target.closest("#rdpick");if(!p
     {head:true,label:"Benim panolarım"},...myBoards(pid).map(b=>({label:b.name||"Pano",fn:()=>{S.sub[pid]="b:"+b.id;save();renderProject()}})),"-",
     {label:"+ Ekip panosu",fn:()=>newBoard(pid,false)},{label:"+ Benim panom",fn:()=>newBoard(pid,true)}])});
 function startBoardRename(){
-  const pid=curP();const b=boards(pid).find(x=>x.id===curBoard());if(!b)return;S.renaming="board";
+  const pid=curP();const b=boards(pid).find(x=>x.id===curBoard());if(!b)return;if(b.locked){toast("Pano kilitli · adını değiştirmek için önce kilidi aç",null,true);return}S.renaming="board";
   $("bbar").innerHTML=`<span class="pill name"><input id="bnameIn" maxlength="40" value="${esc(b.name||"")}" aria-label="Pano adı"></span>`;
   const inp=$("bnameIn");inp.focus();inp.select();
   const done=ok=>{if(S.renaming!=="board")return;S.renaming=null;const v=inp.value.trim();
