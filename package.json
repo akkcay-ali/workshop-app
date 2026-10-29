@@ -1,0 +1,8 @@
+{
+  "name": "workshop-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Workshop – kişisel planlama ve referans panosu",
+  "scripts": { "tauri": "tauri" },
+  "devDependencies": { "@tauri-apps/cli": "^2" }
+}

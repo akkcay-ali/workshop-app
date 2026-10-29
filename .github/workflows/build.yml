@@ -1,0 +1,57 @@
+name: Windows derlemesi
+
+# main dalına her gönderimde Windows kurulum dosyası derlenir ve
+# "Releases" sayfasına eklenir. Elle başlatmak için: Actions → Windows derlemesi → Run workflow.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: windows-build
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Arayüzü ortak kaynaktan üret
+        run: python tools/build-frontend.py
+        env:
+          PYTHONUTF8: "1"
+
+      - run: npm ci
+
+      - name: Derle ve sürüm olarak yayınla
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "Workshop v__VERSION__"
+          releaseBody: "Windows kurulumu: aşağıdaki **Workshop_…_x64-setup.exe** dosyasını indirip çalıştır."
+          releaseDraft: false
+          prerelease: false
+          args: --bundles nsis
+
+      - name: Kurulum dosyasını iş çıktısı olarak da sakla
+        uses: actions/upload-artifact@v4
+        with:
+          name: workshop-windows-setup
+          path: src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
