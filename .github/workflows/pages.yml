@@ -5,7 +5,7 @@ name: Web sürümü
 on:
   push:
     branches: [main]
-    paths: [web/**, src/vendor/**, src/fonts/**, src/fonts.css, tools/build-frontend.py, .github/workflows/pages.yml]
+    paths: [web/**, src/vendor/**, src/fonts/**, src/fonts.css, src/favicon.svg, tools/build-frontend.py, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:

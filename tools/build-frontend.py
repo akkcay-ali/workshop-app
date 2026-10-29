@@ -23,6 +23,7 @@ head = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Workshop</title>
+<link rel="icon" href="favicon.svg">
 <link rel="stylesheet" href="fonts.css">
 <style>html{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="vendor/fflate.js"></script>

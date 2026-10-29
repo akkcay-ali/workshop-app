@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Workshop</title>
+<link rel="icon" href="favicon.svg">
 <link rel="stylesheet" href="fonts.css">
 <style>html{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="vendor/fflate.js"></script>
@@ -524,6 +525,13 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   background:var(--ink);color:var(--accent-ink);font-size:13px;font-weight:500;z-index:60;box-shadow:0 12px 30px -10px rgb(0 0 0 / .7);max-width:calc(100% - 32px)}
 .toast button{border:0;background:var(--accent-ink);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
+/* logo */
+.wmark{width:18px;height:16px;flex:0 0 auto}
+.tab.home .wmark{width:16px;height:15px;margin-right:1px}
+:root[data-theme="light"] .wmark{--wm:#3E4A6B}
+.wlock{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:400;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
+.wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
+#updSec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 /* ekip */
 .av{--c:var(--t1);width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;flex:0 0 auto;font-size:10.5px;font-weight:600;line-height:1;
   background:color-mix(in srgb,var(--c) 30%,var(--surface));color:var(--c);border:1px solid color-mix(in srgb,var(--c) 55%,transparent)}
@@ -703,7 +711,7 @@ body.frameless .app{padding-top:8px}
   <div class="cfgsec"><span class="small">Tema · bu cihazda hatırlanır</span><div class="themes" id="themes">
     <button class="thm dark" data-theme="dark"><i></i>Koyu</button><button class="thm light" data-theme="light"><i></i>Açık</button><button class="thm vivid" data-theme="vivid"><i></i>Renkli</button></div></div>
   <div class="cfgsec"><span class="small">Yazı tipi · bu cihazda hatırlanır</span><div id="fontList" class="fontgrid"></div></div>
-  <div class="cfgsec" id="updSec" hidden><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
+  <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
     <div class="row"><button class="btn" id="libOpen" style="flex:1">Klasörü göster</button><button class="btn" id="libChange" style="flex:1">Değiştir…</button></div>
@@ -849,8 +857,11 @@ function toast(msg,action,force){if(!action&&!force&&quietNow())return;
 function run(p){return Promise.resolve(p).catch(err=>{toast(err&&err.code==="quota_exceeded"?"Depolama sınırı doldu, eski kayıtları silmen gerekiyor.":"Kaydedilemedi: "+((err&&err.message)||"bilinmeyen hata"),null,true)})}
 
 /* ---------- tabs / navigation ---------- */
+/* Workshop logosu (W + iğne) */
+const WMARK='<svg class="wmark" viewBox="16 18 88 80" aria-hidden="true"><path d="M27 42 L44 86 L60 54" fill="none" stroke="#7D8596" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 54 L76 86 L93 42" fill="none" stroke="var(--wm,#D7DEF5)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="31" r="7" fill="#93CDD6"/></svg>';
+const WLOCK=`<span class="wlock">${WMARK}<span>Workshop</span></span>`;
 const ICON={
-  home:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 7.2L8 2.5l5.5 4.7V13.5h-11z"/><path d="M6.5 13.5V10h3v3.5"/></svg>',
+  home:WMARK,
   proj:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.5h11"/></svg>'
 };
 function save(){LS.set("view",S.view);LS.set("open",S.open);LS.set("sub",S.sub)}
@@ -1048,7 +1059,7 @@ function weekBlock(){
       const pn=id=>{const p=projects().find(x=>x.id===id);return p?p.name||"Proje":""};
       return `<div class="fnl"><span class="small">Odak notları</span>${ns.map(f=>`<div><b title="${esc(f.note)}">${esc(f.note)}</b><span class="small">${esc([pn(f.project),fmtMin(f.mins||0)].filter(Boolean).join(" · "))}</span></div>`).join("")}</div>`})()}</div>`;
 }
-function renderHome(){renderHome0();drawHere();presTrack();if(S.mode==="cloud"&&!CL.me)$("vHome").insertAdjacentHTML("afterbegin",`<div class="cbanner"><span><b>Workshop web</b><span class="small" style="display:block;margin-top:3px">Ortak projelerini görmek ve yeni proje açmak için ekip hesabınla giriş yap.</span></span><button class="btn primary" data-acct>Giriş yap</button></div>`)}
+function renderHome(){renderHome0();drawHere();presTrack();if(S.mode==="cloud"&&!CL.me)$("vHome").insertAdjacentHTML("afterbegin",`<div class="cbanner"><span>${WLOCK}<span class="small" style="display:block;margin-top:6px">Ortak projelerini görmek ve yeni proje açmak için ekip hesabınla giriş yap.</span></span><button class="btn primary" data-acct>Giriş yap</button></div>`)}
 function renderHome0(){
   const ps=projects();const all=S.items.filter(i=>i.type==="task");
   const cardsHtml=ps.map(p=>{
@@ -2518,7 +2529,7 @@ $("updCheck").onclick=()=>{closePops();checkUpdate(true)};
 
 /* klasör ayarları, kısayollar, bağlantılar */
 function drawLib(){const on=S.mode==="file";$("libSec").hidden=!on;$("updSec").hidden=!TA;
-  if(TA&&TA.app)TA.app.getVersion().then(v=>{$("verTxt").textContent="Workshop "+v+(UPD?" · "+UPD.version+" hazır":"")}).catch(()=>{});if(on){$("libPath").textContent=FS.dir;$("libPath").title=FS.dir}
+  if(TA&&TA.app)TA.app.getVersion().then(v=>{$("verLock").innerHTML=WMARK+"<span>Workshop</span>";$("verTxt").textContent="Sürüm "+v+(UPD?" · "+UPD.version+" hazır":"")}).catch(()=>{});if(on){$("libPath").textContent=FS.dir;$("libPath").title=FS.dir}
   $("bkOut").hidden=!!TA;$("bkIn").hidden=!TA;
   $("bkTxt").textContent=TA?"Web sürümünden indirdiğin yedeği içe aktar · her proje bir dosya olur":"Yedek · tüm projeler ve görseller tek dosyada (masaüstü uygulamasına taşımak için)"}
 if(TA){
