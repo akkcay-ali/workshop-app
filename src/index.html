@@ -257,7 +257,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 .wk .d{font-family:var(--f-mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase}
 .wk .n{font-family:var(--f-mono);font-size:13px;color:var(--ink-2)}
 .wk .c{height:3px;width:3px;border-radius:50%;margin-top:2px}
-.wk .c.on{background:var(--ink-2)}
+.wk .c.on{background:var(--ink-2)}.wk .c.ms{background:#E4C485;width:5px;height:5px;border-radius:1px;transform:rotate(45deg);margin-top:1px}
 .wk:hover{border-color:var(--stroke)}
 .wk.is-today .n{color:var(--accent)}
 .wk[aria-pressed="true"]{background:var(--glass-3);border-color:var(--stroke-2)}
@@ -585,19 +585,7 @@ button:disabled{cursor:var(--cur)}
 .pvtog[aria-pressed="true"]{color:var(--ink);border-color:var(--stroke-2);background:var(--glass-2)}
 .pvtog[aria-pressed="true"]::before{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
 .pvtog:active{transform:scale(.94)}
-/* Merkez takvimi: iki hafta */
-.hcbar{display:flex;align-items:center;gap:6px;margin-left:auto}
-.hcal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
-.hcd{min-height:84px;border:1px solid var(--stroke);border-radius:10px;background:var(--field);padding:6px;display:flex;flex-direction:column;gap:3px;min-width:0;overflow:hidden;cursor:var(--cur-pt);transition:border-color .15s}
-.hcd:hover{border-color:var(--stroke-2)}.hcd.past{opacity:.5}.hcd.is-today{border-color:var(--accent)}
-.hcd .n{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);display:flex;gap:5px}.hcd .n b{font-weight:400;color:var(--ink-2)}.hcd.is-today .n,.hcd.is-today .n b{color:var(--accent)}
-.hct,.hcm{display:flex;align-items:center;gap:5px;border:0;background:none;padding:1px 0;color:var(--ink-2);font-size:11.5px;text-align:left;min-width:0;line-height:1.3}
-.hct>span:first-child,.hcm>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
-.hct .av{width:15px;height:15px;font-size:8px;flex:0 0 auto}.hct.done{color:var(--ink-3);text-decoration:line-through}.hct:hover,.hcm:hover{color:var(--ink)}
-.hcm{color:#E4C485;font-weight:500}.hcm::before{content:"";width:7px;height:7px;transform:rotate(45deg);background:currentColor;border-radius:1px;flex:0 0 auto}
-.hcd .more{font-family:var(--f-mono);font-size:10px;color:var(--ink-3)}
 .cell .cms2{font-size:11px;color:#E4C485;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:700px){.hcal{grid-template-columns:repeat(7,minmax(38px,1fr));overflow-x:auto}.hcd{min-height:56px}.hct,.hcm{font-size:0;gap:0}.hct .av{width:12px;height:12px}}
 .seg{display:inline-flex;gap:2px;background:var(--glass);border:1px solid var(--stroke);border-radius:10px;padding:3px}
 .seg button{border:0;background:transparent;color:var(--ink-2);border-radius:7px;padding:6px 11px;font-size:12.5px;transition:background .15s,color .15s}
 .seg button[aria-pressed="true"]{background:var(--glass-3);color:var(--ink)}.seg.sm button{padding:4px 10px;font-size:12px}
@@ -1352,10 +1340,11 @@ function renderHead(){
   st+=bs.map(b=>`<button class="st" data-sub="b:${esc(b.id)}" aria-selected="${s==="b:"+b.id}">${esc(b.name||"Pano")}</button>`).join("");
   st+=`<button class="st plus" data-newb title="Yeni pano">+ pano</button><button class="st" data-sub="cal" aria-selected="${s==="cal"}">Takvim</button>`;
   let right="";
-  if(s==="tasks"){const ts=isShared(pid)?tasksOf(pid).filter(isMineT):tasksOf(pid);
+  if(s==="tasks"||s==="hub"){const hub=s==="hub";const ts=hub?teamOf(pid):isShared(pid)?tasksOf(pid).filter(isMineT):tasksOf(pid);const ms=hub?milestones(pid):[];
     right=`<button class="arrow" data-wk="-1" aria-label="Önceki hafta">‹</button>`;
-    for(let i=0;i<7;i++){const d=addDays(S.week,i),k=ymd(d);const has=ts.some(t=>t.date===k&&!t.done);
-      right+=`<button class="wk${k===TODAY?" is-today":""}" data-day="${k}" aria-pressed="${k===S.sel}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}"><span class="d">${DSH[d.getDay()]}</span><span class="n">${d.getDate()}</span><span class="c${has?" on":""}"></span></button>`}
+    /* Merkez'de aynı şerit ekip görevlerini ve kilometre taşlarını gösterir; gün tıklanınca o günün listesi açılır */
+    for(let i=0;i<7;i++){const d=addDays(S.week,i),k=ymd(d);const has=ts.some(t=>t.date===k&&!t.done);const m=ms.some(x=>x.date===k);
+      right+=`<button class="wk${k===TODAY?" is-today":""}" ${hub?`data-hubday="${k}"`:`data-day="${k}"`} aria-pressed="${!hub&&k===S.sel}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}"><span class="d">${DSH[d.getDay()]}</span><span class="n">${d.getDate()}</span><span class="c${m?" ms":has?" on":""}"></span></button>`}
     right+=`<button class="arrow" data-wk="1" aria-label="Sonraki hafta">›</button>`;
   }
   const shb=cloudAvail()?`<button class="shbtn${isShared(pid)?" on":""}" data-share="${esc(pid)}" title="${isShared(pid)?"Paylaşım ve üyeler":"Ekiple paylaş"}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="2.4"/><path d="M2 13.2c.5-2.2 2-3.4 4-3.4s3.5 1.2 4 3.4M11 4.2v4M9 6.2h4"/></svg>${isShared(pid)?"Ortak":"Paylaş"}</button>`:"";
@@ -1374,6 +1363,7 @@ $("phead").addEventListener("click",e=>{
   const sb=e.target.closest("[data-sub]");if(sb){if(document.body.classList.contains("boardfs"))setBoardFS(false);S.sub[pid]=sb.dataset.sub;S.selSet.clear();save();renderProject();return}
   if(e.target.closest("[data-newb]")){run(api.add({type:"board",project:pid,name:"Yeni pano",order:Date.now()}).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}));return}
   const d=e.target.closest("[data-day]");if(d){S.sel=d.dataset.day;renderProject();return}
+  const hd=e.target.closest("[data-hubday]");if(hd){hubDay(hd.dataset.hubday,hd);return}
   const w=e.target.closest("[data-wk]");if(w){S.week=addDays(S.week,7*+w.dataset.wk);renderHead();return}
 });
 function placeInd(pid){
@@ -2894,7 +2884,7 @@ async function cStart(user){if(CL.me===user.id)return;CL.me=user.id;CL.email=use
   const c=LS.get("cl_cache_"+CL.me,null);
   if(c){CL.pids=new Set(c.pids);CL.own=new Set(c.own);CL.mc=new Map(c.mc||[]);CL.prof=new Map(c.prof||[]);CL.people=new Map(c.people||[]);cMerge(c.items||[]);cAssetsFor(c.items||[]);renderAll()}
   drawAcct();await cLoad();cSubscribe();loadNotifs()}
-function cStop(){try{voiceLeave()}catch(_){}if(CL.chan)CL.sb.removeChannel(CL.chan);CL.chan=null;for(const ch of CL.pres.values())CL.sb.removeChannel(ch);CL.pres.clear();CL.here.clear();presLast="";
+function cStop(){try{voiceLeave()}catch(_){}if(CL.chan)CL.sb.removeChannel(CL.chan);CL.chan=null;for(const ch of CL.pres.values())CL.sb.removeChannel(ch);CL.pres.clear();CL.here.clear();presSent.clear();presAt.clear();
   [...CL.pids].forEach(p=>{if(S.open.includes(p))closeTab(p)});
   S.items=S.items.filter(i=>!CL.items.has(i.id));CL.items.clear();CL.pids.clear();CL.own.clear();CL.out.clear();saveOut();
   CL.me=null;CL.email="";CL.notifs=[];CL.msgs.clear();renderAll();drawAcct();drawBell()}
@@ -3062,17 +3052,25 @@ function drawAct(pid){const el=$("actList");if(!el||curP()!==pid)return;const c=
     <span class="aw">${ago(g.ts)}</span></button>`).join(""):`<div class="empty">Henüz hareket yok.</div>`}
 
 /* --- şu an kim burada (Supabase presence, özel kanal proj:<pid>) --- */
-let presLast="";
 function presSync(){if(!CL.sb||!CL.me)return;const want=new Set([...CL.pids].filter(isShared));
   for(const [pid,ch] of CL.pres)if(!want.has(pid)){CL.sb.removeChannel(ch);CL.pres.delete(pid);CL.here.delete(pid)}
   for(const pid of want){if(CL.pres.has(pid))continue;
     const ch=CL.sb.channel("proj:"+pid,{config:{private:true,presence:{key:CL.me}}});CL.pres.set(pid,ch);
     ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:!!s.v,m:!!s.m,s:!!s.s});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
       .on("broadcast",{event:"rtc"},({payload})=>onRtc(pid,payload))
-      .subscribe(s=>{if(s==="SUBSCRIBED"){presLast="";presTrack()}})}}
-function presTrack(force){if(!CL.me)return;const pid=curP();const w=pid?subOf(pid):"";const key=(pid||"")+"|"+w+"|"+pname(CL.me)+"|"+(V.pid||"")+(V.muted?"m":"")+(V.screen?"s":"");if(!force&&key===presLast)return;presLast=key;
+      .subscribe(s=>{if(s==="SUBSCRIBED"){presSent.delete(pid);presTrack();if(V.pid===pid)rtcSend("*",{k:"join"})}})}}
+/* Supabase istemci başına presence mesajını sınırlar: aynı durumu tekrar gönderme, değişiklikleri biriktir,
+   her kanala yalnızca durumu gerçekten değiştiyse ve en fazla ~1,2 sn'de bir yaz. */
+const presSent=new Map(),presAt=new Map();let presT=null;
+function presTrack(force){if(!CL.me)return;if(force){presSent.clear()}clearTimeout(presT);presT=setTimeout(presFlush,force?60:350)}
+function presFlush(){presT=null;if(!CL.me)return;const pid=curP();const w=pid?subOf(pid):"";let wait=0;
   /* sesli odadayken başka sayfaya geçince de o projede görünmeye devam et */
-  for(const [p,ch] of CL.pres){try{if(p===pid||p===V.pid)ch.track({w:p===pid?w:"",n:pname(CL.me),t:Date.now(),v:V.pid===p,m:V.pid===p&&V.muted,s:V.pid===p&&!!V.screen});else ch.untrack()}catch(_){}}}
+  for(const [p,ch] of CL.pres){if(ch.state!=="joined")continue;
+    const st=p===pid||p===V.pid?{w:p===pid?w:"",n:pname(CL.me),v:V.pid===p,m:V.pid===p&&V.muted,s:V.pid===p&&!!V.screen}:null;
+    const key=st?JSON.stringify(st):"-";const prev=presSent.get(p);if(prev===key||(prev===undefined&&!st))continue;
+    const gap=Date.now()-(presAt.get(p)||0);if(gap<1200){wait=Math.max(wait,1200-gap);continue}
+    presSent.set(p,key);presAt.set(p,Date.now());try{if(st)ch.track(st);else ch.untrack()}catch(_){}}
+  if(wait)presT=setTimeout(presFlush,wait+20)}
 function drawHere(){
   const pid=curP();const box=$("hereBox");
   if(box&&pid){const l=CL.here.get(pid)||[];box.innerHTML=l.filter(h=>h.w||h.v).map(h=>`<span class="hp${h.v?" inv":""}" title="${esc(pname(h.u))} · ${esc(h.v?"sesli odada":h.w==="hub"?"Merkez":h.w==="tasks"?"Görevlerim":h.w==="team"?"Ekip":h.w==="cal"?"Takvim":"panoda")}">${avatar(h.u)}</span>`).join("");
@@ -3142,15 +3140,12 @@ function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";rend
     <section class="block hb span2 fixh"><div class="bhead"><h2>İş akışı</h2><button class="mini" data-kanban>Panoyu aç →</button></div>
       ${asgBar(pid)}<div class="mkgrid">${STS.map(s=>col(s[0])).join("")}</div></section>
     <section class="block hb fixh"><div class="bhead"><h2>Son hareketler</h2></div><div class="actlist" id="actList"></div></section>
-    ${hubCal(pid)}
     <section class="block hb span3"><div class="bhead"><h2>Referanslar</h2><span class="count">${wait?wait+" onay bekliyor":""}</span></div>
       ${refs.length?`<div class="hrefs">${refs.map(c=>`<button class="href" data-copen="${esc(c.id)}">${c.kind==="audio"?`<span class="hau">${AU_IC}<span>${esc(c.text||"Ses")}</span></span>`:`<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`}${rvChip(c)}${commentsOf(c.id).length?`<span class="hcc">${commentsOf(c.id).length}</span>`:""}</button>`).join("")}</div>`
         :`<div class="empty">Panolara görsel ya da ses eklendikçe burada görünür.</div>`}</section>
   </div>${chatBlock(pid)}</div></div>`;
   fitBrief();drawAct(pid);loadAct(pid);drawVoice();if(CL.msgs.has(pid))drawChat(pid);else loadMsgs(pid)}
 $("sHub").addEventListener("click",e=>{const pid=curP();
-  const hw=e.target.closest("[data-hw]");if(hw){S.hw=S.hw||{};S.hw[pid]=+hw.dataset.hw?(S.hw[pid]||0)+ +hw.dataset.hw:0;renderHub();return}
-  const hd=e.target.closest("[data-hcal],[data-hday]");if(hd&&!e.target.closest("[data-topen],[data-ms]")){const k=hd.dataset.hday;if(k){const d=parse(k);S.cy=d.getFullYear();S.cm=d.getMonth()}S.sub[pid]="cal";save();renderProject();return}
   if(e.target.closest("[data-msadd]")){const f=$("msForm");f.hidden=!f.hidden;if(!f.hidden)f.n.focus();return}
   if(e.target.closest("[data-kanban]")){S.sub[pid]="team";save();renderProject();return}
   const m=e.target.closest("[data-ms]");if(m){msMenu(m.dataset.ms,e.clientX,e.clientY);return}
@@ -3163,16 +3158,13 @@ function msMenu(id,x,y){const m=S.items.find(i=>i.id===id);if(!m)return;
     {label:"Tarihi değiştir",fn:()=>{const d=prompt("Tarih (YYYY-AA-GG)",m.date||"");if(d!==null&&(!d||/^\d{4}-\d\d-\d\d$/.test(d)))run(api.update(id,{date:d}))}},"-",
     {label:"Sil",danger:true,confirm:"Emin misin? Görevler kalır",fn:()=>{S.items.filter(t=>t.milestone===id).forEach(t=>run(api.update(t.id,{milestone:null})));run(api.remove(id))}}])}
 
-function hubCal(pid){const off=(S.hw&&S.hw[pid])||0;const start=addDays(monday(now),off*7);const ts=teamOf(pid),ms=milestones(pid);let g="";
-  for(let i=0;i<14;i++){const d=addDays(start,i),k=ymd(d);const m=ms.filter(x=>x.date===k);const l=ts.filter(t=>t.date===k).sort(sortTasks);const room=Math.max(0,3-m.length);
-    g+=`<div class="hcd${k===TODAY?" is-today":""}${k<TODAY?" past":""}" data-hday="${k}"><span class="n"><b>${DSH[d.getDay()]}</b>${d.getDate()}${d.getDate()===1||i===0?" "+MSH[d.getMonth()]:""}</span>
-      ${m.map(x=>`<button class="hcm" data-ms="${esc(x.id)}" title="${esc(x.name||"Hedef")}"><span>${esc(x.name||"Hedef")}</span></button>`).join("")}
-      ${l.slice(0,room).map(t=>`<button class="hct${t.done?" done":""}" data-topen="${esc(t.id)}" title="${esc(t.title)}"><span>${esc(t.title)}</span>${t.assignee?avatar(t.assignee):""}</button>`).join("")}${l.length>room?`<span class="more">+${l.length-room}</span>`:""}</div>`}
-  const e=addDays(start,13);
-  return `<section class="block hb span3"><div class="bhead"><h2>Takvim</h2><span class="count">${start.getDate()} ${MSH[start.getMonth()]} – ${e.getDate()} ${MSH[e.getMonth()]}</span>
-    <div class="hcbar"><button class="arrow" data-hw="-1" aria-label="Önceki hafta">‹</button><button class="mini" data-hw="0">bugün</button><button class="arrow" data-hw="1" aria-label="Sonraki hafta">›</button><button class="mini" data-hcal>Takvimi aç →</button></div></div>
-    <div class="hcal">${g}</div></section>`}
-
+function hubDay(k,el){const pid=curP();const d=parse(k);const r=el.getBoundingClientRect();
+  const ms=milestones(pid).filter(m=>m.date===k),ts=teamOf(pid).filter(t=>t.date===k).sort(sortTasks);
+  const it=[...ms.map(m=>({label:"◆ "+(m.name||"Hedef"),fn:()=>msMenu(m.id,r.left,r.bottom+4)})),
+    ...ts.map(t=>({label:(t.done?"✓ ":"")+t.title+(t.assignee?" · "+(t.assignee===CL.me?"sen":pname(t.assignee)):""),fn:()=>openDrawer(t.id)}))];
+  if(!it.length)it.push({head:true,label:"Bu gün için ekip görevi ya da hedef yok"});
+  it.push("-",{label:"Takvimde aç",fn:()=>{S.cy=d.getFullYear();S.cm=d.getMonth();S.sub[pid]="cal";save();renderProject()}});
+  openCtx(r.left,r.bottom+6,`${DAYS[d.getDay()]} · ${d.getDate()} ${MONTHS[d.getMonth()]}`,it)}
 /* ---------- Kanban (Ekip sekmesi, ortak projeler) ---------- */
 function kanbanHtml(pid){const msf=S.msf&&milestones(pid).find(m=>m.id===S.msf);
   const ts=teamOf(pid).filter(t=>asgPass(t)&&(!msf||t.milestone===msf.id));
@@ -3371,15 +3363,15 @@ const STUN=[{urls:"stun:stun.cloudflare.com:3478"},{urls:"stun:stun.l.google.com
 async function iceServers(){if(V.ice&&V.ice.at>Date.now()-(V.ice.list===STUN?60e3:6*3600e3))return V.ice.list;/* TURN alınamadıysa 1 dk sonra yeniden dene */
   try{const {data,error}=await CL.sb.functions.invoke("turn-ice",{body:{}});if(!error&&data&&data.iceServers&&data.iceServers.length){V.ice={at:Date.now(),list:data.iceServers};return data.iceServers}}catch(_){}
   V.ice={at:Date.now(),list:STUN};return STUN}
-const voiceIn=pid=>{const l=CL.here.get(pid)||[];return l.filter(h=>h.v).map(h=>h.u)};
+const voiceIn=pid=>{const l=CL.here.get(pid)||[];const u=new Set(l.filter(h=>h.v).map(h=>h.u));if(V.pid===pid)for(const k of V.peers.keys())u.add(k);return [...u]};
 async function voiceJoin(pid){if(V.pid===pid)return;if(V.pid)voiceLeave();
   try{V.stream=await micStream(LS.get("vMic",""))}
   catch(e){toast("Mikrofona erişilemedi: "+(e&&e.name==="NotAllowedError"?"izin verilmedi":(e&&e.message)||e),null,true);return}
   V.pid=pid;V.muted=false;await iceServers();
   if(!V.actx)try{V.actx=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}
   V.meAn=analyse(V.stream);voiceLoop();presTrack(true);drawVoice();chimeJoin(true);
-  for(const u of voiceIn(pid))if(u!==CL.me)peerFor(u)}
-function voiceLeave(){if(!V.pid)return;shareStop();S.scrHide=false;for(const u of [...V.peers.keys()])peerClose(u);
+  rtcSend("*",{k:"join"});for(const u of voiceIn(pid))if(u!==CL.me)peerFor(u)}
+function voiceLeave(){if(!V.pid)return;shareStop();S.scrHide=false;rtcSend("*",{k:"bye"});for(const u of [...V.peers.keys()])peerClose(u);
   if(V.stream)V.stream.getTracks().forEach(t=>t.stop());V.stream=null;V.meAn=null;const pid=V.pid;V.pid=null;V.speak.clear();cancelAnimationFrame(V.loop);
   presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
 function voiceMute(){if(!V.stream)return;V.muted=!V.muted;V.stream.getAudioTracks().forEach(t=>t.enabled=!V.muted);presTrack(true);drawVoice()}
@@ -3401,7 +3393,11 @@ function peerFor(u){if(!V.pid||u===CL.me)return null;let p=V.peers.get(u);if(p)r
   return p}
 function peerClose(u){const p=V.peers.get(u);if(!p)return;try{p.pc.close()}catch(_){}if(p.audio){p.audio.srcObject=null}const hadV=!!p.video;V.peers.delete(u);V.speak.delete(u);drawVoice();if(hadV)drawScreen()}
 function rtcSend(to,msg){const ch=CL.pres.get(V.pid);if(!ch)return;ch.send({type:"broadcast",event:"rtc",payload:Object.assign({to,from:CL.me},msg)})}
-async function onRtc(pid,m){if(!m||m.to!==CL.me||pid!==V.pid||!V.stream)return;let p=V.peers.get(m.from);
+async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||pid!==V.pid||!V.stream)return;let p=V.peers.get(m.from);
+  /* odaya giriş/çıkış: presence gecikse ya da kısılsa da bağlantı kurulur */
+  if(m.k==="join"){if(!p)peerFor(m.from);rtcSend(m.from,{k:"here"});return}
+  if(m.k==="here"){if(!p)peerFor(m.from);return}
+  if(m.k==="bye"){peerClose(m.from);return}
   try{if(m.k==="offer"||m.k==="answer"){if(!p)p=peerFor(m.from);const pc=p.pc;
       const collision=m.k==="offer"&&(p.making||pc.signalingState!=="stable");p.ignore=!p.polite&&collision;if(p.ignore)return;
       await pc.setRemoteDescription({type:m.k,sdp:m.sdp});for(const c of p.pend.splice(0))await pc.addIceCandidate(c).catch(()=>{});
@@ -3434,7 +3430,8 @@ function drawScreen(){const w=$("scr");let src=null,who=null;for(const p of V.pe
   if(w.hidden)animShow(w);drawVoice()}
 /* odadaki kişiler değişince bağlan / kopar */
 function voiceSync(pid){if(V.pid!==pid)return;const inn=new Set(voiceIn(pid));for(const u of inn)if(u!==CL.me&&!V.peers.has(u))peerFor(u);
-  for(const u of [...V.peers.keys()])if(!inn.has(u))peerClose(u)}
+  /* presence'ta görünmeyen kişiyi yalnızca bağlantısı da kopmuşsa kapat (çıkış "bye" ile gelir) */
+  for(const [u,p] of [...V.peers])if(!inn.has(u)&&["failed","closed","disconnected"].includes(p.pc.connectionState))peerClose(u)}
 /* konuşan kişiyi göster */
 function analyse(stream){if(!V.actx)return null;try{const s=V.actx.createMediaStreamSource(stream),a=V.actx.createAnalyser();a.fftSize=512;s.connect(a);return {a,buf:new Uint8Array(a.fftSize)}}catch(_){return null}}
 function level(an){if(!an)return 0;an.a.getByteTimeDomainData(an.buf);let m=0;for(const v of an.buf){const d=Math.abs(v-128);if(d>m)m=d}return m}
