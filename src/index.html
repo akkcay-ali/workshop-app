@@ -552,6 +552,7 @@ button:disabled{cursor:var(--cur)}
 .wcard .acform{display:flex;flex-direction:column;gap:8px;margin-top:4px}.wcmsg:empty{display:none}.wcmsg{color:var(--ink-2)}
 .wcor{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:11px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.08em}.wcor::before,.wcor::after{content:"";flex:1;height:1px;background:var(--stroke)}
 .wcnote{line-height:1.5;color:var(--ink-3)}
+.touchonly{display:none}.nokbd .touchonly{display:inline}.nokbd .kbonly,.nokbd kbd,.nokbd #kbOpen{display:none!important}
 .wlock{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:400;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
 .wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
 #updSec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
@@ -856,7 +857,7 @@ body.frameless .app{padding-top:8px}
           <div class="marquee" id="marquee" hidden></div>
           <div class="guides" id="guides"></div>
           <div class="albar" id="albar" hidden></div>
-          <div class="bempty" id="bempty" hidden><div><h3>Pano boş</h3>Görseli buraya sürükle ya da <b>Ctrl+V</b> ile yapıştır. Boş bir yere çift tıklarsan not açılır. Sürükleyerek toplu seçersin; kaydırmak için boşluk tuşu ya da orta tuş.</div></div>
+          <div class="bempty" id="bempty" hidden><div><h3>Pano boş</h3><span class="kbonly">Görseli buraya sürükle ya da <b>Ctrl+V</b> ile yapıştır.</span><span class="touchonly">Aşağıdaki araç çubuğundan görsel, not ya da link ekle; iki parmakla kaydırıp yakınlaştır.</span><span class="kbonly"> Boş bir yere çift tıklarsan not açılır. Sürükleyerek toplu seçersin; kaydırmak için boşluk tuşu ya da orta tuş.</span></div></div>
           <div class="bbar" id="bbar"></div>
           <button class="pill fsx" id="fsx" hidden title="Tam ekrandan çık">Tam ekrandan çık <kbd>Ctrl Space</kbd></button>
           <div class="linkpop" id="linkpop" hidden><input class="field" id="linkIn" placeholder="https://…" aria-label="Link adresi"><button class="btn" id="linkAdd">Ekle</button></div>
@@ -1100,7 +1101,11 @@ const boardVisible=()=>curP()&&curBoard();
 /* ---------- toast ---------- */
 let toastTimer;
 let quietNow=()=>false;/* zamanlayıcı bölümü doldurur */
-function toast(msg,action,force){if(!action&&!force&&quietNow())return;
+/* iPad / dokunmatik: klavye kısayolu ipuçları gizlenir */
+const NOKBD=/iPad|iPhone|Android/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1)||(matchMedia("(hover:none) and (pointer:coarse)").matches);
+if(NOKBD)document.documentElement.classList.add("nokbd");
+const kbStrip=t=>NOKBD&&typeof t==="string"?t.replace(/\s+·\s+(?:Ctrl|Alt|Shift|Enter|Esc|Delete|Space|[A-Z]\b)[^·]*$/,""):t;
+function toast(msg,action,force){if(NOKBD&&typeof msg==="string")msg=msg.replace(/\s*·\s*[^·]*\b(?:Ctrl|Alt N|Esc)\b[^·]*$/,"");if(!action&&!force&&quietNow())return;
   $("toastT").textContent=msg;const b=$("toastB");b.hidden=!action;
   if(action){b.textContent=action.label||"Geri al";b.onclick=()=>{action.fn();$("toast").hidden=true}}
   $("toast").hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").hidden=true,action?7000:3500);
@@ -1365,7 +1370,7 @@ function animHide(el){if(!el||el.hidden||el.classList.contains("closing"))return
 function animShow(el){const was=!el.hidden&&!el.classList.contains("closing");el.classList.remove("closing");el.hidden=false;
   if(was){el.style.animation="none";void el.offsetWidth;el.style.animation=""}}
 function closeCtx(){animHide($("ctx"))}
-function openCtx(x,y,title,items){
+function openCtx(x,y,title,items){if(NOKBD)items=items.map(it=>it&&typeof it==="object"&&it.label?Object.assign({},it,{label:kbStrip(it.label)}):it);
   ctxItems=items;const m=$("ctx");
   m.innerHTML=(title?`<div class="ch">${esc(title)}</div>`:"")+items.map((it,i)=>it==="-"?`<div class="sep2"></div>`:it.head?`<div class="chs">${esc(it.label)}</div>`:`<button role="menuitem" data-ci="${i}" class="${it.danger?"danger":""}${it.on!=null?" chk"+(it.on?" on":""):""}">${esc(it.label)}</button>`).join("");
   animShow(m);const w=m.offsetWidth,h=m.offsetHeight;
