@@ -1,10 +1,12 @@
 name: Windows derlemesi
 
-# main dalına her gönderimde Windows kurulum dosyası derlenir ve
-# "Releases" sayfasına eklenir. Elle başlatmak için: Actions → Windows derlemesi → Run workflow.
+# Sürüm numarası değiştiğinde (src-tauri/tauri.conf.json) Windows kurulum dosyası derlenir
+# ve "Releases" sayfasına eklenir; arayüz denemeleri derleme tetiklemez.
+# Elle başlatmak için: Actions → Windows derlemesi → Run workflow.
 on:
   push:
     branches: [main]
+    paths: [src-tauri/tauri.conf.json]
   workflow_dispatch:
 
 concurrency:

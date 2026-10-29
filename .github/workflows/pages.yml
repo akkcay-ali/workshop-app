@@ -1,0 +1,34 @@
+name: Web sürümü
+
+# Arayüz değişince web sürümü GitHub Pages'te yayınlanır (≈1 dk):
+# https://akkcay-ali.github.io/workshop-app/
+on:
+  push:
+    branches: [main]
+    paths: [web/**, src/vendor/**, src/fonts/**, src/fonts.css, tools/build-frontend.py, .github/workflows/pages.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.dep.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: python3 tools/build-frontend.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: src
+      - id: dep
+        uses: actions/deploy-pages@v4

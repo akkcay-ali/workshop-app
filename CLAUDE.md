@@ -18,7 +18,17 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   (ham gövde + `path` başlığı, geçici dosya üzerinden atomik yazım), `rename_file`, `trash_file`,
   `initial_files`. Çift tıklanan dosyalar `open-files` olayıyla gelir (single-instance).
 
+## Bulut (ortak projeler)
+- Supabase projesi `workshop` (ref `mbhpblbynyaotbblnxyr`). Tablolar: `projects`, `members`, `invites`, `profiles`, `items`
+  (öğe = satır, `data` jsonb, silme = `deleted`), kova `assets` (`<pid>/<assetId>`). RLS: `private.is_member`.
+  Davet: `invite_member(p, mail)` RPC.
+- İstemci: `CL` nesnesi, `wrapApi()` api/assets çağrılarını projeye göre yönlendirir (`isCloud(pid)`).
+  `cloudOnly()` = GitHub Pages sürümü (window.claude yok, supabase-js var). claude.ai artifact'ında bulut kapalı.
+- `src/vendor/supabase.js` (supabase-js UMD) build-frontend ile eklenir.
+
 ## Derleme
+- Masaüstü derlemesi yalnızca `src-tauri/tauri.conf.json` değişince (sürüm artışı) çalışır.
+- Web sürümü `pages.yml` ile GitHub Pages'e gider (arayüz değişince).
 - Windows kurulumu GitHub Actions'ta (`.github/workflows/build.yml`) derlenir ve Release olarak yayınlanır.
   Yeni sürüm için `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` ve `package.json` içindeki
   `version` birlikte artırılır; aynı sürüm numarasıyla tekrar gönderim Release'i güncellemeyebilir.

@@ -2,7 +2,7 @@
 
 Web sürümü bu dosyanın kendisidir; masaüstü sürümü bu betiğin
 ürettiği dosyayı kullanır. Fark: Google Fonts yerine gömülü yazı tipleri,
-zip için fflate ve düzgün bir <head>."""
+zip için fflate, ortak projeler için supabase-js ve düzgün bir <head>."""
 import pathlib, re
 
 root = pathlib.Path(__file__).resolve().parent.parent
@@ -26,6 +26,7 @@ head = """<!doctype html>
 <link rel="stylesheet" href="fonts.css">
 <style>html{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="vendor/fflate.js"></script>
+<script src="vendor/supabase.js"></script>
 </head>
 <body>
 """

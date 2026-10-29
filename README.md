@@ -31,6 +31,16 @@ Güncelleme paketleri imzalıdır; uygulama sadece bu deponun imza anahtarıyla 
 - Silinen projeler Geri Dönüşüm Kutusu'na gider.
 - Panodan silinen görseller bir sonraki kayıtta dosyadan da çıkar; eski görseller saklanmaz.
 
+## Ortak projeler (bulut)
+
+- Bir projeye sağ tık → **Ekiple paylaş…** (ya da proje başlığındaki **Paylaş**) projeyi Supabase'e taşır;
+  yerel `.workshop` dosyası Geri Dönüşüm Kutusu'na gider. Ekip arkadaşları e-postayla davet edilir.
+- Hesap: Ayarlar → **Ekip hesabı**. Kayıtlı olmayan biri davet edilirse, o e-postayla hesap açınca proje ona açılır.
+- Değişiklikler herkese anında yansır; bağlantı yokken yapılanlar sırada bekler, bağlantı gelince gönderilir.
+- Web sürümü (kurulum gerektirmez): https://akkcay-ali.github.io/workshop-app/ — yalnızca ortak projeleri gösterir.
+- Arka uç: Supabase (`items` tablosunda her öğe bir satır, görseller özel `assets` kovasında `<proje>/<görsel>`),
+  erişim satır düzeyinde kurallarla yalnızca proje üyelerine açık.
+
 ## Web sürümünden taşıma
 
 Web sürümünde Ayarlar → **Yedek indir** ile bir `.json` yedeği al, masaüstü uygulamasında
