@@ -333,6 +333,15 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 .card .txt{white-space:pre-wrap;overflow-wrap:anywhere;min-height:1.4em;outline:none}
 .card.k-note .txt:empty::before{content:"Not yaz…";color:var(--paper-ink-2)}
 .card .txt[contenteditable]{cursor:text;user-select:text;-webkit-user-select:text}
+.card.k-video{background:var(--bar);border:1px solid var(--stroke-2);display:flex;flex-direction:column;overflow:hidden;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.card.k-video .vid{position:relative;aspect-ratio:16/9;background:#000;display:grid;place-items:center;overflow:hidden}
+.card.k-video .vid img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+.card.k-video .vid iframe,.card.k-video .vid video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.vplay{position:relative;width:52px;height:52px;border-radius:50%;border:0;background:rgb(255 255 255 / .92);color:#111;display:grid;place-items:center;box-shadow:0 6px 20px rgb(0 0 0 / .45);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.vplay svg{width:20px;height:20px;margin-left:3px}.vplay:hover{transform:scale(1.1)}.vplay:active{transform:scale(.92)}
+.vstop{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:0;background:rgb(0 0 0 / .6);color:#fff;font-size:14px;line-height:24px;padding:0}
+.card.k-video .vmeta{padding:10px 12px;display:flex;flex-direction:column;gap:4px}.card.k-video .host{font-family:var(--f-mono);font-size:11px;color:var(--accent)}
+.card.k-video .txt{font-size:13.5px;line-height:1.3}.card.k-video .txt:empty:not([contenteditable]){display:none}.card.k-video a{font-family:var(--f-mono);font-size:11px;color:var(--ink-2);text-decoration:none;align-self:flex-start}
 .card.k-link{background:var(--bar);border:1px solid var(--stroke-2);padding:12px 14px;display:flex;flex-direction:column;gap:6px;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:0 14px 30px -16px rgb(0 0 0 / .8)}
 .card.k-link .host{font-family:var(--f-mono);font-size:11px;color:var(--accent)}
 .card.k-link .txt{font-family:var(--f-display);font-size:16px;line-height:1.25}
@@ -529,6 +538,20 @@ button:disabled{cursor:var(--cur)}
 .wmark{width:18px;height:16px;flex:0 0 auto}
 .tab.home .wmark{width:21px;height:19px;margin:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}.tab.home:hover .wmark{transform:scale(1.12) rotate(-4deg)}
 :root[data-theme="light"] .wmark{--wm:#3E4A6B}
+.cmp{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:24px;background:rgb(8 9 11 / .78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.cmpbox{width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px}
+.cmph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink)}.cmph .sp{flex:1}#cmpFade{width:160px}
+.cmpst{position:relative;align-self:center;max-width:100%;line-height:0;border-radius:12px;overflow:hidden;background:#000;user-select:none;touch-action:none}
+.cmpst img{display:block;max-width:100%;max-height:calc(100vh - 140px);object-fit:contain;pointer-events:none}
+.cmpb{position:absolute;inset:0}.cmpb img{width:100%;height:100%;max-height:none}
+.cmpst[data-m="slide"]{cursor:ew-resize}
+.cmpbar{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 8px rgb(0 0 0 / .6);pointer-events:none}
+.cmpbar span{position:absolute;top:50%;left:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgb(0 0 0 / .5)}
+.cmpbar span::before{content:"‹ ›";position:absolute;inset:0;display:grid;place-items:center;color:#111;font:600 12px/1 var(--f-body);letter-spacing:2px}
+.cmpst:not([data-m="slide"]) .cmpbar{display:none}
+.cmpt{position:absolute;top:10px;font:500 11px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgb(0 0 0 / .5);padding:5px 8px;border-radius:6px}
+.cmpt.l{left:10px}.cmpt.r{right:10px}.cmpst[data-m="fade"] .cmpt{display:none}
+.cmpst[data-m="side"]{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:transparent}.cmpst[data-m="side"] .cmpb{position:static}.cmpst[data-m="side"] .cmpb img{height:auto;max-height:calc(100vh - 140px)}
 .welcome{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgb(8 9 11 / .55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;transition:opacity .25s}
 .welcome.on{opacity:1}
 .wcard{width:min(380px,100%);box-sizing:border-box;padding:28px 26px 22px;border-radius:18px;background:var(--surface);border:1px solid var(--stroke-2);box-shadow:0 30px 80px rgb(0 0 0 / .45);display:flex;flex-direction:column;gap:12px;transform:translateY(14px) scale(.96);transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
@@ -538,6 +561,7 @@ button:disabled{cursor:var(--cur)}
 .wcard .acform{display:flex;flex-direction:column;gap:8px;margin-top:4px}.wcmsg:empty{display:none}.wcmsg{color:var(--ink-2)}
 .wcor{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:11px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.08em}.wcor::before,.wcor::after{content:"";flex:1;height:1px;background:var(--stroke)}
 .wcnote{line-height:1.5;color:var(--ink-3)}
+.deskonly{display:none!important}.isdesk .deskonly{display:inline-flex!important}
 .touchonly{display:none}.nokbd .touchonly{display:inline}.nokbd .tool.touchonly{display:inline-flex}.nokbd .tools .sep.touchonly{display:block}.nokbd .kbonly,.nokbd kbd,.nokbd #kbOpen{display:none!important}
 .wlock{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:400;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
 .wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
@@ -645,8 +669,17 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .drt:hover{border-color:var(--stroke)}.drt:focus{outline:none;border-color:var(--stroke-2);background:var(--glass)}
 .drgrid{display:grid;grid-template-columns:60px minmax(0,1fr);gap:8px 12px;align-items:center}.drgrid>span{display:flex;align-items:center;gap:6px}
 .field.sm{padding:5px 8px;font-size:12.5px;height:auto}.drn{color:var(--ink-2)}
-.drimg{border-radius:12px;overflow:hidden;background:var(--glass);max-height:260px;display:flex;align-items:center;justify-content:center;margin-right:76px}
-.drimg img{max-width:100%;max-height:260px;display:block}.drimg .hau{height:110px}.drnote{padding:14px;white-space:pre-wrap}
+.pinwrap{position:relative;display:inline-block;max-width:100%;line-height:0}.pinwrap.pinable{cursor:crosshair}
+.pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50% 50% 50% 4px;border:2px solid #fff;background:var(--accent);color:#0D0E10;font:600 11px/18px var(--f-body);text-align:center;padding:0;box-shadow:0 3px 10px rgb(0 0 0 / .45);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.pin:hover,.pin.hl{transform:translate(-50%,-50%) scale(1.25);z-index:2}.pin.new{background:#E4C485;animation:pinPop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pinPop{from{transform:translate(-50%,-50%) scale(0)}to{transform:translate(-50%,-50%) scale(1)}}
+.pin.sm{position:static;transform:none;display:inline-block;width:18px;height:18px;line-height:14px;font-size:10px;margin-right:6px;vertical-align:middle}
+.pinn{flex:0 0 auto;width:16px;height:16px;border-radius:50% 50% 50% 3px;background:var(--accent);color:#0D0E10;font:600 9.5px/16px var(--f-body);text-align:center}
+.pinhint{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);margin-bottom:6px}.pinhint .mini{margin-left:auto}
+.cm.flash{animation:cmFlash 1.2s ease-out}@keyframes cmFlash{0%{background:color-mix(in srgb,var(--accent) 22%,transparent)}100%{background:transparent}}
+.cpins{position:absolute;inset:0;pointer-events:none}.cpin{position:absolute;transform:translate(-50%,-50%);min-width:16px;height:16px;border-radius:50% 50% 50% 3px;border:1.5px solid #fff;background:var(--accent);color:#0D0E10;font:600 9px/13px var(--f-body);text-align:center;pointer-events:auto;cursor:var(--cur-pt);box-shadow:0 2px 6px rgb(0 0 0 / .5)}
+.drimg{border-radius:12px;overflow:hidden;background:var(--glass);max-height:300px;display:flex;align-items:center;justify-content:center;margin-top:38px}
+.drimg img{max-width:100%;max-height:300px;display:block}.drimg .hau{height:110px}.drnote{padding:14px;white-space:pre-wrap}
 .rvbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.rvbar .sp{flex:1}.mini.ok{color:var(--t5)}.mini.rev{color:#E6A3B4}
 .rvnote{font-size:12.5px;color:var(--ink-2);background:var(--glass);border-radius:8px;padding:8px 10px}
 .cmh{font-family:var(--f-display);font-size:14px;margin-top:6px;border-top:1px solid var(--stroke);padding-top:12px}
@@ -662,7 +695,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 /* bildirimler */
 .bellb{position:relative}.bellb .bn{position:absolute;top:3px;right:3px;min-width:15px;height:15px;border-radius:8px;background:var(--t2);color:#17191E;font-size:9.5px;font-weight:700;display:grid;place-items:center;padding:0 3px;box-sizing:border-box}
 @media (prefers-reduced-motion:no-preference){.bellb .bn:not([hidden]){animation:popIn .42s linear both}}
-#bellPop{width:min(380px,calc(100vw - 32px))}.bellh{display:flex;justify-content:space-between;align-items:center}.bellh h3{margin:0}
+#bellPop{width:min(380px,calc(100vw - 32px))}.bellh{display:flex;gap:6px;align-items:center}.bellh h3{flex:1}#bellSys.off{opacity:.55}.bellh h3{margin:0}
 .bell{display:flex;flex-direction:column;gap:2px;margin-top:8px}
 .nt{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:10px;align-items:start;border:0;background:none;color:var(--ink-2);text-align:left;padding:8px 6px;border-radius:9px;font-size:12.5px;line-height:1.4}
 .nt:hover{background:var(--glass-2)}.nt.un{color:var(--ink)}.nt.un .mono::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--t2);margin-right:5px;vertical-align:1px}
@@ -863,13 +896,14 @@ body.frameless .app{padding-top:8px}
             <button class="tool" data-tool="note" title="Not ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2.5h10v8l-3 3H3z"/><path d="M10 13.5v-3h3"/></svg><span class="lbl">Not</span></button>
             <button class="tool" data-tool="image" title="Görsel ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><circle cx="6" cy="6.5" r="1.2"/><path d="M2.5 12l4-4 3 3 2-2 2.5 2.5"/></svg><span class="lbl">Görsel</span></button>
             <button class="tool" data-tool="link" title="Link ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 9.5l3-3"/><path d="M7 4.5l1.2-1.2a2.6 2.6 0 013.7 3.7L10.7 8.2"/><path d="M9 11.5l-1.2 1.2a2.6 2.6 0 01-3.7-3.7L5.3 7.8"/></svg><span class="lbl">Link</span></button>
+            <button class="tool deskonly" data-tool="snip" title="Ekran alıntısı · Ctrl+Alt+W (uygulama arkadayken de çalışır)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/><circle cx="8" cy="8" r="2"/></svg>Alıntı</button>
             <span class="sep"></span>
             <button class="tool" data-tool="out" aria-label="Uzaklaş">−</button>
             <span class="zoomv" id="zoomv">100%</span>
             <button class="tool" data-tool="in" aria-label="Yakınlaş">+</button>
             <button class="tool" data-tool="fit" title="Hepsini göster"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><span class="lbl">Sığdır</span></button>
           </div>
-          <input type="file" id="fileIn" accept="image/*" multiple hidden>
+          <input type="file" id="fileIn" accept="image/*" multiple hidden><input type="file" id="verIn" accept="image/*" hidden>
         </div>
       </div>
     </section>
@@ -897,6 +931,11 @@ body.frameless .app{padding-top:8px}
 <div class="fnote" id="fnote" hidden role="dialog" aria-label="Odak notu"><span class="small" id="fnT">Bu odakta ne yaptın?</span>
   <div class="row"><input class="field" id="fnIn" maxlength="140" placeholder="kısa bir not · Enter kaydeder"><button class="btn" id="fnSkip">Geç</button></div></div>
 
+<div class="cmp" id="cmp" hidden role="dialog" aria-label="Karşılaştır"><div class="cmpbox">
+  <div class="cmph"><div class="seg sm" id="cmpMode" role="group" aria-label="Görünüm"><button data-cm="slide" aria-pressed="true">Kaydır</button><button data-cm="fade" aria-pressed="false">Üst üste</button><button data-cm="side" aria-pressed="false">Yan yana</button></div>
+    <input type="range" id="cmpFade" min="0" max="100" value="50" aria-label="Saydamlık" hidden><span class="sp"></span><span class="small" id="cmpL"></span><button class="btn sm" id="cmpSwap" title="Yer değiştir">⇄</button><button class="btn sm" id="cmpX">Kapat <kbd>Esc</kbd></button></div>
+  <div class="cmpst" id="cmpS" data-m="slide"><div class="cmpa"><img id="cmpA" alt="Önce"></div><div class="cmpb" id="cmpBw"><img id="cmpB" alt="Sonra"></div><div class="cmpbar" id="cmpBar"><span></span></div>
+    <span class="cmpt l">önce</span><span class="cmpt r">sonra</span></div></div></div>
 <div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="wcT">
   <div class="wcard">
     <div class="wclogo" id="wcLogo"></div>
@@ -953,12 +992,12 @@ body.frameless .app{padding-top:8px}
   <button data-scrfs title="Tam ekran" aria-label="Tam ekran"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
   <button data-scrx title="Gizle" aria-label="Gizle">×</button></div><video id="scrV" autoplay playsinline muted></video></div>
 <div class="pop" id="voicePop" hidden role="dialog" aria-label="Sesli oda"><div id="voiceBody"></div></div>
-<div class="pop" id="bellPop" hidden role="dialog" aria-label="Bildirimler"><div class="bellh"><h3>Bildirimler</h3><button class="mini" id="bellAll">tümünü okundu say</button></div><div class="bell" id="bellList"></div></div>
+<div class="pop" id="bellPop" hidden role="dialog" aria-label="Bildirimler"><div class="bellh"><h3>Bildirimler</h3><button class="mini" id="bellSys" title="Pencere arkadayken sistem bildirimi göster"></button><button class="mini" id="bellAll">tümünü okundu say</button></div><div class="bell" id="bellList"></div></div>
 <div class="sk" id="npk" hidden role="dialog" aria-label="Yeni proje"><div class="skbox npbox"><div class="kbhead"><h2>Yeni proje</h2><button class="btn" id="npClose">Vazgeç <kbd>Esc</kbd></button></div>
   <div class="npopts" id="npOpts"></div><span class="small npmsg" id="npMsg"></span></div></div>
 <div class="sk" id="shr" hidden role="dialog" aria-label="Paylaşım"><div class="skbox shbox"><div class="kbhead"><h2 id="shrT">Paylaşım</h2><button class="btn" id="shrClose">Kapat <kbd>Esc</kbd></button></div>
   <div class="shbody"><span class="small">Eklediğin kişiler bu projeyi PC'de, iPad'de ya da web'de görüp düzenleyebilir. Değişiklikler herkese anında yansır.</span>
-  <div class="row"><input class="field" id="shrIn" type="email" placeholder="ekip arkadaşının e-postası" style="flex:1"><button class="btn primary" id="shrAdd">Davet et</button></div>
+  <div class="row" id="shrInv"><input class="field" id="shrIn" type="email" placeholder="ekip arkadaşının e-postası" style="flex:1"><button class="btn primary" id="shrAdd">Davet et</button></div>
   <span class="small" id="shrMsg"></span><div class="shlist" id="shrList"></div>
   <div class="row" style="justify-content:flex-end"><button class="btn" id="shrLeave">Projeden ayrıl</button></div></div></div></div>
 <div class="sk" id="kb" hidden role="dialog" aria-label="Klavye kısayolları"><div class="skbox kbbox"><div class="kbhead"><h2>Klavye kısayolları</h2><button class="btn" id="kbClose">Kapat <kbd>Esc</kbd></button></div><div class="kbgrid" id="kbGrid"></div></div></div>
@@ -1078,7 +1117,7 @@ const tasksOf=pid=>S.items.filter(i=>i.type==="task"&&projOf(i)===pid);
 /* ortak projede: özel görev (yalnızca sahibi görür, veritabanı RLS) ve ekip görevi */
 const teamOf=pid=>tasksOf(pid).filter(t=>!t.private);
 const isMineT=t=>!!t.private||t.assignee===CL.me;
-const REFK=["image","note","link","audio"];
+const REFK=["image","note","link","audio","video"];
 function cardsOfProject(pid){const ids=boardIds(pid);return S.items.filter(i=>i.type==="card"&&REFK.includes(i.kind)&&ids.has(i.board))}
 const cards=b=>S.items.filter(i=>i.type==="card"&&i.kind!=="draw"&&i.board===b);
 const inks=b=>S.items.filter(i=>i.type==="card"&&i.kind==="draw"&&i.board===b);
@@ -1238,6 +1277,7 @@ function refMini(c,cls){
   if(c.kind==="image")return `<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`;
   if(c.kind==="note")return esc((c.text||"").slice(0,cls==="rp"?70:14));
   if(c.kind==="audio")return AU_IC+esc((c.text||"ses").slice(0,cls==="rp"?40:10));
+  if(c.kind==="video"){const v=vidInfo(c.url);return v&&v.thumb?`<img src="${esc(v.thumb)}" alt="" loading="lazy">`:VID_IC+esc((c.text||"video").slice(0,cls==="rp"?40:10))}
   return esc(hostOf(c.url)||"link");
 }
 function refThumbs(t){
@@ -1376,9 +1416,20 @@ $("vHome").addEventListener("contextmenu",e=>{
   const c=e.target.closest(".pcard[data-go]");if(!c)return;e.preventDefault();projMenu(c.dataset.go,e.clientX,e.clientY)});
 /* proje adı yalnızca sağ tık menüsünden değişir (sekme ya da ana sayfa kartı) */
 $("tabs").addEventListener("contextmenu",e=>{const t=e.target.closest('.tab[data-go]:not([data-go="home"])');if(!t)return;e.preventDefault();projMenu(t.dataset.go,e.clientX,e.clientY)});
+/* bulut / ortak projenin tamamını görselleriyle .workshop dosyasına yedekle */
+async function cloudBackup(pid){const p=proj(pid);if(!p||!window.fflate){toast("Yedek bu sürümde alınamıyor",null,true);return}
+  toast("Yedek hazırlanıyor…",null,true);
+  const items=S.items.filter(i=>i.type!=="settings"&&(i.id===pid||(i.type!=="project"&&itemProject(i)===pid))).map(strip);
+  await Promise.all(items.flatMap(it=>(it.type==="card"?[[it.assetId,it.ap],...((it.versions||[]).map(v=>[v.assetId,v.ap]))]:[]).filter(a=>a[0]&&!BLOB.has(a[0])).map(a=>cAsset(pid,a[0],a[1]).catch(()=>{}))));
+  let z;try{z=await zipItems(pid,items)}catch(e){toast("Yedek hazırlanamadı: "+(e&&e.message||e),null,true);return}
+  const name=safeName(p.name)+" yedek "+TODAY+".workshop";
+  if(S.mode==="file"&&TA){const dest=await TA.dialog.save({defaultPath:FS.dir+SEP()+name,filters:[{name:"Workshop projesi",extensions:["workshop"]}]});if(!dest)return;
+    try{await writeBytes(dest,z);toast("Yedek kaydedildi · "+baseName(dest),null,true)}catch(e){toast("Kaydedilemedi: "+(e&&e.message||e),null,true)}return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([z],{type:"application/zip"}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast("Yedek indirildi",null,true)}
 function projMenu(pid,x,y){const p=proj(pid);if(!p)return;
   const it=[{label:"Aç",fn:()=>go(pid)},{label:"Yeniden adlandır",fn:()=>{go(pid);S.renaming="project";renderHead()}}];
   if(S.mode==="file"&&FS.files.get(pid))it.push({label:"Dosyayı klasörde göster",fn:()=>TA.opener.revealItemInDir(FS.files.get(pid).path)},{label:"Kopyasını dışa aktar…",fn:()=>exportProjectCopy(pid)});
+  if(isCloud(pid))it.push({label:"Yedek indir (.workshop)",fn:()=>cloudBackup(pid)});
   if(cloudAvail()){if(!isCloud(pid))it.push({label:"Buluta taşı (sadece ben)",fn:()=>toCloud(pid,false)});
     it.push({label:isShared(pid)?"Paylaşım ve üyeler…":"Ekiple paylaş…",fn:()=>shareProject(pid)})}
   if(isCloud(pid)&&!CL.own.has(pid))it.push("-",{label:"Projeden ayrıl",danger:true,confirm:"Emin misin? Sende görünmez olur",fn:()=>deleteProject(pid)});
@@ -1393,7 +1444,7 @@ function deleteProject(pid){
   if(isCloud(pid)){const own=CL.own.has(pid);closeTab(pid);run(cDropProject(pid)).then(()=>toast(own?"Proje silindi":"Projeden ayrıldın",null,true));return}
   const bids=boardIds(pid);
   const del=S.items.filter(i=>(i.type==="task"&&projOf(i)===pid)||(i.type==="board"&&projOf(i)===pid)||(i.type==="card"&&bids.has(i.board))||(i.type==="project"&&i.id===pid)||(i.type==="focus"&&i.project===pid));
-  del.forEach(i=>{if(i.assetId&&assets)assets.delete(i.assetId).catch(()=>{})});
+  del.forEach(i=>{if(assets)assetIdsOf(i).forEach(a=>assets.delete(a).catch(()=>{}))});
   run(Promise.all(del.map(i=>api.remove(i.id))));
   closeTab(pid);toast("Proje silindi");
 }
@@ -1550,6 +1601,7 @@ function cardHTML(c){
   if(c.kind==="palette")return `<div class="pal"></div>`+x;
   if(c.kind==="link")return `<span class="host"></span><div class="txt"></div><a target="_blank" rel="noopener">Aç ↗</a>`+x;
   if(c.kind==="audio")return auHTML()+x;
+  if(c.kind==="video")return `<div class="vid" data-nodrag></div><div class="vmeta"><span class="host"></span><div class="txt"></div><a target="_blank" rel="noopener">Aç ↗</a></div>`+x;
   return `<div class="txt"></div>`+x;
 }
 function hostOf(u){try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return ""}}
@@ -1567,13 +1619,17 @@ function syncCards(){
       el.querySelector(".pal").innerHTML=(c.colors||[]).map(h=>`<button class="psw" data-hex="${esc(h)}" style="background:${esc(h)};color:${lum(h)>.55?"#18191C":"#F2F3F5"}" title="Kopyala">${esc(h.toUpperCase())}</button>`).join("")}}
     el.classList.toggle("sel",S.selSet.has(c.id));el.classList.toggle("locked",!!c.locked);
     {const rvt=isShared(curP())&&c.review&&c.review.state?{wait:"onay bekliyor",ok:"onaylandı",rev:"revizyon"}[c.review.state]:null,ncm=isShared(curP())?commentsOf(c.id).length:0;
-     el.dataset.rv=rvt?c.review.state:"";const bs=[c.locked&&"kilitli",c.ext&&"web",rvt,ncm&&{cm:ncm}].filter(Boolean);let bd=el.querySelector(":scope > .badges");
+     el.dataset.rv=rvt?c.review.state:"";const bs=[...((c.tags||[]).slice(0,2).map(t=>"#"+t)),c.versions&&c.versions.length&&("v"+(c.versions.length+1)),c.locked&&"kilitli",c.ext&&"web",rvt,ncm&&{cm:ncm}].filter(Boolean);let bd=el.querySelector(":scope > .badges");
      if(bs.length){if(!bd){bd=document.createElement("span");bd.className="badges";el.appendChild(bd)}const h=bs.map(x=>typeof x==="object"?`<span class="bcm" data-cmopen data-nodrag title="Yorumları aç (C)">${x.cm} yorum</span>`:`<span>${x}</span>`).join("");if(bd.innerHTML!==h)bd.innerHTML=h}else if(bd)bd.remove()}
-    if(c.kind==="image"){const img=el.querySelector("img");const s=imgSrc(c);if(img.getAttribute("src")!==s)img.setAttribute("src",s);el.classList.toggle("gray",!!c.gray);el.classList.toggle("flip",!!c.flip)}
+    if(c.kind==="image"){const img=el.querySelector("img");const s=imgSrc(c);if(img.getAttribute("src")!==s)img.setAttribute("src",s);el.classList.toggle("gray",!!c.gray);el.classList.toggle("flip",!!c.flip);
+      /* görsele iğneli yorumlar: panoda küçük numaralı noktalar */
+      const pins=commentsOf(c.id).filter(x=>x.pin);let pl=el.querySelector(":scope > .cpins");
+      if(pins.length){if(!pl){pl=document.createElement("span");pl.className="cpins";el.appendChild(pl)}const h=pins.map((x,i)=>`<span class="cpin" style="left:${(c.flip?1-x.pin.x:x.pin.x)*100}%;top:${x.pin.y*100}%" data-cmopen data-nodrag title="${esc((x.text||"").slice(0,80))}">${i+1}</span>`).join("");if(pl.innerHTML!==h)pl.innerHTML=h}else if(pl)pl.remove()}
     const txt=el.querySelector(".txt");
-    if(txt&&S.editing!==c.id){const val=c.kind==="audio"?(c.text||"Ses kaydı"):c.kind==="link"?(c.text||hostOf(c.url)||c.url):(c.text||"");if(txt.textContent!==val)txt.textContent=val}
+    if(txt&&S.editing!==c.id){const val=c.kind==="audio"?(c.text||"Ses kaydı"):c.kind==="video"?(c.text||""):c.kind==="link"?(c.text||hostOf(c.url)||c.url):(c.text||"");if(txt.textContent!==val)txt.textContent=val}
     if(c.kind==="image")syncImgNote(el,c);
     if(c.kind==="audio"){el.dataset.au=c.id;const ho=el.querySelector(".host");const hv=driveId(c.url)?"Google Drive · ses":hostOf(c.url);if(ho.textContent!==hv)ho.textContent=hv;const a=el.querySelector(".aulink");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
+    if(c.kind==="video")syncVideo(el,c);
     if(c.kind==="link"){el.querySelector(".host").textContent=hostOf(c.url);const a=el.querySelector("a");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
   }
   world.querySelectorAll(".card").forEach(el=>{if(!seen.has(el.dataset.id))el.remove()});
@@ -1698,7 +1754,7 @@ function endPointer(e){
     undoPatch(d.items.length+d.ks.length>1?"Taşıma":"Taşıma",[...d.items.map(o=>[o.c.id,{x:o.x0,y:o.y0}]),...d.ks.map(o=>[o.k.id,{pts:(o.k.pts||[]).slice()}])]);
     for(const o of d.items){const x=o.x0+ddx,y=o.y0+ddy;const u=o.z?{x,y,z:o.z}:{x,y};Object.assign(o.c,u);run(api.update(o.c.id,u))}
     for(const o of d.ks){const p=(o.k.pts||[]).map((v,i)=>r1(v+(i%2?ddy:ddx)));o.k.pts=p;o.g.removeAttribute("transform");
-      o.g.querySelectorAll("path").forEach(x=>x.setAttribute("d",inkD(o.k)));run(api.update(o.k.id,{pts:p}))}
+      o.g.querySelectorAll("path").forEach(x=>x.setAttribute("d",x.classList.contains("vis")?inkVisD(o.k):inkD(o.k)));run(api.update(o.k.id,{pts:p}))}
     syncCards();return}
   if(!d.moved){syncCards();return}
   const c=S.items.find(i=>i.id===d.id);const w=Math.round(parseFloat(d.el.style.width));undoPatch("Boyut",[[d.id,{w:d.w0}]]);if(c)c.w=w;run(api.update(d.id,{w}));
@@ -1787,7 +1843,55 @@ document.addEventListener("paste",e=>{
   else if(t&&api){e.preventDefault();const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"note",x:Math.round(p.x-120),y:Math.round(p.y-40),w:240,text:t.slice(0,4000),z:maxZ()+1,created:Date.now()})).then(r=>r&&undoRemove("Not",[r.id]))}
 });
 $("fileIn").addEventListener("change",e=>{addImages(e.target.files);e.target.value=""});
-function addLink(u){if(!api)return;if(!/^https?:\/\//i.test(u))u="https://"+u;if(!hostOf(u)){toast("Bu bir link adresine benzemiyor.");return}
+/* ---------- ekran alıntısı → pano (masaüstü): sistemin alıntı aracı, sonuç panodan alınır ---------- */
+let snipping=false;
+function snipTarget(){if(boardVisible())return {pid:curP(),bid:curBoard()};const pid=curP()||(S.open||[]).find(p=>proj(p));if(!pid)return null;return {pid,bid:refBoard(pid)}}
+const clipBytes=async()=>{try{return new Uint8Array(await TA.core.invoke("clip_image"))}catch(_){return new Uint8Array(0)}};
+const hashB=b=>{let h=b.length;for(let i=0;i<b.length;i+=97)h=(h*31+b[i])|0;return h};
+async function startSnip(){if(S.mode!=="file"||!TA||snipping)return;const tgt=snipTarget();if(!tgt){toast("Önce bir proje aç; alıntı onun panosuna eklenir",null,true);return}
+  snipping=true;let seq0=0;try{seq0=await TA.core.invoke("clip_seq")}catch(_){}
+  let h0=null;if(!seq0)h0=hashB(await clipBytes());
+  try{await TA.core.invoke("snip_start")}catch(e){snipping=false;toast("Ekran alıntısı açılamadı: "+e,null,true);return}
+  const t0=Date.now();
+  const poll=async()=>{if(Date.now()-t0>90000){snipping=false;return}
+    let changed=false;if(seq0){const q=await TA.core.invoke("clip_seq").catch(()=>seq0);changed=q!==seq0;if(changed)seq0=q}else{const b=await clipBytes();changed=b.length&&hashB(b)!==h0}
+    if(changed){const b=await clipBytes();if(b.length){snipping=false;await addShot(b,tgt);return}}
+    setTimeout(poll,500)};
+  setTimeout(poll,700)}
+async function addShot(bytes,tgt){
+  if(curP()!==tgt.pid)go(tgt.pid);S.sub[tgt.pid]="b:"+tgt.bid;save();renderProject();
+  await new Promise(r=>requestAnimationFrame(()=>r()));
+  const f=new File([bytes],"alinti-"+Date.now()+".png",{type:"image/png"});await addImages([f]);
+  const b=boards(tgt.pid).find(x=>x.id===tgt.bid);const msg="Alıntı panoya eklendi · "+((b&&b.name)||"Pano");toast(msg,null,true);
+  teamNotify("Workshop",msg)}
+
+/* ---------- sürüm yığını: aynı kartın v1, v2, v3… hâlleri ---------- */
+let verFor=null;
+function addVersion(id){verFor=id;$("verIn").click()}
+$("verIn").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";const c=S.items.find(i=>i.id===verFor);if(!f||!c||!assets)return;
+  try{toast("Yeni sürüm yükleniyor…",null,true);const dims=await new Promise(res=>{const u=URL.createObjectURL(f);const im=new Image();im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight,im});im.onerror=()=>res({w:0,h:0});im.src=u});
+    const a=await assets.upload(await shrink(f,dims));const ap=(CL.apre&&CL.apre.get(a.id))||null;
+    const prev={assetId:c.assetId||null,ap:c.ap||null,at:c.vAt||c.created||Date.now(),by:c.vBy||null};
+    const vs=(c.versions||[]).concat(prev.assetId?[prev]:[]);
+    undoPatch("Yeni sürüm",[[c.id,{assetId:c.assetId,ap:c.ap||null,versions:c.versions||null,vAt:c.vAt||null,vBy:c.vBy||null,review:c.review||null}]]);
+    const u={assetId:a.id,ap,versions:vs,vAt:Date.now(),vBy:CL.me||null,review:null};Object.assign(c,u);run(api.update(c.id,u));syncCards();toast(`v${vs.length+1} eklendi · eski sürümler kartta duruyor`,null,true)}
+  catch(err){toast("Sürüm eklenemedi: "+((err&&err.message)||err),null,true)}});
+const verObj=(c,v)=>({kind:"image",assetId:v.assetId,ap:v.ap,created:v.at,text:"v"+((c.versions||[]).indexOf(v)+1)});
+async function verLoad(c,v){const pid=itemProject(c);if(v.assetId&&!BLOB.has(v.assetId)&&isCloud(pid))await cAsset(pid,v.assetId,v.ap).catch(()=>{})}
+async function verCompare(c,v){await verLoad(c,v);openCompare(verObj(c,v),Object.assign({},c,{text:"v"+((c.versions||[]).length+1)+" · güncel"}))}
+function verRestore(c,v){const vs=(c.versions||[]).filter(x=>x!==v);vs.push({assetId:c.assetId,ap:c.ap||null,at:c.vAt||c.created,by:c.vBy||null});
+  undoPatch("Sürüme dön",[[c.id,{assetId:c.assetId,ap:c.ap||null,versions:c.versions||null,vAt:c.vAt||null}]]);
+  const u={assetId:v.assetId,ap:v.ap||null,versions:vs,vAt:v.at||Date.now()};Object.assign(c,u);verLoad(c,v).then(()=>syncCards());run(api.update(c.id,u));toast("Sürüme dönüldü",null,true)}
+function verItems(c){const vs=c.versions||[];if(!vs.length)return [];const d=t=>{if(!t)return "";const x=new Date(t);return x.getDate()+" "+MSH[x.getMonth()]};
+  return [{head:true,label:`Sürümler · şu an v${vs.length+1}`},{label:"Önceki sürümle karşılaştır",fn:()=>verCompare(c,vs[vs.length-1])},
+    ...vs.map((v,i)=>({label:`v${i+1}${v.at?" · "+d(v.at):""} · buna dön`,fn:()=>verRestore(c,v)})).reverse()]}
+function addVideo(u){const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"video",url:u,text:"",x:Math.round(p.x-180),y:Math.round(p.y-120),w:360,z:maxZ()+1,created:Date.now()})).then(r=>r&&undoRemove("Video",[r.id]))}
+function addLink(u,force){if(!api)return;if(!/^https?:\/\//i.test(u))u="https://"+u;if(!hostOf(u)){toast("Bu bir link adresine benzemiyor.");return}
+  const vi=vidInfo(u);
+  /* Drive linki ses de video da olabilir: sor */
+  if(!force&&driveId(u)&&!/\.(mp3|wav|ogg|m4a|aac|flac|opus)(\?|#|$)/i.test(u)){const r=$("linkpop").getBoundingClientRect();
+    openCtx(r.left,r.top-110,"Drive dosyası",[{label:"Ses olarak ekle",fn:()=>addLink(u,"audio")},{label:"Video olarak ekle",fn:()=>addVideo(u)}]);return}
+  if(force!=="audio"&&vi&&vi.t!=="drive"){addVideo(u);return}
   if(isAudioUrl(u)){const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"audio",url:u,text:"",x:Math.round(p.x-150),y:Math.round(p.y-40),w:300,z:maxZ()+1,created:Date.now()})).then(r=>{if(r){undoRemove("Ses",[r.id]);setTimeout(()=>startEdit(r.id,true),80)}});return}
   const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"link",url:u,text:"",x:Math.round(p.x-130),y:Math.round(p.y-40),w:260,z:maxZ()+1,created:Date.now()})).then(r=>r&&undoRemove("Link",[r.id]))}
 $("linkAdd").onclick=()=>{const v=$("linkIn").value.trim();if(v){addLink(v);$("linkIn").value="";$("linkpop").hidden=true}};
@@ -1796,7 +1900,7 @@ $("tools").addEventListener("click",e=>{
   const t=e.target.closest("[data-tool]");if(!t)return;const r=stage.getBoundingClientRect();
   const tl=t.dataset.tool;
   if(INK_TOOLS.includes(tl)){setTool(tl);return}
-  if(tl==="undo"){undo();return}if(tl==="redo"){redo();return}
+  if(tl==="undo"){undo();return}if(tl==="redo"){redo();return}if(tl==="snip"){startSnip();return}
   if(tl==="note"||tl==="image"||tl==="link")setTool("select");
   switch(tl){
     case "note":{if(!api)return;const p=centerWorld();addNote(p.x-120+Math.random()*40,p.y-60+Math.random()*40);break}
@@ -1810,11 +1914,12 @@ $("tools").addEventListener("click",e=>{
 function deleteCard(id){const c=S.items.find(i=>i.id===id);if(!c)return;const doc=Object.assign({},c);S.selSet.delete(id);run(api.remove(id));const u=undoRestore("Silme",[doc]);toast("Kart silindi",{fn:()=>runUndo(u)})}
 world.addEventListener("click",e=>{const x=e.target.closest("[data-cdel]");if(x)deleteCard(x.closest(".card").dataset.id);const ed=e.target.closest("[data-cedit]");if(ed)openEditor(ed.closest(".card").dataset.id)});
 /* pano sahibi: ortak projede yalnızca o siler, adını/kilidini/gizliliğini değiştirir (veritabanı da engeller) */
-const canMng=(pid,b)=>!b||!isShared(pid)||!b.owner||b.owner===CL.me;
-const ownerNote=b=>"Panonun sahibi "+pname(b.owner)+" · içeriği düzenleyebilirsin";
+/* sahibi yazmayan (eski/ana) panoları ortak projede proje sahibi yönetir */
+const canMng=(pid,b)=>!b||!isShared(pid)||(b.owner?b.owner===CL.me:CL.own.has(pid));
+const ownerNote=b=>(b&&b.owner?"Panonun sahibi "+pname(b.owner):"Bu panoyu proje sahibi yönetir")+" · içeriği düzenleyebilirsin";
 function deleteBoard(pid,id){const lb=boards(pid).find(x=>x.id===id);if(!canMng(pid,lb)){toast(ownerNote(lb),null,true);return}if(lb&&lb.locked){toast("Pano kilitli · silmek için önce kilidi aç",null,true);return}
   const cs=S.items.filter(i=>i.type==="card"&&i.board===id);
-  cs.forEach(c=>{if(c.assetId&&assets&&!S.items.some(o=>o.id!==c.id&&o.board!==id&&o.assetId===c.assetId))assets.delete(c.assetId).catch(()=>{})});
+  cs.forEach(c=>{if(assets)assetIdsOf(c).forEach(a=>{if(!S.items.some(o=>o.id!==c.id&&o.board!==id&&assetIdsOf(o).includes(a)))assets.delete(a).catch(()=>{})})});
   run(Promise.all(cs.map(c=>api.remove(c.id))).then(()=>api.remove(id)));
   if(S.sub[pid]==="b:"+id){S.sub[pid]="b:"+mainBoard(pid);save()}renderProject();toast("Pano silindi");
 }
@@ -1833,7 +1938,7 @@ function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filt
     <span class="rdtip">Sağ tık: kilitle, adını değiştir, sil</span>`}
 function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},CL.me&&isCloud(pid)?{owner:CL.me}:{},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
 /* kilitli pano: adı değişmez, silinemez (kartlar düzenlenebilir) */
-function lockBoard(pid,b){if(!canMng(pid,b)){toast(ownerNote(b),null,true);return}const v=!b.locked;if(b.virtual)run(api.set(b.id,{type:"board",project:pid,name:b.name||"Referanslar",order:0,locked:v}));else run(api.update(b.id,{locked:v}));
+function lockBoard(pid,b){if(!canMng(pid,b)){toast(ownerNote(b),null,true);return}const v=!b.locked;if(b.virtual)run(api.set(b.id,Object.assign({type:"board",project:pid,name:b.name||"Referanslar",order:0,locked:v},isCloud(pid)&&CL.own.has(pid)?{owner:CL.me}:{})));else run(api.update(b.id,{locked:v}));
   toast(v?"Pano kilitlendi · silinemez, adı değişmez":"Kilit açıldı",null,true)}
 function boardMenu(pid,id,x,y){const b=boards(pid).find(v=>v.id===id);if(!b)return;const main=b.virtual||id===mainBoard(pid);
   const go2=()=>{S.sub[pid]="b:"+id;S.selSet.clear();save();renderProject()};
@@ -1865,7 +1970,7 @@ async function sendToBoard(ids,tb,rm){const pid=curP();if(!isCloud(pid))return;c
   /* hedefte boş bir yere, göreli düzen korunarak */
   const there=S.items.filter(i=>i.type==="card"&&i.board===tb&&i.kind!=="draw");const right=there.length?Math.max(...there.map(c=>(c.x||0)+(c.w||240)))+80:0;
   const bx=Math.min(...src.map(c=>c.kind==="draw"?Math.min(...(c.pts||[0]).filter((_,i)=>!(i%2))):(c.x||0)));const dx=right-bx;
-  try{for(const c of src){await pubAsset(pid,c);const {id,private:_p,ap:_a,review:_r,...d}=c;const n=Object.assign(JSON.parse(JSON.stringify(d)),{board:tb,created:Date.now()});
+  try{for(const c of src){await pubAsset(pid,c);const {id,private:_p,ap:_a,review:_r,versions:_v,vAt:_va,vBy:_vb,...d}=c;const n=Object.assign(JSON.parse(JSON.stringify(d)),{board:tb,created:Date.now()});
       if(n.kind==="draw")n.pts=(n.pts||[]).map((v,i)=>i%2?v:r1(v+dx));else n.x=(n.x||0)+dx;
       await api.add(n);if(c.assetId)CL.apre.set(c.assetId,"")}
     if(rm){for(const c of src){await api.remove(c.id);if(c.ap&&c.assetId)CL.sb.storage.from("assets").remove([pid+"/"+c.ap+c.assetId]).catch(()=>{})}}
@@ -1879,8 +1984,10 @@ function dropToBoard(ids,tb){const pid=curP();const from=curBoard();
   for(const c of list){c.board=tb;run(api.update(c.id,{board:tb}))}S.selSet.clear();syncCards();renderDir();toast(list.length+" kart taşındı")}
 /* sahibi ekip panosunu tekrar gizliye alır: kartlar ve görselleri özel olur, ekipte anında kaybolur */
 async function boardToPrivate(pid,id){const b=boards(pid).find(x=>x.id===id);if(!b||b.owner!==CL.me)return;const cs=S.items.filter(i=>i.type==="card"&&i.board===id);const pre="p/"+CL.me+"/";
-  try{for(const c of cs){if(c.assetId&&!c.ap){const {error}=await CL.sb.storage.from("assets").copy(pid+"/"+c.assetId,pid+"/"+pre+c.assetId);if(error&&!/exist|duplicate/i.test(error.message||""))throw error;CL.apre.set(c.assetId,pre)}
-      await api.update(c.id,Object.assign({private:true},c.assetId?{ap:pre}:{}))}
+  const toPriv=async a=>{const {error}=await CL.sb.storage.from("assets").copy(pid+"/"+a,pid+"/"+pre+a);if(error&&!/exist|duplicate/i.test(error.message||""))throw error};
+  try{for(const c of cs){if(c.assetId&&!c.ap){await toPriv(c.assetId);CL.apre.set(c.assetId,pre)}
+      const vs=c.versions?await Promise.all(c.versions.map(async v=>{if(v.assetId&&!v.ap)await toPriv(v.assetId);return Object.assign({},v,{ap:v.assetId?pre:null})})):null;
+      await api.update(c.id,Object.assign({private:true},c.assetId?{ap:pre}:{},vs?{versions:vs}:{}))}
     await api.update(id,{private:true});cHide(pid,[id,...cs.map(c=>c.id)]);
     /* ekip klasöründeki kopyayı kaldır (başka bir ekip kartı kullanmıyorsa) */
     const rm=[...new Set(cs.filter(c=>c.assetId&&!S.items.some(o=>o.assetId===c.assetId&&!o.private)).map(c=>pid+"/"+c.assetId))];if(rm.length)CL.sb.storage.from("assets").remove(rm).catch(()=>{});toast("Pano gizlendi · yalnızca sen görüyorsun",null,true)}
@@ -1889,7 +1996,9 @@ function cHide(pid,ids){const ch=CL.pres.get(pid);if(ch)try{ch.send({type:"broad
 function onHide(pid,p){const ids=new Set((p&&p.ids)||[]);if(!ids.size)return;S.items=S.items.filter(i=>!ids.has(i.id)||i.private);for(const id of ids){const v=CL.items.get(id);if(v&&!v.private)CL.items.delete(id)}
   if(curP()===pid&&ids.has(curBoard())){S.sub[pid]="b:"+mainBoard(pid);save()}cCacheSave();renderAll()}
 async function openBoardToTeam(pid,id){const cs=S.items.filter(i=>i.type==="card"&&i.board===id);
-  try{for(const c of cs){await pubAsset(pid,c);if(c.assetId)CL.apre.set(c.assetId,"");await api.update(c.id,{private:false,ap:null})}await api.update(id,{private:false,owner:CL.me});toast("Pano ekibe açıldı · herkes görür ve düzenleyebilir, yalnızca sen silebilirsin",null,true)}
+  try{for(const c of cs){await pubAsset(pid,c);if(c.assetId)CL.apre.set(c.assetId,"");
+      const vs=c.versions?await Promise.all(c.versions.map(async v=>{if(v.ap)await pubAsset(pid,v);return Object.assign({},v,{ap:null})})):null;
+      await api.update(c.id,Object.assign({private:false,ap:null},vs?{versions:vs}:{}))}await api.update(id,{private:false,owner:CL.me});toast("Pano ekibe açıldı · herkes görür ve düzenleyebilir, yalnızca sen silebilirsin",null,true)}
   catch(e){toast("Açılamadı: "+(e&&e.message||e),null,true)}}
 $("bbar").addEventListener("click",e=>{const p=e.target.closest("#rdpick");if(!p)return;const pid=curP();const r=p.getBoundingClientRect();
   openCtx(r.left,r.bottom+4,"Panolar",[{head:true,label:"Ekip panoları"},...teamBoards(pid).map(b=>({label:b.name||"Pano",fn:()=>{S.sub[pid]="b:"+b.id;save();renderProject()}})),
@@ -1900,7 +2009,7 @@ function startBoardRename(){
   $("bbar").innerHTML=`<span class="pill name"><input id="bnameIn" maxlength="40" value="${esc(b.name||"")}" aria-label="Pano adı"></span>`;
   const inp=$("bnameIn");inp.focus();inp.select();
   const done=ok=>{if(S.renaming!=="board")return;S.renaming=null;const v=inp.value.trim();
-    if(ok&&v&&v!==b.name){if(b.virtual)run(api.set(b.id,{type:"board",project:pid,name:v,order:0}));else run(api.update(b.id,{name:v}))}
+    if(ok&&v&&v!==b.name){if(b.virtual)run(api.set(b.id,Object.assign({type:"board",project:pid,name:v,order:0},isCloud(pid)&&CL.own.has(pid)?{owner:CL.me}:{})));else run(api.update(b.id,{name:v}))}
     renderProject()};
   inp.onkeydown=e=>{if(e.key==="Enter")done(true);if(e.key==="Escape")done(false)};inp.onblur=()=>done(true);
 }
@@ -1932,19 +2041,38 @@ stage.addEventListener("contextmenu",e=>{
   if(S.selSet.size>1){multiItems.ref=id;const mi=multiItems();multiItems.ref=null;openCtx(e.clientX,e.clientY,S.selSet.size+" öğe seçili",mi);return}
   const items=[];
   if(c.kind==="image")items.push({label:"Odak görünümü",fn:()=>openLB(c.id)},{label:c.gray?"Gri tonu kapat  ·  G":"Gri ton  ·  G",fn:()=>toggleImg("gray",[c.id])},{label:c.flip?"Çevirmeyi kapat  ·  H":"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[c.id])},{label:"Renk paleti çıkar",fn:()=>makePalette(c)});
-  if(c.kind==="frame"||c.kind==="note"||c.kind==="link"||c.kind==="audio")items.push({label:c.kind==="frame"?"Yeniden adlandır":c.kind==="audio"?"Adını düzenle":"Düzenle",fn:()=>startEdit(id,c.kind==="frame"||c.kind==="audio")});
+  if(c.kind==="frame"||c.kind==="note"||c.kind==="link"||c.kind==="audio"||c.kind==="video")items.push({label:c.kind==="frame"?"Yeniden adlandır":c.kind==="audio"||c.kind==="video"?"Adını düzenle":"Düzenle",fn:()=>startEdit(id,c.kind==="frame"||c.kind==="audio"||c.kind==="video")});
   if(c.kind==="image")items.push({label:c.note?"Notu düzenle":"Not ekle",fn:()=>openImgNote(c.id)});
+  if(c.kind==="image"&&assets)items.push({label:"Yeni sürüm ekle…",fn:()=>addVersion(c.id)},...verItems(c));
   if(isShared(curP())&&REFK.includes(c.kind)&&!c.private)items.push({label:"Yorumlar ve onay…"+(commentsOf(c.id).length?`  ·  ${commentsOf(c.id).length}`:""),fn:()=>openDrawer(c.id)},{label:c.review&&c.review.state==="wait"?"Onay isteğini geri çek":"Onay iste",fn:()=>run(api.update(c.id,{review:c.review&&c.review.state==="wait"?null:{state:"wait",by:CL.me,at:Date.now()}}))});
   if(c.kind==="image")items.splice(1,0,{label:"Düzenle (çiz, kırp, döndür)  ·  Enter",fn:()=>openEditor(c.id)});
   if(c.kind==="frame")items.push({label:"Çerçeveyi PNG indir",fn:()=>exportPNG(withFrameContents(new Set([id])),c.text||"Çerçeve")},{label:"Çerçeveyi PDF indir",fn:()=>exportPDF(withFrameContents(new Set([id])),c.text||"Çerçeve")});
+  if(c.kind!=="draw"&&c.kind!=="palette")items.push({label:(c.tags&&c.tags.length?"Etiketler · "+c.tags.map(t=>"#"+t).join(" "):"Etiket ekle…"),fn:()=>editTags(c)});
   if(c.private)items.push(...sendItems([id]));
   if(c.kind!=="draw")items.push({label:"Kopyasını oluştur  ·  Ctrl+D",fn:()=>duplicateSel([id])});
   if(c.kind!=="draw")items.push({label:c.locked?"Kilidi aç  ·  L":"Kilitle  ·  L",fn:()=>toggleLock([id])});
   if(S.selSet.size>1)items.push({label:"Seçimi çerçevele  ·  Ctrl+G",fn:frameSelection});
   if(items.length)items.push("-");
   if(!c.locked)items.push({label:S.selSet.size>1?`Seçileni sil (${S.selSet.size})`:(c.kind==="frame"?"Çerçeveyi sil (içindekiler kalır)":"Sil"),danger:true,fn:deleteSelected});
-  openCtx(e.clientX,e.clientY,{image:"Görsel",note:"Not",link:"Link",audio:"Ses",frame:c.text||"Çerçeve",palette:"Palet",draw:"Çizim"}[c.kind]||"",items);
+  openCtx(e.clientX,e.clientY,{image:"Görsel",note:"Not",link:"Link",audio:"Ses",video:"Video",frame:c.text||"Çerçeve",palette:"Palet",draw:"Çizim"}[c.kind]||"",items);
 });
+
+/* ---------- önce / sonra karşılaştırma ---------- */
+const CMP={a:null,b:null,x:.5,m:"slide"};
+function openCompare(a,b){/* eskisi solda (önce) */if((a.created||0)>(b.created||0))[a,b]=[b,a];CMP.a=a;CMP.b=b;CMP.x=.5;drawCompare();animShow($("cmp"))}
+function drawCompare(){$("cmpA").src=imgSrc(CMP.a);$("cmpB").src=imgSrc(CMP.b);const S2=$("cmpS");S2.dataset.m=CMP.m;
+  document.querySelectorAll("#cmpMode [data-cm]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.cm===CMP.m));$("cmpFade").hidden=CMP.m!=="fade";
+  $("cmpL").textContent=(CMP.a.text||CMP.a.note||"önce").toString().slice(0,30)+"  ·  "+(CMP.b.text||CMP.b.note||"sonra").toString().slice(0,30);
+  $("cmpBw").style.clipPath=CMP.m==="slide"?`inset(0 0 0 ${CMP.x*100}%)`:"none";$("cmpBar").style.left=CMP.x*100+"%";$("cmpBw").style.opacity=CMP.m==="fade"?$("cmpFade").value/100:1}
+function closeCompare(){animHide($("cmp"))}
+(()=>{let dragging=false;const S2=$("cmpS");const mv=e=>{const r=$("cmpA").getBoundingClientRect();CMP.x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));drawCompare()};
+  S2.addEventListener("pointerdown",e=>{if(CMP.m!=="slide")return;dragging=true;S2.setPointerCapture(e.pointerId);mv(e)});
+  S2.addEventListener("pointermove",e=>{if(dragging)mv(e)});S2.addEventListener("pointerup",()=>dragging=false);S2.addEventListener("pointercancel",()=>dragging=false);
+  $("cmpMode").addEventListener("click",e=>{const b=e.target.closest("[data-cm]");if(b){CMP.m=b.dataset.cm;drawCompare()}});
+  $("cmpFade").addEventListener("input",drawCompare);$("cmpSwap").onclick=()=>{[CMP.a,CMP.b]=[CMP.b,CMP.a];drawCompare()};$("cmpX").onclick=closeCompare;
+  $("cmp").addEventListener("click",e=>{if(e.target===$("cmp"))closeCompare()});
+  document.addEventListener("keydown",e=>{if($("cmp").hidden)return;if(e.key==="Escape"){e.stopPropagation();closeCompare()}
+    if(e.key==="ArrowLeft"||e.key==="ArrowRight"){CMP.x=Math.min(1,Math.max(0,CMP.x+(e.key==="ArrowLeft"?-.05:.05)));drawCompare()}},true)})();
 
 /* ---------- genel geri alma / yineleme ---------- */
 const UNDO=[],REDO=[];
@@ -2002,7 +2130,7 @@ async function renderExport(ids){
     else if(c.kind==="palette"){rr(cx,bx,by,w,h,10);cx.fillStyle="#26282d";cx.fill();const cols=c.colors||[];const gap=5,sw=(w-14-gap*(cols.length-1))/cols.length;
       cols.forEach((hx,i)=>{const sx=bx+7+i*(sw+gap);rr(cx,sx,by+7,sw,h-14,7);cx.fillStyle=hx;cx.fill();cx.fillStyle=lum(hx)>.55?"#18191C":"#F2F3F5";cx.font=`10px ${fm}`;cx.textAlign="center";cx.textBaseline="bottom";cx.fillText(hx.toUpperCase(),sx+sw/2,by+h-12)})}
     cx.restore()}
-  for(const k of ks){cx.save();cx.lineCap="round";cx.lineJoin="round";cx.lineWidth=k.w||3;cx.strokeStyle=k.color||"#FF5C57";cx.stroke(new Path2D(inkD(k)));cx.restore()}
+  for(const k of ks){cx.save();if(k.pr&&k.shape==="pen"){cx.fillStyle=k.color||"#FF5C57";cx.fill(new Path2D(inkOutline(k)))}else{cx.lineCap="round";cx.lineJoin="round";cx.lineWidth=k.w||3;cx.strokeStyle=k.color||"#FF5C57";cx.stroke(new Path2D(inkD(k)))}cx.restore()}
   $("toast").hidden=true;return {cv,failed,W,H};
 }
 async function saveFile(blob,fname,failed,kind){
@@ -2197,6 +2325,8 @@ function multiItems(){
     {label:"Izgaraya diz",fn:arrangeSel},{label:"Seçimi çerçevele  ·  Ctrl+G",fn:frameSelection},{label:"Kopyasını oluştur  ·  Ctrl+D",fn:()=>duplicateSel()}];
   if(hasImg)it.push({label:"Gri ton  ·  G",fn:()=>toggleImg("gray",[...S.selSet])},{label:"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[...S.selSet])});
   it.push({label:"Seçimi PNG indir",fn:()=>exportPNG(withFrameContents(S.selSet),"Seçim")},{label:"Seçimi PDF indir",fn:()=>exportPDF(withFrameContents(S.selSet),"Seçim")},{label:"Kilitle / kilidi aç  ·  L",fn:()=>toggleLock([...S.selSet])});
+  const imgs=[...S.selSet].map(id=>S.items.find(i=>i.id===id)).filter(c=>c&&c.kind==="image");
+  if(imgs.length===2)it.unshift({label:"Karşılaştır (önce / sonra)",fn:()=>openCompare(imgs[0],imgs[1])},"-");
   if(privB(curBoard()))it.push("-",...sendItems([...S.selSet]));
   it.push("-",{label:`Seçileni sil (${S.selSet.size})`,danger:true,fn:deleteSelected});return it;
 }
@@ -2327,17 +2457,24 @@ function inkD(k){
   for(let i=2;i<p.length-2;i+=2)d+=`Q${p[i]} ${p[i+1]} ${r1((p[i]+p[i+2])/2)} ${r1((p[i+1]+p[i+3])/2)}`;
   return d+`L${p[p.length-2]} ${p[p.length-1]}`;
 }
+/* kalem basıncı (Apple Pencil, tablet): çizgi, basınca göre kalınlaşıp incelen dolu bir şekil olarak çizilir */
+function inkOutline(k){const p=k.pts||[],pr=k.pr||[],n=p.length/2;if(n<2)return inkD(k);const w=k.w||3;const L=[],Rr=[];
+  for(let i=0;i<n;i++){const a=Math.max(0,i-1),b=Math.min(n-1,i+1);let dx=p[2*b]-p[2*a],dy=p[2*b+1]-p[2*a+1];const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
+    const hw=w*(.2+1.1*(pr[i]==null?.5:pr[i]))/2;L.push([r1(p[2*i]-dy*hw),r1(p[2*i+1]+dx*hw)]);Rr.push([r1(p[2*i]+dy*hw),r1(p[2*i+1]-dx*hw)])}
+  const e=w*(.2+1.1*(pr[n-1]==null?.5:pr[n-1]))/2,s0=w*(.2+1.1*(pr[0]==null?.5:pr[0]))/2;
+  return `M${L[0][0]} ${L[0][1]}`+L.slice(1).map(q=>`L${q[0]} ${q[1]}`).join("")+`A${r1(e)} ${r1(e)} 0 0 1 ${Rr[n-1][0]} ${Rr[n-1][1]}`+Rr.slice(0,-1).reverse().map(q=>`L${q[0]} ${q[1]}`).join("")+`A${r1(s0)} ${r1(s0)} 0 0 1 ${L[0][0]} ${L[0][1]}Z`}
+const inkVisD=k=>k.pr&&k.shape==="pen"?inkOutline(k):inkD(k);
 function inkG(k){
   const g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("data-ink",k.id||"");
-  const d=inkD(k),w=k.w||3;
-  g.innerHTML=`<path class="hit" d="${d}" stroke-width="${r1(w+12)}"/><path class="vis" d="${d}" stroke="${esc(k.color||INK_COLORS[0][0])}" stroke-width="${w}"/>`;
+  const d=inkD(k),w=k.w||3,col=esc(k.color||INK_COLORS[0][0]);
+  g.innerHTML=`<path class="hit" d="${d}" stroke-width="${r1(w+12)}"/>`+(k.pr&&k.shape==="pen"?`<path class="vis prs" d="${inkVisD(k)}" style="fill:${col};stroke:none"/>`:`<path class="vis" d="${d}" stroke="${col}" stroke-width="${w}"/>`);
   return g;
 }
 function syncInk(){
   const svg=world.querySelector(".ink");if(!svg)return;const seen=new Set();
   for(const k of inks(curBoard())){seen.add(k.id);let g=svg.querySelector(`g[data-ink="${k.id}"]`);
     if(!g){g=inkG(k);svg.appendChild(g)}
-    else if(!(drag&&drag.ids&&drag.ids.has(k.id))){const d=inkD(k);const v=g.querySelector(".vis");if(v&&v.getAttribute("d")!==d)g.querySelectorAll("path").forEach(x=>x.setAttribute("d",d))}
+    else if(!(drag&&drag.ids&&drag.ids.has(k.id))){const d=inkD(k),vd=inkVisD(k);const v=g.querySelector(".vis");if(v&&v.getAttribute("d")!==vd){v.setAttribute("d",vd);const h=g.querySelector(".hit");if(h)h.setAttribute("d",d)}}
     g.classList.toggle("sel",S.selSet.has(k.id))}
   svg.querySelectorAll("g[data-ink]").forEach(g=>{const id=g.getAttribute("data-ink");if(id&&!seen.has(id))g.remove()});
 }
@@ -2349,7 +2486,9 @@ function inkDown(e){
   const k={shape:S.tool,color:IK.color,w:r1(INK_W[IK.w]/z),pts:S.tool==="pen"?[x,y]:[x,y,x,y]};
   const g=inkG(Object.assign({},k,{pts:k.shape==="pen"?penPts(k):k.pts}));world.querySelector(".ink").appendChild(g);
   ink={pid:e.pointerId,mode:"draw",k,g,z,br:{x,y},R:(SMOOTH[IK.sm]||SMOOTH[0])[1]/z,lv:IK.sm||0};
+  if(S.tool==="pen"&&e.pointerType==="pen"&&e.pressure>0){k.pr=[r2(e.pressure)];g.remove();ink.g=inkG(Object.assign({},k,{pts:penPts(k),pr:[k.pr[0],k.pr[0]]}));world.querySelector(".ink").appendChild(ink.g)}
 }
+const r2=v=>Math.round(v*100)/100;
 function inkMove(e){
   if(ink.mode==="erase"){eraseAt(e);return}
   const k=ink.k;
@@ -2358,10 +2497,10 @@ function inkMove(e){
     for(const ev of (evs.length?evs:[e])){let p=toWorld(ev.clientX,ev.clientY);
       if(ink.R>0){/* ip sabitleyici: fırça, imleçten ip uzunluğu kadar geride gelir; titremeler yutulur */
         const b=ink.br,dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy);if(d<=ink.R)continue;const t=(d-ink.R)/d;b.x+=dx*t;b.y+=dy*t;p=b}
-      const n=k.pts.length;if(Math.hypot(p.x-k.pts[n-2],p.y-k.pts[n-1])>=min)k.pts.push(r1(p.x),r1(p.y))}
+      const n=k.pts.length;if(Math.hypot(p.x-k.pts[n-2],p.y-k.pts[n-1])>=min){k.pts.push(r1(p.x),r1(p.y));if(k.pr)k.pr.push(r2(ev.pressure||k.pr[k.pr.length-1]))}}
   }else{const p=toWorld(e.clientX,e.clientY);k.pts[2]=r1(p.x);k.pts[3]=r1(p.y)}
-  const d=inkD(k.shape==="pen"?Object.assign({},k,{pts:penPts(k)}):k);
-  ink.g.querySelectorAll("path").forEach(x=>x.setAttribute("d",d));
+  const kk=k.shape==="pen"?Object.assign({},k,{pts:penPts(k),pr:k.pr&&k.pr.length<2?[k.pr[0],k.pr[0]]:k.pr}):k;const d=inkD(kk);
+  const h=ink.g.querySelector(".hit"),v=ink.g.querySelector(".vis");if(h)h.setAttribute("d",d);if(v)v.setAttribute("d",inkVisD(kk));
 }
 function simplify(p,eps){
   const n=p.length/2;if(n<3)return p;const keep=new Uint8Array(n);keep[0]=keep[n-1]=1;const st=[[0,n-1]];
@@ -2380,11 +2519,14 @@ function inkUp(){
   const s=ink;ink=null;
   if(s.mode==="erase"){const docs=s.gone;if(docs.length){const u=undoRestore("Silgi",docs);toast(docs.length>1?docs.length+" çizim silindi":"Çizim silindi",{fn:()=>runUndo(u)})}return}
   const k=s.k;let p=k.pts;
-  if(k.shape==="pen")p=p.length<4?penPts(k):simplify(s.lv?chaikin(p,s.lv>=2?2:1):p,(s.lv?.45:.7)/s.z);
+  let pr=null;
+  /* basınçlı çizgide noktalar seyreltilmez (basınç dizisi noktalarla eşleşsin) */
+  if(k.shape==="pen"&&k.pr&&k.pr.length*2===p.length&&new Set(k.pr).size>1){pr=k.pr;if(p.length<4){p=penPts(k);pr=[pr[0],pr[0]]}}
+  else if(k.shape==="pen")p=p.length<4?penPts(k):simplify(s.lv?chaikin(p,s.lv>=2?2:1):p,(s.lv?.45:.7)/s.z);
   else{if(Math.hypot(p[2]-p[0],p[3]-p[1])*s.z<6){s.g.remove();return}
     if(k.shape==="rect")p=[Math.min(p[0],p[2]),Math.min(p[1],p[3]),Math.max(p[0],p[2]),Math.max(p[1],p[3])]}
   const bid=curBoard();if(!bid){s.g.remove();return}
-  run(api.add({type:"card",board:bid,kind:"draw",shape:k.shape,pts:p,color:k.color,w:k.w,created:Date.now()})).then(ref=>{
+  run(api.add(Object.assign({type:"card",board:bid,kind:"draw",shape:k.shape,pts:p,color:k.color,w:k.w,created:Date.now()},pr?{pr}:{}))).then(ref=>{
     s.g.remove();if(ref)undoRemove("Çizim",[ref.id]);syncInk()});
 }
 function cancelInk(){if(ink&&ink.g)ink.g.remove();ink=null}
@@ -2531,6 +2673,10 @@ function tReset(){if(!TM.endAt&&TM.left===TM.dur)TM.cycle=0;/* ikinci sıfırla 
   TM.endAt=null;TM.left=TM.dur;TM.proj=null;tSave();drawTimer()}
 function tSet(min,mode){min=Math.max(1,Math.min(240,Math.round(min)));TM.mode=mode||"focus";if(TM.mode==="focus")TM.fdur=min*60;
   TM.dur=min*60;TM.left=TM.dur;TM.endAt=null;tSave();drawTimer()}
+/* ekip bildirimleri (bahsetme, atama, onay, özel mesaj, alıntı): pencere arkadayken sistem bildirimi; zil menüsünden kapatılır */
+async function teamNotify(title,body){if(LS.get("tnotify",true)===false||(document.hasFocus()&&!document.hidden))return;
+  try{if(TA&&TA.notification){const N=TA.notification;let g=await N.isPermissionGranted();if(!g)g=(await N.requestPermission())==="granted";if(g)N.sendNotification({title,body});return}
+    if("Notification"in window){if(Notification.permission==="default")await Notification.requestPermission();if(Notification.permission==="granted")new Notification(title,{body,icon:"apple-touch-icon.png"})}}catch(_){}}
 /* sistem bildirimi: sadece uygulama arka plandayken */
 async function notify(title,body){if(!OPT("fnotify")||(document.hasFocus()&&!document.hidden))return;
   try{if(TA&&TA.notification){const N=TA.notification;let g=await N.isPermissionGranted();if(!g)g=(await N.requestPermission())==="granted";if(g)N.sendNotification({title,body});return}
@@ -2612,9 +2758,11 @@ function searchIndex(){
   for(const t of S.items.filter(i=>i.type==="task")){const pid=projOf(t);
     out.push({k:"görev",t:t.title,w:[pn(pid),t.date?parse(t.date).getDate()+" "+MSH[parse(t.date).getMonth()]:"tarihsiz",t.tag?"#"+t.tag:"",t.done?"tamam":""].filter(Boolean).join(" · "),x:t.tag,
       go:()=>{go(pid);S.sub[pid]="tasks";if(t.date){S.sel=t.date;S.week=monday(parse(t.date))}save();renderProject()}})}
-  for(const c of S.items.filter(i=>i.type==="card"&&["note","link","frame","audio"].includes(i.kind))){const p=projOfBoard(c.board);if(!p)continue;const b=boards(p.id).find(x=>x.id===c.board);
-    const title=c.kind==="link"?(c.text||hostOf(c.url)):(c.text||"").split("\n")[0];
-    out.push({k:{note:"not",link:"link",frame:"çerçeve",audio:"ses"}[c.kind],t:title||"…",w:p.name+" · "+((b&&b.name)||"Pano"),x:c.kind==="note"?c.text:c.url,
+  for(const c of S.items.filter(i=>i.type==="card"&&["note","link","frame","audio","video","image"].includes(i.kind))){const p=projOfBoard(c.board);if(!p)continue;const b=boards(p.id).find(x=>x.id===c.board);
+    const tg=(c.tags||[]).map(t=>"#"+t).join(" ");if(c.kind==="image"&&!tg&&!c.note&&!c.text&&!COLR.has(c.id))continue;
+    const title=c.kind==="link"?(c.text||hostOf(c.url)):c.kind==="image"?((c.note||c.text||"").split("\n")[0]||tg||(COLR.get(c.id)||[]).join(", ")):(c.text||"").split("\n")[0];
+    out.push({k:{note:"not",link:"link",frame:"çerçeve",audio:"ses",video:"video",image:"görsel"}[c.kind],t:title||"…",w:p.name+" · "+((b&&b.name)||"Pano")+(tg&&title!==tg?" · "+tg:""),
+      x:[c.kind==="note"?c.text:c.url,tg,c.note,c.kind==="image"?(COLR.get(c.id)||[]).join(" "):""].filter(Boolean).join(" "),
       go:()=>{go(p.id);S.sub[p.id]="b:"+c.board;save();S.selSet=new Set([c.id]);renderProject();centerOn(c)}})}
   return out;
 }
@@ -2628,7 +2776,23 @@ function runSearch(){
     :`<div class="skempty">Sonuç yok</div>`;
   const el=$("skRes").querySelector('[aria-selected="true"]');if(el)el.scrollIntoView({block:"nearest"});
 }
-function openSearch(){closeLB();closePops();animShow($("sk"));$("skIn").value="";skSel=0;runSearch();$("skIn").focus()}
+function openSearch(){closeLB();closePops();animShow($("sk"));$("skIn").value="";skSel=0;runSearch();$("skIn").focus();colorsAll().then(()=>{if(!$("sk").hidden)runSearch()})}
+/* ---------- etiketler ve baskın renk (aramada "#beton", "mavi") ---------- */
+const COLR=new Map();
+function colName(r,g,b){const mx=Math.max(r,g,b)/255,mn=Math.min(r,g,b)/255,l=(mx+mn)/2,d=mx-mn;const sat=d===0?0:d/(1-Math.abs(2*l-1));
+  if(l<.16)return "siyah";if(l>.88&&sat<.3)return "beyaz";if(sat<.16)return "gri";
+  let h;if(d===0)h=0;else if(mx===r/255)h=60*(((g-b)/255/d)%6);else if(mx===g/255)h=60*((b-r)/255/d+2);else h=60*((r-g)/255/d+4);if(h<0)h+=360;
+  if((h<40&&h>=15)&&l<.45)return "kahverengi";
+  return h<15||h>=345?"kırmızı":h<40?"turuncu":h<68?"sarı":h<160?"yeşil":h<195?"turkuaz":h<255?"mavi":h<300?"mor":"pembe"}
+function colorsOf(img){try{const cv=document.createElement("canvas");cv.width=cv.height=24;const x=cv.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,24,24);
+  const d=x.getImageData(0,0,24,24).data;const cnt={};for(let i=0;i<d.length;i+=4){const n=colName(d[i],d[i+1],d[i+2]);cnt[n]=(cnt[n]||0)+1}
+  return Object.entries(cnt).sort((a,b)=>b[1]-a[1]).filter(([n,v],i)=>i===0||v>=576*.18).slice(0,3).map(a=>a[0])}catch(_){return null}}
+async function colorOf(c){if(COLR.has(c.id))return;const src=imgSrc(c);if(!src)return;
+  await new Promise(res=>{const im=new Image();im.onload=()=>{const r=colorsOf(im);if(r)COLR.set(c.id,r);res()};im.onerror=res;im.src=src})}
+async function colorsAll(){const list=S.items.filter(i=>i.type==="card"&&i.kind==="image"&&!COLR.has(i.id)&&imgSrc(i));for(let k=0;k<list.length;k+=8)await Promise.all(list.slice(k,k+8).map(colorOf))}
+function editTags(c){const v=prompt("Etiketler (virgülle ayır) · aramada #etiket ile bulunur",(c.tags||[]).join(", "));if(v===null)return;
+  const tags=[...new Set(v.split(/[,#]/).map(t=>t.trim().toLocaleLowerCase("tr").replace(/\s+/g,"-")).filter(Boolean))].slice(0,12);
+  undoPatch("Etiketler",[[c.id,{tags:c.tags||null}]]);c.tags=tags.length?tags:null;run(api.update(c.id,{tags:c.tags}));syncCards()}
 function closeSearch(){animHide($("sk"))}
 function pickSearch(i){const r=skList[i];if(!r)return;closeSearch();r.go()}
 $("skBtn").onclick=e=>{e.stopPropagation();openSearch()};
@@ -2656,7 +2820,7 @@ const cfg=()=>S.items.find(i=>i.id==="settings"&&i.type==="settings")||{};
 const hqOn=()=>!!cfg().hq;
 /* kart, geri al geçmişi ya da açık düzenleyici tarafından kullanılan görseller */
 function assetRefs(){const r=new Set();
-  const add=o=>{if(o&&o.assetId)r.add(o.assetId)};
+  const add=o=>{if(o&&o.assetId)r.add(o.assetId);if(o&&Array.isArray(o.versions))o.versions.forEach(v=>v&&v.assetId&&r.add(v.assetId))};
   S.items.forEach(add);
   for(const op of [...UNDO,...REDO]){if(op.docs)op.docs.forEach(add);if(op.list)op.list.forEach(([,p])=>add(p))}
   if(ED.c)add(ED.c);return r}
@@ -2755,9 +2919,12 @@ function routeOf(v){if(!v)return "ls";if(v.type==="settings")return "settings";c
 async function uniquePath(dir,name,except){let i=1,p;
   do{p=dir+SEP()+safeName(name)+(i>1?" ("+i+")":"")+".workshop";i++}
   while(p!==except&&([...FS.files.values()].some(f=>f.path===p)||await tinv("exists",{path:p})));return p}
+/* kartın tüm görselleri (sürümler dahil) */
+const assetIdsOf=it=>[it.assetId,...(Array.isArray(it.versions)?it.versions.map(v=>v.assetId):[])].filter(Boolean);
+async function blobOf(id){if(S.mode==="file"&&FS.blobs.has(id))return FS.blobs.get(id);const u=BLOB.get(id);if(!u)return null;try{return await (await fetch(u)).blob()}catch(_){return null}}
 async function zipItems(pid,items){
   const files={"project.json":fflate.strToU8(JSON.stringify({app:"workshop",format:1,saved:new Date().toISOString(),project:pid,items}))};
-  for(const it of items){const id=it.assetId;if(!id)continue;const b=FS.blobs.get(id);if(!b)continue;const k=`images/${id}.${IMG_EXT[b.type]||"bin"}`;
+  for(const it of items)for(const id of assetIdsOf(it)){const b=await blobOf(id);if(!b)continue;const k=`images/${id}.${IMG_EXT[b.type]||"bin"}`;
     if(!files[k])files[k]=[new Uint8Array(await b.arrayBuffer()),{level:0}]}
   return fflate.zipSync(files,{level:6});
 }
@@ -2849,6 +3016,7 @@ async function fileMode(){
   const first=await tinv("initial_files");if(first&&first.length)openWorkshopFiles(first);
   setTimeout(()=>checkUpdate(false),4000);cBoot().then(maybeWelcome);
   TA.event.listen("open-files",e=>openWorkshopFiles(e.payload||[]));
+  TA.event.listen("snip",()=>startSnip());document.body.classList.add("isdesk");
   /* pencere kapanırken bekleyen kayıtları bitir */
   const win=TA.window.getCurrentWindow();let closing=false;
   win.onCloseRequested(async ev=>{if(closing)return;const pending=CL.out.size>0||[...FS.files.values()].some(f=>f.dirty||f.saving||f.timer);
@@ -3020,6 +3188,7 @@ async function cAsset(pid,id,pre){if(!id||BLOB.has(id)||CL.fetching.has(id)||!CL
     if(!blob){const {data,error}=await CL.sb.storage.from("assets").download(path);if(error)throw error;blob=data;try{if(cache)await cache.put(key,new Response(blob))}catch(_){}}
     BLOB.set(id,URL.createObjectURL(blob));cRender()}catch(_){}finally{CL.fetching.delete(id)}}
 function cAssetsFor(list){for(const v of list)if(v.assetId){const pid=v.type==="card"?docPid(v):null;if(pid)cAsset(pid,v.assetId,v.ap)}}
+/* sürüm görselleri yalnızca bakıldığında indirilir (verLoad) */
 
 /* --- yükleme ve anlık değişiklikler --- */
 function cMerge(items){const ids=new Set(items.map(v=>v.id));
@@ -3135,10 +3304,12 @@ async function drawShare(){const pid=shPid;if(!pid)return;const L=$("shrList");L
   const em=Object.fromEntries((pf||[]).map(x=>[x.id,x.email]));const owner=CL.own.has(pid);if(shPid!==pid)return;
   const n=(ms||[]).length+(inv||[]).length;if(CL.mc.get(pid)!==n){CL.mc.set(pid,n);cCacheSave();presSync();renderAll()}
   L.innerHTML=(ms||[]).map(m=>`<div class="shrow">${avatar(m.user_id,"lg")}<span class="n">${esc(pname(m.user_id))}${m.user_id===CL.me?" <i>(sen)</i>":""} <i>${esc(em[m.user_id]||"")}</i></span><span class="small">${m.role==="owner"?"sahibi":"düzenleyebilir"}</span>${owner&&m.role!=="owner"?`<button class="mini" data-rmu="${esc(m.user_id)}">çıkar</button>`:""}</div>`).join("")
-    +(inv||[]).map(i=>`<div class="shrow"><span class="shav off">@</span><span class="n">${esc(i.email)}</span><span class="small">kayıt olunca katılacak</span><button class="mini" data-rmi="${esc(i.email)}">iptal</button></div>`).join("")}
+    +(inv||[]).map(i=>`<div class="shrow"><span class="shav off">@</span><span class="n">${esc(i.email)}</span><span class="small">kayıt olunca katılacak</span>${owner?`<button class="mini" data-rmi="${esc(i.email)}">iptal</button>`:""}</div>`).join("")
+  /* davet yalnızca proje sahibinden (veritabanı da engeller) */
+  $("shrInv").hidden=!owner;if(!owner)$("shrMsg").textContent="Yeni kişileri yalnızca proje sahibi davet edebilir."}
 async function shareInvite(){const m=$("shrIn").value.trim();if(!m||!shPid)return;$("shrAdd").disabled=true;
   const {data,error}=await CL.sb.rpc("invite_member",{p:shPid,mail:m});$("shrAdd").disabled=false;
-  if(error){$("shrMsg").textContent=/bad_email/.test(error.message)?"Geçerli bir e-posta yaz":"Davet edilemedi: "+error.message;return}
+  if(error){$("shrMsg").textContent=/bad_email/.test(error.message)?"Geçerli bir e-posta yaz":/not_owner/.test(error.message)?"Yeni kişileri yalnızca proje sahibi davet edebilir.":"Davet edilemedi: "+error.message;return}
   $("shrIn").value="";$("shrMsg").textContent=data==="added"?m+" eklendi, projeyi hemen görür.":m+" henüz kayıtlı değil. Bu e-postayla Workshop'ta hesap açınca proje ona açılır.";drawShare()}
 function openAcct(){if($("acctPop").hidden)$("acctBtn").click();setTimeout(()=>{const i=$("acEmail");if(i&&!$("acctOut").hidden)i.focus()},120)}
 function drawAcct(){const btn=$("acctBtn");btn.hidden=!cloudAvail();if(btn.hidden)return;
@@ -3380,7 +3551,8 @@ document.addEventListener("drop",e=>{if(!kdrag)return;const col=e.target.closest
 
 /* ---------- Ayrıntı paneli: görev ya da referans ---------- */
 let drId=null;
-function openDrawer(id){const it=S.items.find(i=>i.id===id);if(!it)return;drId=id;drawDrawer();animShow($("drw"));setTimeout(()=>{const i=$("cmIn");if(i)i.focus()},80)}
+let pinAt=null;
+function openDrawer(id){const it=S.items.find(i=>i.id===id);if(!it)return;if(drId!==id)pinAt=null;drId=id;drawDrawer();animShow($("drw"));setTimeout(()=>{const i=$("cmIn");if(i)i.focus()},80)}
 function closeDrawer(){animHide($("drw"));drId=null;$("mentionBox").hidden=true}
 function drawDrawer(){const it=S.items.find(i=>i.id===drId);if(!it){if(drId)closeDrawer();return}const pid=itemProject(it);const sh=isShared(pid)&&!it.private;const D=$("drwBody");
   const keep=document.activeElement&&document.activeElement.id==="cmIn"?$("cmIn").value:null;
@@ -3392,21 +3564,22 @@ function drawDrawer(){const it=S.items.find(i=>i.id===drId);if(!it){if(drId)clos
         <span class="small">Tarih</span><span><input type="date" class="field sm" id="drDate" value="${esc(it.date||"")}"></span>
         <span class="small">Hedef</span><span><select class="field sm" id="drMs"><option value="">—</option>${ms.map(m=>`<option value="${esc(m.id)}"${it.milestone===m.id?" selected":""}>${esc(m.name)}</option>`).join("")}</select></span></div>`}
   else if(it.type==="card"){const rv=it.review||{};
-    head=`<div class="drimg">${it.kind==="image"?`<img src="${esc(imgSrc(it))}" alt="">`:it.kind==="audio"?`<span class="hau">${AU_IC}<span>${esc(it.text||"Ses")}</span></span>`:`<div class="drnote">${esc(it.text||it.url||"")}</div>`}</div>
+    const pins=commentsOf(it.id).filter(c=>c.pin);
+    head=`<div class="drimg">${it.kind==="image"?`<div class="pinwrap${sh?" pinable":""}" id="drPin" title="${sh?"Görselde bir noktaya tıkla, oraya yorum bırak":""}"><img src="${esc(imgSrc(it))}" alt="">${pins.map((c,i)=>`<button class="pin" style="left:${c.pin.x*100}%;top:${c.pin.y*100}%" data-pinc="${esc(c.id)}" title="${esc((c.text||"").slice(0,80))}">${i+1}</button>`).join("")}${pinAt?`<span class="pin new" style="left:${pinAt.x*100}%;top:${pinAt.y*100}%">${pins.length+1}</span>`:""}</div>`:it.kind==="audio"?`<span class="hau">${AU_IC}<span>${esc(it.text||"Ses")}</span></span>`:`<div class="drnote">${esc(it.text||it.url||"")}</div>`}</div>
       ${sh?`<div class="rvbar">${rvChip(it,true)||`<span class="small">Henüz değerlendirilmedi</span>`}<span class="sp"></span>
         <button class="mini" data-rv="wait">Onay iste</button><button class="mini ok" data-rv="ok">Onayla</button><button class="mini rev" data-rv="rev">Revizyon</button></div>
         ${rv.note?`<div class="rvnote">${esc(rv.note)}</div>`:""}`:""}
       <button class="mini" data-goto="${esc(it.id)}">Panoda göster</button>`}
   const cs=commentsOf(it.id);
   D.innerHTML=head+(sh?`<div class="cmh">Yorumlar <span class="count">${cs.length||""}</span></div>
-    <div class="cms">${cs.length?cs.map(c=>`<div class="cm">${avatar(c.author)}<div class="cb"><div class="cmt"><b>${esc(c.author===CL.me?"Sen":pname(c.author))}</b><span class="mono">${ago(c.created||0)}</span>${c.author===CL.me?`<button class="mini danger" data-cmdel="${esc(c.id)}">sil</button>`:""}</div><div class="cx2">${mentionHtml(c.text)}</div></div></div>`).join(""):`<div class="empty">İlk yorumu sen yaz. <code>@</code> ile birinden bahsedebilirsin.</div>`}</div>
-    <form class="cmform" id="cmForm" autocomplete="off"><textarea id="cmIn" rows="2" maxlength="2000" placeholder="Yorum yaz… @ ile bahset · Enter gönderir"></textarea><button class="btn primary" type="submit">Gönder</button></form>`:"");
+    <div class="cms">${cs.length?cs.map(c=>`<div class="cm" data-cmid="${esc(c.id)}">${avatar(c.author)}<div class="cb"><div class="cmt">${c.pin?`<span class="pinn">${cs.filter(x=>x.pin).indexOf(c)+1}</span>`:""}<b>${esc(c.author===CL.me?"Sen":pname(c.author))}</b><span class="mono">${ago(c.created||0)}</span>${c.author===CL.me?`<button class="mini danger" data-cmdel="${esc(c.id)}">sil</button>`:""}</div><div class="cx2">${mentionHtml(c.text)}</div></div></div>`).join(""):`<div class="empty">İlk yorumu sen yaz. <code>@</code> ile birinden bahsedebilirsin.</div>`}</div>
+    <form class="cmform" id="cmForm" autocomplete="off">${pinAt?`<div class="pinhint"><span class="pin sm">${commentsOf(it.id).filter(c=>c.pin).length+1}</span>İşaretlediğin noktaya yorum<button type="button" class="mini" data-pinx>vazgeç</button></div>`:""}<textarea id="cmIn" rows="2" maxlength="2000" placeholder="${pinAt?"Bu noktaya yorum yaz…":"Yorum yaz… @ ile bahset · Enter gönderir"}"></textarea><button class="btn primary" type="submit">Gönder</button></form>`:"");
   if(keep!=null){const i=$("cmIn");if(i){i.value=keep;i.focus()}}
   const cl=D.querySelector(".cms");if(cl)cl.scrollTop=cl.scrollHeight}
 function mentionHtml(t){let h=esc(t||"");for(const m of people(curP()||"")){const n=esc(pname(m.id));h=h.split("@"+n).join(`<span class="men">@${n}</span>`)}return h}
 function sendComment(){const i=$("cmIn");const v=i.value.trim();if(!v||!drId)return;const it=S.items.find(x=>x.id===drId);if(!it)return;const pid=itemProject(it);
   const mentions=people(pid).filter(m=>m.id!==CL.me&&v.includes("@"+pname(m.id))).map(m=>m.id);
-  i.value="";$("mentionBox").hidden=true;run(api.add({type:"comment",project:pid,target:drId,text:v,mentions,author:CL.me,created:Date.now()}))}
+  const pin=pinAt;pinAt=null;i.value="";$("mentionBox").hidden=true;run(api.add(Object.assign({type:"comment",project:pid,target:drId,text:v,mentions,author:CL.me,created:Date.now()},pin?{pin}:{})))}
 function setReview(st){const it=S.items.find(x=>x.id===drId);if(!it)return;let note="";
   if(st==="rev"){note=prompt("Revizyon notu (isteğe bağlı)","")??null;if(note===null)return}
   const cur=it.review&&it.review.state;run(api.update(it.id,{review:cur===st&&st!=="wait"?null:{state:st,by:CL.me,at:Date.now(),note:note||""}}))}
@@ -3420,6 +3593,7 @@ function mentionSuggest(){const i=$("cmIn"),box=$("mentionBox");if(!i){box.hidde
 function mentionPick(uid){const i=$("cmIn");const pos=i.selectionStart;const before=i.value.slice(0,pos).replace(/@([^\s@]*)$/,"@"+pname(uid)+" ");i.value=before+i.value.slice(pos);i.focus();i.selectionStart=i.selectionEnd=before.length;$("mentionBox").hidden=true}
 $("mentionBox").addEventListener("mousedown",e=>{const b=e.target.closest("[data-mn]");if(b){e.preventDefault();mentionPick(b.dataset.mn)}});
 $("drw").addEventListener("input",e=>{if(e.target.id==="cmIn")mentionSuggest()});
+$("drw").addEventListener("pointerover",e=>{const c=e.target.closest(".cm[data-cmid]");document.querySelectorAll("#drw .pin.hl").forEach(x=>x.classList.remove("hl"));if(c){const p=document.querySelector(`#drw .pin[data-pinc="${CSS.escape(c.dataset.cmid)}"]`);if(p)p.classList.add("hl")}});
 $("drw").addEventListener("keydown",e=>{
   if(e.target.id==="cmIn"){const box=$("mentionBox");
     if(!box.hidden&&(e.key==="Enter"||e.key==="Tab")){const b=box.querySelector(".on");if(b){e.preventDefault();mentionPick(b.dataset.mn);return}}
@@ -3434,6 +3608,10 @@ $("drw").addEventListener("change",e=>{const id=drId;if(!id)return;
   if(e.target.id==="drMs")run(api.update(id,{milestone:e.target.value||null}))});
 $("drw").addEventListener("click",e=>{
   if(e.target.closest("#drwClose")){closeDrawer();return}
+  if(e.target.closest("[data-pinx]")){pinAt=null;drawDrawer();return}
+  const pc=e.target.closest("[data-pinc]");if(pc){const el=document.querySelector(`#drw .cm[data-cmid="${CSS.escape(pc.dataset.pinc)}"]`);if(el){el.scrollIntoView({block:"nearest",behavior:"smooth"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}return}
+  const pw=e.target.closest("#drPin.pinable");if(pw){const r=pw.querySelector("img").getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    if(x>=0&&x<=1&&y>=0&&y<=1){pinAt={x:Math.round(x*1000)/1000,y:Math.round(y*1000)/1000};drawDrawer();setTimeout(()=>{const i=$("cmIn");if(i)i.focus()},30)}return}
   const s=e.target.closest("[data-dst]");if(s){setStatus(drId,s.dataset.dst);return}
   const r=e.target.closest("[data-rv]");if(r){setReview(r.dataset.rv);return}
   const d=e.target.closest("[data-cmdel]");if(d){run(api.remove(d.dataset.cmdel));return}
@@ -3452,12 +3630,15 @@ function drawBell(){const b=$("bellBtn");b.hidden=!CL.me;if(!CL.me)return;const 
     <span class="small">${esc([((proj(x.project_id)||{}).name)||"",x.title||""].filter(Boolean).join(" · "))}</span>${x.body?`<span class="nq">${esc(x.body)}</span>`:""}</span><span class="mono">${ago(Date.parse(x.at))}</span></button>`).join("")
     :`<div class="empty">Bildirim yok. Senden bahsedildiğinde, sana görev atandığında ya da onay istendiğinde burada görünür.</div>`}
 async function markRead(ids){if(!ids.length)return;(CL.notifs||[]).forEach(n=>{if(ids.includes(n.id))n.read=true});drawBell();await CL.sb.from("notifications").update({read:true}).in("id",ids)}
-$("bellBtn").onclick=e=>{e.stopPropagation();togglePop("bellPop","bellBtn");drawBell()};
+$("bellBtn").onclick=e=>{e.stopPropagation();togglePop("bellPop","bellBtn");drawBell();drawBellSys()};
+const drawBellSys=()=>{const on=LS.get("tnotify",true)!==false;$("bellSys").textContent=on?"masaüstü bildirimi açık":"masaüstü bildirimi kapalı";$("bellSys").classList.toggle("off",!on)};
+$("bellSys").onclick=async e=>{e.stopPropagation();const on=LS.get("tnotify",true)===false;LS.set("tnotify",on);drawBellSys();
+  if(on&&!TA&&"Notification"in window&&Notification.permission==="default")try{await Notification.requestPermission()}catch(_){}}
 $("bellAll").onclick=()=>markRead((CL.notifs||[]).filter(n=>!n.read).map(n=>n.id));
 $("bellList").addEventListener("click",e=>{const b=e.target.closest("[data-nt]");if(!b)return;const n=(CL.notifs||[]).find(x=>String(x.id)===b.dataset.nt);if(!n)return;
   markRead([n.id]);closePops();if(!S.items.some(i=>i.id===n.project_id))return;go(n.project_id);setTimeout(()=>{if(n.item_id&&S.items.some(i=>i.id===n.item_id))openDrawer(n.item_id)},120)});
 function onNotif(p){const r=p.new;if(!r||r.user_id!==CL.me)return;CL.notifs=[r].concat(CL.notifs||[]).slice(0,40);
-  const go_=()=>{drawBell();toast(`${pname(r.actor)} ${NTX[r.kind]||""}${r.title?" · "+r.title:""}`,{label:"Aç",fn:()=>{markRead([r.id]);go(r.project_id);setTimeout(()=>r.item_id&&openDrawer(r.item_id),120)}});notify("Workshop",`${pname(r.actor)} ${NTX[r.kind]||""}${r.title?" · "+r.title:""}`)};
+  const go_=()=>{drawBell();toast(`${pname(r.actor)} ${NTX[r.kind]||""}${r.title?" · "+r.title:""}`,{label:"Aç",fn:()=>{markRead([r.id]);go(r.project_id);setTimeout(()=>r.item_id&&openDrawer(r.item_id),120)}});teamNotify("Workshop",`${pname(r.actor)} ${NTX[r.kind]||""}${r.title?" · "+r.title:""}`)};
   if(r.actor&&!CL.prof.has(r.actor))CL.sb.from("profiles").select("id,email,name").eq("id",r.actor).then(({data})=>{(data||[]).forEach(x=>CL.prof.set(x.id,x));go_()});else go_()}
 
 /* ---------- Görsele bağlı not (her projede) ---------- */
@@ -3477,6 +3658,22 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&e.target.closest&&e
 const AU_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 12.5V4l7-1.5V11"/><circle cx="4.3" cy="12.5" r="1.8"/><circle cx="11.3" cy="11" r="1.8"/></svg>';
 const CM_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2.5 3.5h11v7.5H7l-3 2.5V11H2.5z"/></svg>';
 function driveId(u){const m=/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:[^#]*&)?id=)([\w-]{20,})/.exec(u)||/docs\.google\.com\/uc\?(?:[^#]*&)?id=([\w-]{20,})/.exec(u);return m?m[1]:null}
+/* video linkleri: YouTube, Vimeo, Drive, doğrudan dosya */
+const VID_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="1.8" y="3.5" width="9" height="9" rx="1.6"/><path d="M10.8 6.6l3.4-2v6.8l-3.4-2z"/></svg>';
+function vidInfo(u){if(!u)return null;let m;
+  if((m=/(?:youtube\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/.exec(u)))return {t:"yt",id:m[1],thumb:`https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg`,embed:`https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1&rel=0`};
+  if((m=/vimeo\.com\/(?:video\/)?(\d+)/.exec(u)))return {t:"vimeo",id:m[1],embed:`https://player.vimeo.com/video/${m[1]}?autoplay=1`};
+  const d=driveId(u);if(d)return {t:"drive",id:d,thumb:`https://drive.google.com/thumbnail?id=${d}&sz=w640`,embed:`https://drive.google.com/file/d/${d}/preview`};
+  if(/\.(mp4|mov|m4v|webm)(\?|#|$)/i.test(u))return {t:"file",src:u};return null}
+const VPLAY=new Set();
+function syncVideo(el,c){const v=vidInfo(c.url)||{t:"file",src:c.url};const box=el.querySelector(".vid");const on=VPLAY.has(c.id);const key=(on?"on|":"off|")+c.url;
+  const ho=el.querySelector(".host");const hv={yt:"YouTube",vimeo:"Vimeo",drive:"Google Drive · video",file:hostOf(c.url)+" · video"}[v.t];if(ho.textContent!==hv)ho.textContent=hv;
+  const a=el.querySelector(".vmeta a");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url);
+  if(box.dataset.k===key)return;box.dataset.k=key;
+  if(on)box.innerHTML=v.t==="file"?`<video src="${esc(v.src)}" controls autoplay playsinline></video>`:`<iframe src="${esc(v.embed)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe><button class="vstop" data-vstop title="Kapat">×</button>`;
+  else box.innerHTML=`${v.thumb?`<img src="${esc(v.thumb)}" alt="" draggable="false" onerror="this.remove()">`:""}<button class="vplay" data-vplay aria-label="Oynat"><svg viewBox="0 0 16 16"><path d="M5 3.2v9.6L13 8z" fill="currentColor"/></svg></button>`}
+world.addEventListener("click",e=>{const p=e.target.closest("[data-vplay]"),st=e.target.closest("[data-vstop]");if(!p&&!st)return;const el=e.target.closest(".card");if(!el)return;e.stopPropagation();
+  const id=el.dataset.id;if(p){VPLAY.clear();VPLAY.add(id)}else VPLAY.delete(id);syncCards()});
 const isAudioUrl=u=>!!driveId(u)||/\.(mp3|wav|ogg|oga|m4a|aac|flac|opus|webm)(\?|#|$)/i.test(u);
 const audioSrc=u=>{const id=driveId(u);return id?`https://drive.google.com/uc?export=download&id=${id}`:u};
 const AU={el:null,id:null};
@@ -3530,7 +3727,9 @@ function onMsg(p){const m=p.new;if(!m||!m.id||!CL.pids.has(m.project_id))return;
   const viewing=curP()===m.project_id&&subOf(m.project_id)==="hub"&&(CL.chatTo.get(m.project_id)||"g")===convOf(m);
   if(m.sender!==CL.me){if(viewing&&document.hasFocus())drawChat(m.project_id);
     else{drawChat(m.project_id);drawChatBadge();const pn=(proj(m.project_id)||{}).name||"";const who=pname(m.sender)+(m.recipient?" (özel)":" · "+pn);
-      if(m.recipient||!viewing){toast(who+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{go(m.project_id);S.sub[m.project_id]="hub";CL.chatTo.set(m.project_id,convOf(m));save();renderProject()}});notify(who,m.text.slice(0,140))}}}}
+      if(m.recipient||!viewing){toast(who+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{go(m.project_id);S.sub[m.project_id]="hub";CL.chatTo.set(m.project_id,convOf(m));save();renderProject()}});
+        /* sistem bildirimi: özel mesaj ya da adın geçtiyse; genel sohbet her mesajda rahatsız etmesin */
+        if(m.recipient||(pname(CL.me)&&m.text.includes("@"+pname(CL.me))))teamNotify(who,m.text.slice(0,140))}}}}
 document.addEventListener("click",e=>{const c=e.target.closest("[data-chat]");if(!c)return;const pid=curP();CL.chatTo.set(pid,c.dataset.chat);const L=$("chatList");if(L)delete L.dataset.init;drawChat(pid);setTimeout(()=>{const i=$("chatIn");if(i)i.focus()},0)});
 document.addEventListener("submit",e=>{if(e.target.id==="chatForm"){e.preventDefault();sendChat()}});
 

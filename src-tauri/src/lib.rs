@@ -154,6 +154,64 @@ fn initial_files() -> Vec<String> {
     workshop_args(&std::env::args().collect::<Vec<_>>())
 }
 
+/// Ekran alıntısı: sistemin kendi alıntı aracını açar (Windows: Ekran Alıntısı, macOS: screencapture).
+/// Seçilen bölge panoya (clipboard) kopyalanır; arayüz `clip_seq`/`clip_image` ile alır.
+#[tauri::command]
+fn snip_start() -> Result<(), String> {
+    #[cfg(windows)]
+    {
+        std::process::Command::new("explorer.exe")
+            .arg("ms-screenclip:")
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("screencapture")
+            .args(["-i", "-c"])
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+    #[allow(unreachable_code)]
+    Err("Bu sistemde ekran alıntısı desteklenmiyor".into())
+}
+
+/// Panonun değişim sayacı (Windows). Diğer sistemlerde 0: arayüz içerik karşılaştırır.
+#[tauri::command]
+fn clip_seq() -> u32 {
+    #[cfg(windows)]
+    {
+        return unsafe { windows_sys::Win32::System::DataExchange::GetClipboardSequenceNumber() };
+    }
+    #[allow(unreachable_code)]
+    0
+}
+
+/// Panodaki görsel PNG olarak (yoksa boş).
+#[tauri::command]
+fn clip_image() -> tauri::ipc::Response {
+    #[cfg(desktop)]
+    {
+        if let Ok(mut cb) = arboard::Clipboard::new() {
+            if let Ok(img) = cb.get_image() {
+                let mut out = Vec::new();
+                {
+                    let mut enc = png::Encoder::new(&mut out, img.width as u32, img.height as u32);
+                    enc.set_color(png::ColorType::Rgba);
+                    enc.set_depth(png::BitDepth::Eight);
+                    if let Ok(mut w) = enc.write_header() {
+                        let _ = w.write_image_data(&img.bytes);
+                    }
+                }
+                return tauri::ipc::Response::new(out);
+            }
+        }
+    }
+    tauri::ipc::Response::new(Vec::new())
+}
+
 /// Açılış hatası: sessizce kapanmak yerine nedenini söyleyen bir Windows penceresi.
 /// `webview` doğruysa WebView2 indirme sayfasını açmayı önerir.
 #[cfg(windows)]
@@ -209,6 +267,20 @@ pub fn run() {
                 let _ = app.emit("open-files", files);
             }
         }));
+        // Ctrl+Alt+W: uygulama arkadayken bile ekran alıntısını panoya ekle
+        {
+            use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
+            let snip = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyW);
+            builder = builder.plugin(
+                tauri_plugin_global_shortcut::Builder::new()
+                    .with_handler(move |app, sc, ev| {
+                        if sc == &snip && ev.state() == ShortcutState::Pressed {
+                            let _ = app.emit("snip", ());
+                        }
+                    })
+                    .build(),
+            );
+        }
         // Kendi kendini güncelleme: GitHub sürümlerindeki imzalı latest.json'u denetler
         builder = builder
             .plugin(tauri_plugin_updater::Builder::new().build())
@@ -216,6 +288,17 @@ pub fn run() {
     }
 
     let res = builder
+        .setup(|_app| {
+            // kısayol başka bir uygulamada kullanılıyorsa sessizce geç
+            #[cfg(desktop)]
+            {
+                use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+                let _ = _app
+                    .global_shortcut()
+                    .register(Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyW));
+            }
+            Ok(())
+        })
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
@@ -228,7 +311,10 @@ pub fn run() {
             exists,
             rename_file,
             trash_file,
-            initial_files
+            initial_files,
+            snip_start,
+            clip_seq,
+            clip_image
         ])
         .run(tauri::generate_context!());
     if let Err(e) = res {

@@ -44,6 +44,14 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Özel pano `board.private`, üzerindeki kartlar da `private` (api.add otomatik), görselleri `<pid>/p/<uid>/<id>` (kartta `ap`; storage RLS yalnızca sahibine).
   Ekibe gönder: sağ tık ya da kartı dizindeki ekip panosunun adına sürükle (`sendToBoard`, dosya `storage.copy` ile ekip klasörüne); "Ekibe aç" panonun tamamını açar. Pano kilidi `board.locked`: adı değişmez, silinemez (`lockBoard`, sağ tık menüsü `boardMenu`). Pano sahibi `board.owner` (oluşturan): ortak projede yalnızca o siler, adını/kilidini/gizliliğini değiştirir (`canMng`; veritabanında `private.guard_board` tetikleyicisi). Diğerleri içeriği düzenler. Sahip "Gizliye al" (`boardToPrivate`) ile panoyu özele çevirir; ekipteki istemcilere broadcast `hide` gider. Dizin gizlenebilir: `setRdir` → `body.rdc`, LS `rdirC`.
 - Presence: `presTrack` → `presFlush` (kanal başına yalnızca değişince, ≥1,2 sn arayla; Supabase istemci presence sınırı). Sesli odaya giriş/çıkış ayrıca broadcast `rtc` `join`/`here`/`bye` ile duyurulur.
+- Davet yalnızca proje sahibinden (`invite_member` `not_owner`, `invites_delete` sahibe). Sahipsiz panoları ortak projede proje sahibi yönetir.
+- Yedek: bulut projesi menüsünde "Yedek indir (.workshop)" (`cloudBackup`, `zipItems` + `blobOf`, sürüm görselleri dahil `assetIdsOf`).
+- İğneli yorum: yorumda `pin:{x,y}` (0–1); ayrıntı panelinde görsele tıkla (`pinAt`), panoda `.cpins`. Karşılaştır: iki görsel seç → `#cmp` (kaydır/üst üste/yan yana).
+- Sürüm yığını: kartta `versions:[{assetId,ap,at,by}]`, `vAt`; `addVersion`/`verRestore`/`verCompare`; ekibe gönderirken yalnızca güncel sürüm gider.
+- Video kartı `kind:"video"` (`vidInfo`: YouTube/Vimeo/Drive/mp4; tıklayınca iframe/video, `VPLAY`). Drive linkinde ses/video sorulur.
+- Etiket `card.tags` (sağ tık), aramada `#etiket`; baskın renk `COLR` (yerel hesap, kaydedilmez) ile "mavi" gibi arama.
+- Ekran alıntısı (masaüstü): Ctrl+Alt+W (global-shortcut, `snip` olayı) ya da araç çubuğu "Alıntı" → `snip_start` (Windows ms-screenclip / macOS screencapture) → `clip_seq`/`clip_image` (arboard+png) → açık ya da son panoya eklenir.
+- Ekip bildirimleri `teamNotify` (LS `tnotify`, zil menüsünden): bahsetme/atama/onay/özel mesaj/adın geçtiği mesaj. Kalem basıncı: `draw` kartında `pr` dizisi, `inkOutline` dolu şekil.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 
 ## Giriş ve pencere (masaüstü + web)
