@@ -178,6 +178,9 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .fontopt[aria-pressed="true"]{border-color:var(--accent);background:var(--glass-2)}
 .fontopt span{font-family:var(--f-mono);font-size:10px;color:var(--ink-3)}
 .cfgsec{display:flex;flex-direction:column;gap:6px}
+.ibtn.upd{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.ibtn.upd:hover{filter:brightness(1.06);color:var(--accent-ink)}
+@media (prefers-reduced-motion:no-preference){.ibtn.upd:not([hidden]){animation:popIn .42s linear both}}
 .libpath{font-size:11px;color:var(--ink-2);background:var(--field);border:1px solid var(--stroke);border-radius:8px;padding:7px 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
 .fontgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .fontgrid .fontopt{flex-direction:column;align-items:flex-start;gap:2px;padding:8px 10px;font-size:14px}
@@ -526,6 +529,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
         <svg class="ring" viewBox="0 0 20 20"><circle class="bgc" cx="10" cy="10" r="8"/><circle class="fg" id="ringFg" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27"/></svg>
         <span class="tpill idle" id="tpill">25:00</span>
       </button>
+      <button class="ibtn upd" id="updBtn" hidden title="Yeni sürüm hazır"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12.5v-9M4.5 7L8 3.5 11.5 7"/></svg>Güncelle</button>
       <button class="ibtn" id="skBtn" title="Ara (Ctrl+K)" aria-label="Ara"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg></button>
       <button class="ibtn" id="cfgBtn" aria-expanded="false" aria-controls="cfgPop" title="Ayarlar" aria-label="Ayarlar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.6M8 12.6v1.6M14.2 8h-1.6M3.4 8H1.8M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7L3.6 3.6"/></svg></button>
       <span class="sync" id="sync" title="bağlanıyor"></span>
@@ -597,6 +601,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   <div class="cfgsec"><span class="small">Tema · bu cihazda hatırlanır</span><div class="themes" id="themes">
     <button class="thm dark" data-theme="dark"><i></i>Koyu</button><button class="thm light" data-theme="light"><i></i>Açık</button><button class="thm vivid" data-theme="vivid"><i></i>Renkli</button></div></div>
   <div class="cfgsec"><span class="small">Yazı tipi · bu cihazda hatırlanır</span><div id="fontList" class="fontgrid"></div></div>
+  <div class="cfgsec" id="updSec" hidden><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
     <div class="row"><button class="btn" id="libOpen" style="flex:1">Klasörü göster</button><button class="btn" id="libChange" style="flex:1">Değiştir…</button></div>
@@ -2254,14 +2259,40 @@ async function fileMode(){
   };
   setSync("ok","Projeler dosya olarak kaydediliyor: "+FS.dir);renderAll();flushFocus();
   const first=await tinv("initial_files");if(first&&first.length)openWorkshopFiles(first);
+  setTimeout(()=>checkUpdate(false),4000);
   TA.event.listen("open-files",e=>openWorkshopFiles(e.payload||[]));
   /* pencere kapanırken bekleyen kayıtları bitir */
   const win=TA.window.getCurrentWindow();let closing=false;
   win.onCloseRequested(async ev=>{if(closing)return;const pending=[...FS.files.values()].some(f=>f.dirty||f.saving||f.timer);
     if(!pending)return;ev.preventDefault();closing=true;toast("Kaydediliyor…");try{await flushAll()}catch(_){}await win.destroy()});
 }
+/* ---------- kendi kendini güncelleme (GitHub sürümleri, imzalı) ---------- */
+let UPD=null;
+function drawUpd(){$("updBtn").hidden=!UPD;if(UPD)$("updBtn").title=`Workshop ${UPD.version} hazır · tıkla, indirip kursun`}
+async function checkUpdate(manual){
+  const up=TA&&TA.updater;if(!up){if(manual)toast("Bu sürümde otomatik güncelleme yok");return}
+  try{const u=await up.check();UPD=u||null;drawUpd();
+    if(!u){if(manual)toast("En güncel sürümü kullanıyorsun");return}
+    if(manual)installUpdate();else toast(`Yeni sürüm hazır: ${u.version}`,{label:"Güncelle",fn:installUpdate})}
+  catch(e){if(manual)toast("Güncelleme denetlenemedi: "+(e&&e.message||e))}
+}
+async function installUpdate(){
+  if(!UPD)return;const keep=()=>{$("toast").hidden=false;clearTimeout(toastTimer)};
+  toast("Kaydediliyor…");keep();await flushAll();
+  let total=0,got=0;$("toastT").textContent="Güncelleme indiriliyor…";$("toastB").hidden=true;keep();
+  try{await UPD.downloadAndInstall(ev=>{
+      if(ev.event==="Started")total=(ev.data&&ev.data.contentLength)||0;
+      else if(ev.event==="Progress"){got+=(ev.data&&ev.data.chunkLength)||0;if(total)$("toastT").textContent=`Güncelleme indiriliyor… %${Math.min(100,Math.round(got/total*100))}`}
+      else if(ev.event==="Finished")$("toastT").textContent="Kuruluyor, uygulama yeniden açılacak…";keep()});
+    if(TA.process)await TA.process.relaunch();
+  }catch(e){toast("Güncellenemedi: "+(e&&e.message||e))}
+}
+$("updBtn").onclick=installUpdate;
+$("updCheck").onclick=()=>{closePops();checkUpdate(true)};
+
 /* klasör ayarları, kısayollar, bağlantılar */
-function drawLib(){const on=S.mode==="file";$("libSec").hidden=!on;if(on){$("libPath").textContent=FS.dir;$("libPath").title=FS.dir}
+function drawLib(){const on=S.mode==="file";$("libSec").hidden=!on;$("updSec").hidden=!TA;
+  if(TA&&TA.app)TA.app.getVersion().then(v=>{$("verTxt").textContent="Workshop "+v+(UPD?" · "+UPD.version+" hazır":"")}).catch(()=>{});if(on){$("libPath").textContent=FS.dir;$("libPath").title=FS.dir}
   $("bkOut").hidden=!!TA;$("bkIn").hidden=!TA;
   $("bkTxt").textContent=TA?"Web sürümünden indirdiğin yedeği içe aktar · her proje bir dosya olur":"Yedek · tüm projeler ve görseller tek dosyada (masaüstü uygulamasına taşımak için)"}
 if(TA){

@@ -173,6 +173,10 @@ pub fn run() {
                 let _ = app.emit("open-files", files);
             }
         }));
+        // Kendi kendini güncelleme: GitHub sürümlerindeki imzalı latest.json'u denetler
+        builder = builder
+            .plugin(tauri_plugin_updater::Builder::new().build())
+            .plugin(tauri_plugin_process::init());
     }
 
     builder

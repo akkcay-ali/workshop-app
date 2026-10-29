@@ -13,6 +13,10 @@ paketlenir; aynı arayüz web sürümü olarak da çalışır.
 
 Her `main` gönderiminde GitHub yeni kurulum dosyasını kendisi derler (Actions → *Windows derlemesi*).
 
+**Güncellemeler:** 0.2.0'dan itibaren uygulama açılışta yeni sürüm olup olmadığına bakar; varsa üst çubukta
+**Güncelle** düğmesi çıkar, tek tıkla indirip kurar ve yeniden açılır. Ayarlar → *Güncellemeleri denetle* ile elle de bakılabilir.
+Güncelleme paketleri imzalıdır; uygulama sadece bu deponun imza anahtarıyla imzalanmış sürümleri kurar.
+
 ## Dosyalar
 
 - Her proje tek bir **`.workshop`** dosyasıdır. İçinde proje verisi (`project.json`) ve

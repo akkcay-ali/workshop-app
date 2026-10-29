@@ -22,6 +22,9 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Windows kurulumu GitHub Actions'ta (`.github/workflows/build.yml`) derlenir ve Release olarak yayınlanır.
   Yeni sürüm için `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` ve `package.json` içindeki
   `version` birlikte artırılır; aynı sürüm numarasıyla tekrar gönderim Release'i güncellemeyebilir.
+- Kendi kendini güncelleme: `tauri-plugin-updater`, uç nokta `releases/latest/download/latest.json` (depo herkese açık olmalı).
+  İmza için depo secret'ları gerekir: `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+  Açık anahtar `tauri.conf.json > plugins.updater.pubkey` içinde; anahtar değişirse eski kurulumlar güncellenemez.
 - macOS derlemesi elle tetiklenir (`mac.yml`). iOS derlemesi Mac'te yapılır (README).
 
 ## Kullanıcı tercihleri
