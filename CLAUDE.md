@@ -44,7 +44,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Özel pano `board.private`, üzerindeki kartlar da `private` (api.add otomatik), görselleri `<pid>/p/<uid>/<id>` (kartta `ap`; storage RLS yalnızca sahibine).
   Ekibe gönder: sağ tık ya da kartı dizindeki ekip panosunun adına sürükle (`sendToBoard`, dosya `storage.copy` ile ekip klasörüne); "Ekibe aç" panonun tamamını açar. Pano kilidi `board.locked`: adı değişmez, silinemez (`lockBoard`, sağ tık menüsü `boardMenu`). Pano sahibi `board.owner` (oluşturan): ortak projede yalnızca o siler, adını/kilidini/gizliliğini değiştirir (`canMng`; veritabanında `private.guard_board` tetikleyicisi). Diğerleri içeriği düzenler. Sahip "Gizliye al" (`boardToPrivate`) ile panoyu özele çevirir; ekipteki istemcilere broadcast `hide` gider. Dizin gizlenebilir: `setRdir` → `body.rdc`, LS `rdirC`.
 - Presence: `presTrack` → `presFlush` (kanal başına yalnızca değişince, ≥1,2 sn arayla; Supabase istemci presence sınırı). Sesli odaya giriş/çıkış ayrıca broadcast `rtc` `join`/`here`/`bye` ile duyurulur.
-- Davet yalnızca proje sahibinden (`invite_member` `not_owner`, `invites_delete` sahibe). Sahipsiz panoları ortak projede proje sahibi yönetir.
+- Roller `members.role`: `owner` (yönetici) · `admin` (yetkili) · `editor` (üye). Proje ayarları `#shr` (`openShare`, sekmeler Üyeler/Kullanım, `setShTab`).
+  Yönetici `set_member_role` ile yetki verir/alır (yalnızca owner). Davet ve davet iptali yönetici + yetkili (`private.is_admin`, `invite_member` `not_admin`);
+  çıkarma: yönetici herkesi, yetkili yalnızca üyeleri (`members_delete`). İstemcide `CL.role`, `isAdmin(pid)`.
+  Kullanım: `project_usage(p)` (yalnızca yetkili+; depolama, kişi başı, içerik, 30 gün etkinlik, plan doluluğu) → `drawUsage`; `purge_deleted(p)` 7 günden eski silinmişleri temizler.
+  Sahipsiz panoları ortak projede proje sahibi yönetir.
 - Yedek: bulut projesi menüsünde "Yedek indir (.workshop)" (`cloudBackup`, `zipItems` + `blobOf`, sürüm görselleri dahil `assetIdsOf`).
 - İğneli yorum: yorumda `pin:{x,y}` (0–1); ayrıntı panelinde görsele tıkla (`pinAt`), panoda `.cpins`. Karşılaştır: iki görsel seç → `#cmp` (kaydır/üst üste/yan yana).
 - Sürüm yığını: kartta `versions:[{assetId,ap,at,by}]`, `vAt`; `addVersion`/`verRestore`/`verCompare`; ekibe gönderirken yalnızca güncel sürüm gider.
