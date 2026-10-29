@@ -21,7 +21,8 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 ## Bulut (ortak projeler)
 - Supabase projesi `workshop` (ref `mbhpblbynyaotbblnxyr`). Tablolar: `projects`, `members`, `invites`, `profiles`, `items`
   (öğe = satır, `data` jsonb, silme = `deleted`), kova `assets` (`<pid>/<assetId>`). RLS: `private.is_member`.
-  Davet: `invite_member(p, mail)` RPC.
+  Davet: `invite_member(p, mail)` RPC; davet edilen e-posta `private.allowed_emails`'e eklenir.
+  Kayıt yalnızca `private.allowed_emails` ya da `invites` içindeki e-postalara açık (`private.guard_signup` tetikleyicisi).
 - İstemci: `CL` nesnesi, `wrapApi()` api/assets çağrılarını projeye göre yönlendirir (`isCloud(pid)`).
   `cloudOnly()` = GitHub Pages sürümü (window.claude yok, supabase-js var). claude.ai artifact'ında bulut kapalı.
 - `src/vendor/supabase.js` (supabase-js UMD) build-frontend ile eklenir.

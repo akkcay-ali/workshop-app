@@ -35,7 +35,7 @@ Güncelleme paketleri imzalıdır; uygulama sadece bu deponun imza anahtarıyla 
 
 - Bir projeye sağ tık → **Ekiple paylaş…** (ya da proje başlığındaki **Paylaş**) projeyi Supabase'e taşır;
   yerel `.workshop` dosyası Geri Dönüşüm Kutusu'na gider. Ekip arkadaşları e-postayla davet edilir.
-- Hesap: Ayarlar → **Ekip hesabı**. Kayıtlı olmayan biri davet edilirse, o e-postayla hesap açınca proje ona açılır.
+- Hesap: üst sağdaki kişi simgesi. Yalnızca davet edilen e-postalar hesap açabilir; davetli kişi o e-postayla kayıt olunca proje ona açılır.
 - Değişiklikler herkese anında yansır; bağlantı yokken yapılanlar sırada bekler, bağlantı gelince gönderilir.
 - Web sürümü (kurulum gerektirmez): https://akkcay-ali.github.io/workshop-app/ — yalnızca ortak projeleri gösterir.
 - Arka uç: Supabase (`items` tablosunda her öğe bir satır, görseller özel `assets` kovasında `<proje>/<görsel>`),
