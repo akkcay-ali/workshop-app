@@ -1628,6 +1628,7 @@ function syncCards(){
     const txt=el.querySelector(".txt");
     if(txt&&S.editing!==c.id){const val=c.kind==="audio"?(c.text||"Ses kaydı"):c.kind==="video"?(c.text||""):c.kind==="link"?(c.text||hostOf(c.url)||c.url):(c.text||"");if(txt.textContent!==val)txt.textContent=val}
     if(c.kind==="image")syncImgNote(el,c);
+    if((c.kind==="audio"||c.kind==="video")&&!c.text&&S.editing!==c.id)fillName(c);
     if(c.kind==="audio"){el.dataset.au=c.id;const ho=el.querySelector(".host");const hv=driveId(c.url)?"Google Drive · ses":hostOf(c.url);if(ho.textContent!==hv)ho.textContent=hv;const a=el.querySelector(".aulink");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
     if(c.kind==="video")syncVideo(el,c);
     if(c.kind==="link"){el.querySelector(".host").textContent=hostOf(c.url);const a=el.querySelector("a");if(a.getAttribute("href")!==c.url)a.setAttribute("href",c.url)}
@@ -1885,14 +1886,23 @@ function verRestore(c,v){const vs=(c.versions||[]).filter(x=>x!==v);vs.push({ass
 function verItems(c){const vs=c.versions||[];if(!vs.length)return [];const d=t=>{if(!t)return "";const x=new Date(t);return x.getDate()+" "+MSH[x.getMonth()]};
   return [{head:true,label:`Sürümler · şu an v${vs.length+1}`},{label:"Önceki sürümle karşılaştır",fn:()=>verCompare(c,vs[vs.length-1])},
     ...vs.map((v,i)=>({label:`v${i+1}${v.at?" · "+d(v.at):""} · buna dön`,fn:()=>verRestore(c,v)})).reverse()]}
-function addVideo(u){const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"video",url:u,text:"",x:Math.round(p.x-180),y:Math.round(p.y-120),w:360,z:maxZ()+1,created:Date.now()})).then(r=>r&&undoRemove("Video",[r.id]))}
+function addVideo(u){const p=centerWorld(),bid=curBoard();mediaName(u).then(nm=>run(api.add({type:"card",board:bid,kind:"video",url:u,text:nm||"",x:Math.round(p.x-180),y:Math.round(p.y-120),w:360,z:maxZ()+1,created:Date.now()})).then(r=>r&&undoRemove("Video",[r.id])))}
+/* dosya adını çek: Drive'da anahtarla dosya adı, doğrudan linkte yoldaki ad (uzantısız) */
+const NAMEC=new Map();
+async function mediaName(u){if(NAMEC.has(u))return NAMEC.get(u);let n=null;
+  try{const id=driveId(u);if(id&&DKEY()){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?fields=name&supportsAllDrives=true&key=${encodeURIComponent(DKEY())}`);if(r.ok){const j=await r.json();n=j.name||null}}
+    else if(!id){const last=decodeURIComponent(new URL(u).pathname.split("/").pop()||"");if(/\.[a-z0-9]{2,4}$/i.test(last))n=last}}catch(_){}
+  if(n)n=n.replace(/\.[a-z0-9]{2,4}$/i,"").replace(/[_]+/g," ").trim().slice(0,120)||null;NAMEC.set(u,n);return n}
+/* adı boş eski ses/video kartlarına bir kez adını yaz */
+const NAMEQ=new Set();
+function fillName(c){if(c.text||NAMEQ.has(c.id)||!api)return;NAMEQ.add(c.id);mediaName(c.url).then(n=>{const x=S.items.find(i=>i.id===c.id);if(n&&x&&!x.text){x.text=n;run(api.update(x.id,{text:n}))}})}
 function addLink(u,force){if(!api)return;if(!/^https?:\/\//i.test(u))u="https://"+u;if(!hostOf(u)){toast("Bu bir link adresine benzemiyor.");return}
   const vi=vidInfo(u);
   /* Drive linki ses de video da olabilir: sor */
   if(!force&&driveId(u)&&!/\.(mp3|wav|ogg|m4a|aac|flac|opus)(\?|#|$)/i.test(u)){const r=$("linkpop").getBoundingClientRect();
     openCtx(r.left,r.top-110,"Drive dosyası",[{label:"Ses olarak ekle",fn:()=>addLink(u,"audio")},{label:"Video olarak ekle",fn:()=>addVideo(u)}]);return}
   if(force!=="audio"&&vi&&vi.t!=="drive"){addVideo(u);return}
-  if(isAudioUrl(u)){const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"audio",url:u,text:"",x:Math.round(p.x-150),y:Math.round(p.y-40),w:300,z:maxZ()+1,created:Date.now()})).then(r=>{if(r){undoRemove("Ses",[r.id]);setTimeout(()=>startEdit(r.id,true),80)}});return}
+  if(isAudioUrl(u)){const p=centerWorld(),bid=curBoard();mediaName(u).then(nm=>run(api.add({type:"card",board:bid,kind:"audio",url:u,text:nm||"",x:Math.round(p.x-150),y:Math.round(p.y-40),w:300,z:maxZ()+1,created:Date.now()})).then(r=>{if(r){undoRemove("Ses",[r.id]);if(!nm)setTimeout(()=>startEdit(r.id,true),80)}}));return}
   const p=centerWorld();run(api.add({type:"card",board:curBoard(),kind:"link",url:u,text:"",x:Math.round(p.x-130),y:Math.round(p.y-40),w:260,z:maxZ()+1,created:Date.now()})).then(r=>r&&undoRemove("Link",[r.id]))}
 $("linkAdd").onclick=()=>{const v=$("linkIn").value.trim();if(v){addLink(v);$("linkIn").value="";$("linkpop").hidden=true}};
 $("linkIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("linkAdd").click();if(e.key==="Escape")$("linkpop").hidden=true});

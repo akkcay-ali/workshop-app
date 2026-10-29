@@ -1,6 +1,6 @@
 [package]
 name = "workshop-app"
-version = "0.5.1"
+version = "0.5.2"
 description = "Workshop – kişisel planlama ve referans panosu"
 authors = ["Ali"]
 edition = "2021"
