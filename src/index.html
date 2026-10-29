@@ -1377,7 +1377,7 @@ function renderHead(){
   const bs=boards(pid);
   let name=S.renaming==="project"?`<input class="pname-in" id="pnameIn" maxlength="60" value="${esc(p.name||"")}" aria-label="Proje adı">`:`<h2 class="pname" id="pname" title="Adını değiştirmek için üstteki sekmeye sağ tıkla">${esc(p.name||"Proje")}</h2>`;
   let st=isShared(pid)?`<button class="st" data-sub="hub" aria-selected="${s==="hub"}">Merkez</button><button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevlerim</button><button class="st" data-sub="team" aria-selected="${s==="team"}">Ekip</button>`:`<button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevler</button>`;
-  if(isShared(pid))st+=`<button class="st" data-sub="b:${esc(refBoard(pid))}" aria-selected="${s.startsWith("b:")}">Referanslar</button>`;
+  if(isShared(pid))st+=`<button class="st" data-sub="b:${esc(refBoard(pid))}" aria-selected="${s.startsWith("b:")}">Panolar</button>`;
   else st+=bs.map(b=>`<button class="st" data-sub="b:${esc(b.id)}" aria-selected="${s==="b:"+b.id}">${esc(b.name||"Pano")}</button>`).join("")+`<button class="st plus" data-newb title="Yeni pano">+ pano</button>`;
   st+=`<button class="st" data-sub="cal" aria-selected="${s==="cal"}">Takvim</button>`;
   let right="";
