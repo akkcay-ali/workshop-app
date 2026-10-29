@@ -1780,7 +1780,10 @@ $("tools").addEventListener("click",e=>{
 });
 function deleteCard(id){const c=S.items.find(i=>i.id===id);if(!c)return;const doc=Object.assign({},c);S.selSet.delete(id);run(api.remove(id));const u=undoRestore("Silme",[doc]);toast("Kart silindi",{fn:()=>runUndo(u)})}
 world.addEventListener("click",e=>{const x=e.target.closest("[data-cdel]");if(x)deleteCard(x.closest(".card").dataset.id);const ed=e.target.closest("[data-cedit]");if(ed)openEditor(ed.closest(".card").dataset.id)});
-function deleteBoard(pid,id){const lb=boards(pid).find(x=>x.id===id);if(lb&&lb.locked){toast("Pano kilitli · silmek için önce kilidi aç",null,true);return}
+/* pano sahibi: ortak projede yalnızca o siler, adını/kilidini/gizliliğini değiştirir (veritabanı da engeller) */
+const canMng=(pid,b)=>!b||!isShared(pid)||!b.owner||b.owner===CL.me;
+const ownerNote=b=>"Panonun sahibi "+pname(b.owner)+" · içeriği düzenleyebilirsin";
+function deleteBoard(pid,id){const lb=boards(pid).find(x=>x.id===id);if(!canMng(pid,lb)){toast(ownerNote(lb),null,true);return}if(lb&&lb.locked){toast("Pano kilitli · silmek için önce kilidi aç",null,true);return}
   const cs=S.items.filter(i=>i.type==="card"&&i.board===id);
   cs.forEach(c=>{if(c.assetId&&assets&&!S.items.some(o=>o.id!==c.id&&o.board!==id&&o.assetId===c.assetId))assets.delete(c.assetId).catch(()=>{})});
   run(Promise.all(cs.map(c=>api.remove(c.id))).then(()=>api.remove(id)));
@@ -1794,21 +1797,23 @@ $("phead").addEventListener("contextmenu",e=>{
 });
 /* ---------- Referans dizini (ortak projeler): ekip panoları + benim panolarım ---------- */
 function renderDir(){const pid=curP(),cur=curBoard();const n=b=>cards(b.id).filter(c=>c.kind!=="frame").length;
-  const row=b=>`<button class="rdb${b.id===cur?" on":""}" data-rdb="${esc(b.id)}"><span>${esc(b.name||"Pano")}</span>${b.locked?`<span class="rdl" title="Kilitli">${LOCK_IC}</span>`:""}<span class="mono">${n(b)}</span></button>`;const mine=myBoards(pid);
+  const row=b=>`<button class="rdb${b.id===cur?" on":""}" data-rdb="${esc(b.id)}"${b.owner&&!b.private?` title="Sahibi: ${esc(b.owner===CL.me?"sen":pname(b.owner))}"`:""}><span>${esc(b.name||"Pano")}</span>${b.locked?`<span class="rdl" title="Kilitli">${LOCK_IC}</span>`:""}<span class="mono">${n(b)}</span></button>`;const mine=myBoards(pid);
   const add=(k,t)=>`<button class="rdadd" data-rdnew="${k}" title="${t}" aria-label="${t}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></button>`;
   $("rdir").innerHTML=`<button class="rdcol" data-rdcol title="Paneli gizle" aria-label="Pano panelini gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10"/><path d="M10.5 6.2 8.8 8l1.7 1.8"/></svg></button><div class="rdg"><div class="rdh"><span>Ekip panoları</span>${add("team","Yeni ekip panosu")}</div>${teamBoards(pid).map(row).join("")}</div>
     <div class="rdg"><div class="rdh rdmine">${PRIV_IC}<span>Benim panolarım</span>${add("me","Yalnızca senin göreceğin yeni pano")}</div>${mine.length?mine.map(row).join(""):`<span class="rdempty">Yalnızca senin gördüğün panolar: keşif, deneme, ham referans. Hazır olanı ekip panosunun adına sürükle.</span>`}</div>
     <span class="rdtip">Sağ tık: kilitle, adını değiştir, sil</span>`}
-function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
+function newBoard(pid,priv){run(api.add(Object.assign({type:"board",project:pid,name:priv?"Keşif":"Yeni pano",order:Date.now()},CL.me&&isCloud(pid)?{owner:CL.me}:{},priv?{private:true}:{})).then(ref=>{if(!ref)return;S.sub[pid]="b:"+ref.id;save();renderProject();startBoardRename()}))}
 /* kilitli pano: adı değişmez, silinemez (kartlar düzenlenebilir) */
-function lockBoard(pid,b){const v=!b.locked;if(b.virtual)run(api.set(b.id,{type:"board",project:pid,name:b.name||"Referanslar",order:0,locked:v}));else run(api.update(b.id,{locked:v}));
+function lockBoard(pid,b){if(!canMng(pid,b)){toast(ownerNote(b),null,true);return}const v=!b.locked;if(b.virtual)run(api.set(b.id,{type:"board",project:pid,name:b.name||"Referanslar",order:0,locked:v}));else run(api.update(b.id,{locked:v}));
   toast(v?"Pano kilitlendi · silinemez, adı değişmez":"Kilit açıldı",null,true)}
 function boardMenu(pid,id,x,y){const b=boards(pid).find(v=>v.id===id);if(!b)return;const main=b.virtual||id===mainBoard(pid);
   const go2=()=>{S.sub[pid]="b:"+id;S.selSet.clear();save();renderProject()};
   const items=[{label:"Aç",fn:go2}];
+  if(!canMng(pid,b)){items.push({head:true,label:ownerNote(b)});openCtx(x,y,b.name||"Pano",items);return}
   if(!b.locked)items.push({label:"Yeniden adlandır",fn:()=>{go2();startBoardRename()}});
   items.push({label:b.locked?"Kilidi aç":"Kilitle (silinmez, adı değişmez)",fn:()=>lockBoard(pid,b)});
-  if(b.private&&isShared(pid))items.push({label:"Ekibe aç (herkes görür)",fn:()=>openBoardToTeam(pid,id)});
+  if(b.private&&isShared(pid))items.push({label:"Ekibe aç (herkes görür, düzenleyebilir)",fn:()=>openBoardToTeam(pid,id)});
+  if(!b.private&&!main&&isShared(pid)&&b.owner===CL.me)items.push({label:"Gizliye al (yalnızca sen görürsün)",confirm:"Ekip bu panoyu ve kartlarını artık görmez",fn:()=>boardToPrivate(pid,id)});
   if(!main&&!b.locked)items.push("-",{label:"Panoyu sil",danger:true,confirm:"Emin misin? Kartlarıyla silinir",fn:()=>deleteBoard(pid,id)});
   openCtx(x,y,(b.locked?"Kilitli · ":"")+(b.private?"Yalnızca sen · ":"")+(main?(b.name||"Pano")+" · ana pano":(b.name||"Pano")),items)}
 /* panel gizle / göster (cihazda hatırlanır) */
@@ -1843,15 +1848,26 @@ function dropToBoard(ids,tb){const pid=curP();const from=curBoard();
   /* aynı türden panolar arasında taşı */
   const list=ids.map(id=>S.items.find(i=>i.id===id)).filter(Boolean);undoPatch("Panoya taşı",list.map(c=>[c.id,{board:from}]));
   for(const c of list){c.board=tb;run(api.update(c.id,{board:tb}))}S.selSet.clear();syncCards();renderDir();toast(list.length+" kart taşındı")}
+/* sahibi ekip panosunu tekrar gizliye alır: kartlar ve görselleri özel olur, ekipte anında kaybolur */
+async function boardToPrivate(pid,id){const b=boards(pid).find(x=>x.id===id);if(!b||b.owner!==CL.me)return;const cs=S.items.filter(i=>i.type==="card"&&i.board===id);const pre="p/"+CL.me+"/";
+  try{for(const c of cs){if(c.assetId&&!c.ap){const {error}=await CL.sb.storage.from("assets").copy(pid+"/"+c.assetId,pid+"/"+pre+c.assetId);if(error&&!/exist|duplicate/i.test(error.message||""))throw error;CL.apre.set(c.assetId,pre)}
+      await api.update(c.id,Object.assign({private:true},c.assetId?{ap:pre}:{}))}
+    await api.update(id,{private:true});cHide(pid,[id,...cs.map(c=>c.id)]);
+    /* ekip klasöründeki kopyayı kaldır (başka bir ekip kartı kullanmıyorsa) */
+    const rm=[...new Set(cs.filter(c=>c.assetId&&!S.items.some(o=>o.assetId===c.assetId&&!o.private)).map(c=>pid+"/"+c.assetId))];if(rm.length)CL.sb.storage.from("assets").remove(rm).catch(()=>{});toast("Pano gizlendi · yalnızca sen görüyorsun",null,true)}
+  catch(e){toast("Gizlenemedi: "+(e&&e.message||e),null,true)}}
+function cHide(pid,ids){const ch=CL.pres.get(pid);if(ch)try{ch.send({type:"broadcast",event:"hide",payload:{ids}})}catch(_){}}
+function onHide(pid,p){const ids=new Set((p&&p.ids)||[]);if(!ids.size)return;S.items=S.items.filter(i=>!ids.has(i.id)||i.private);for(const id of ids){const v=CL.items.get(id);if(v&&!v.private)CL.items.delete(id)}
+  if(curP()===pid&&ids.has(curBoard())){S.sub[pid]="b:"+mainBoard(pid);save()}cCacheSave();renderAll()}
 async function openBoardToTeam(pid,id){const cs=S.items.filter(i=>i.type==="card"&&i.board===id);
-  try{for(const c of cs){await pubAsset(pid,c);if(c.assetId)CL.apre.set(c.assetId,"");await api.update(c.id,{private:false,ap:null})}await api.update(id,{private:false});toast("Pano ekibe açıldı · herkes görür",null,true)}
+  try{for(const c of cs){await pubAsset(pid,c);if(c.assetId)CL.apre.set(c.assetId,"");await api.update(c.id,{private:false,ap:null})}await api.update(id,{private:false,owner:CL.me});toast("Pano ekibe açıldı · herkes görür ve düzenleyebilir, yalnızca sen silebilirsin",null,true)}
   catch(e){toast("Açılamadı: "+(e&&e.message||e),null,true)}}
 $("bbar").addEventListener("click",e=>{const p=e.target.closest("#rdpick");if(!p)return;const pid=curP();const r=p.getBoundingClientRect();
   openCtx(r.left,r.bottom+4,"Panolar",[{head:true,label:"Ekip panoları"},...teamBoards(pid).map(b=>({label:b.name||"Pano",fn:()=>{S.sub[pid]="b:"+b.id;save();renderProject()}})),
     {head:true,label:"Benim panolarım"},...myBoards(pid).map(b=>({label:b.name||"Pano",fn:()=>{S.sub[pid]="b:"+b.id;save();renderProject()}})),"-",
     {label:"+ Ekip panosu",fn:()=>newBoard(pid,false)},{label:"+ Benim panom",fn:()=>newBoard(pid,true)}])});
 function startBoardRename(){
-  const pid=curP();const b=boards(pid).find(x=>x.id===curBoard());if(!b)return;if(b.locked){toast("Pano kilitli · adını değiştirmek için önce kilidi aç",null,true);return}S.renaming="board";
+  const pid=curP();const b=boards(pid).find(x=>x.id===curBoard());if(!b)return;if(!canMng(pid,b)){toast(ownerNote(b),null,true);return}if(b.locked){toast("Pano kilitli · adını değiştirmek için önce kilidi aç",null,true);return}S.renaming="board";
   $("bbar").innerHTML=`<span class="pill name"><input id="bnameIn" maxlength="40" value="${esc(b.name||"")}" aria-label="Pano adı"></span>`;
   const inp=$("bnameIn");inp.focus();inp.select();
   const done=ok=>{if(S.renaming!=="board")return;S.renaming=null;const v=inp.value.trim();
@@ -3161,6 +3177,7 @@ function presSync(){if(!CL.sb||!CL.me)return;const want=new Set([...CL.pids].fil
     const ch=CL.sb.channel("proj:"+pid,{config:{private:true,presence:{key:CL.me}}});CL.pres.set(pid,ch);
     ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:!!s.v,m:!!s.m,s:!!s.s});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
       .on("broadcast",{event:"rtc"},({payload})=>onRtc(pid,payload))
+      .on("broadcast",{event:"hide"},({payload})=>onHide(pid,payload))
       .subscribe(s=>{if(s==="SUBSCRIBED"){presSent.delete(pid);presTrack();if(V.pid===pid)rtcSend("*",{k:"join"})}})}}
 /* Supabase istemci başına presence mesajını sınırlar: aynı durumu tekrar gönderme, değişiklikleri biriktir,
    her kanala yalnızca durumu gerçekten değiştiyse ve en fazla ~1,2 sn'de bir yaz. */
