@@ -3273,7 +3273,7 @@ document.addEventListener("submit",e=>{if(e.target.id==="chatForm"){e.preventDef
    ===================================================================== */
 const V={pid:null,stream:null,peers:new Map(),muted:false,ice:null,speak:new Set(),actx:null,loop:0,meAn:null};
 const STUN=[{urls:"stun:stun.cloudflare.com:3478"},{urls:"stun:stun.l.google.com:19302"}];
-async function iceServers(){if(V.ice&&V.ice.at>Date.now()-6*3600e3)return V.ice.list;
+async function iceServers(){if(V.ice&&V.ice.at>Date.now()-(V.ice.list===STUN?60e3:6*3600e3))return V.ice.list;/* TURN alınamadıysa 1 dk sonra yeniden dene */
   try{const {data,error}=await CL.sb.functions.invoke("turn-ice",{body:{}});if(!error&&data&&data.iceServers&&data.iceServers.length){V.ice={at:Date.now(),list:data.iceServers};return data.iceServers}}catch(_){}
   V.ice={at:Date.now(),list:STUN};return STUN}
 const voiceIn=pid=>{const l=CL.here.get(pid)||[];return l.filter(h=>h.v).map(h=>h.u)};
