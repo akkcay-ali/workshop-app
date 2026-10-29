@@ -49,7 +49,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 ## Giriş ve pencere (masaüstü + web)
 - Web (Pages) de aynı giriş ekranını gösterir; hesapsız modda yerel projeler tarayıcıda (öğeler localStorage `wloose`, görseller IndexedDB `ws-local` → `idbAssets`).
 - İlk açılış: giriş ekranı `#welcome` (`maybeWelcome`, LS `welcome` = `acct`|`guest`); hesapsız devam = çevrimdışı, bir daha sorulmaz, giriş sağ üstten. Girişsizken ses/bildirim düğmeleri gizli.
-- iPad/dokunmatik (`NOKBD`, `html.nokbd`): `kbd`, `.kbonly`, kısayol yardımı gizli; menü etiketlerindeki "· Ctrl+…" (`kbStrip`) ve bildirimlerdeki kısayol ipuçları atılır. Web ana ekrana eklenebilir (`manifest.webmanifest`, `apple-touch-icon.png`).
+- iPad/dokunmatik (`NOKBD`, `html.nokbd`): `kbd`, `.kbonly`, kısayol yardımı gizli; menü etiketlerindeki "· Ctrl+…" (`kbStrip`) ve parantez içi açıklamalar (`kbStrip`), bildirimlerdeki kısayol ipuçları atılır. Panoda iki parmakla dokun = geri al, üç parmak = yinele (`TT`); araç çubuğunda geri al/yinele düğmeleri (`.touchonly`). Uzun basma = sağ tık (dizin satırları ve proje sekmeleri dahil). Web ana ekrana eklenebilir (`manifest.webmanifest`, `apple-touch-icon.png`).
 - Pencere × düğmesi görev çubuğuna küçültür; çıkış: × üzerinde sağ tık › Uygulamadan çık ya da Ctrl+Q (`onCloseRequested` bekleyen kayıtları bitirir).
 
 ## Derleme

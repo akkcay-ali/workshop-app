@@ -538,7 +538,7 @@ button:disabled{cursor:var(--cur)}
 .wcard .acform{display:flex;flex-direction:column;gap:8px;margin-top:4px}.wcmsg:empty{display:none}.wcmsg{color:var(--ink-2)}
 .wcor{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:11px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.08em}.wcor::before,.wcor::after{content:"";flex:1;height:1px;background:var(--stroke)}
 .wcnote{line-height:1.5;color:var(--ink-3)}
-.touchonly{display:none}.nokbd .touchonly{display:inline}.nokbd .kbonly,.nokbd kbd,.nokbd #kbOpen{display:none!important}
+.touchonly{display:none}.nokbd .touchonly{display:inline}.nokbd .tool.touchonly{display:inline-flex}.nokbd .tools .sep.touchonly{display:block}.nokbd .kbonly,.nokbd kbd,.nokbd #kbOpen{display:none!important}
 .wlock{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:400;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
 .wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
 #updSec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
@@ -849,6 +849,9 @@ body.frameless .app{padding-top:8px}
           <div class="linkpop" id="linkpop" hidden><input class="field" id="linkIn" placeholder="https://…" aria-label="Link adresi"><button class="btn" id="linkAdd">Ekle</button></div>
           <div class="inkbar" id="inkbar" hidden></div>
           <div class="tools" id="tools">
+            <button class="tool ic touchonly" data-tool="undo" title="Geri al · iki parmakla dokun" aria-label="Geri al"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5L2.5 6.5l3 3"/><path d="M2.5 6.5h7a3.5 3.5 0 010 7H7"/></svg></button>
+            <button class="tool ic touchonly" data-tool="redo" title="Yinele · üç parmakla dokun" aria-label="Yinele"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.5l3 3-3 3"/><path d="M13.5 6.5h-7a3.5 3.5 0 000 7H9"/></svg></button>
+            <span class="sep touchonly"></span>
             <button class="tool ic" data-tool="select" aria-pressed="true" title="Seç / taşı (V)" aria-label="Seç"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3.5 2.5l9 5-4 1.2-1.8 3.8z"/></svg></button>
             <button class="tool ic" data-tool="pen" aria-pressed="false" title="Kalem (P)" aria-label="Kalem"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M10.5 2.5l3 3-8 8H2.5v-3z"/><path d="M9 4l3 3"/></svg></button>
             <button class="tool ic" data-tool="arrow" aria-pressed="false" title="Ok (A)" aria-label="Ok"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13L13 3"/><path d="M7 3h6v6"/></svg></button>
@@ -1090,7 +1093,8 @@ let quietNow=()=>false;/* zamanlayıcı bölümü doldurur */
 /* iPad / dokunmatik: klavye kısayolu ipuçları gizlenir */
 const NOKBD=/iPad|iPhone|Android/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1)||(matchMedia("(hover:none) and (pointer:coarse)").matches);
 if(NOKBD)document.documentElement.classList.add("nokbd");
-const kbStrip=t=>NOKBD&&typeof t==="string"?t.replace(/\s+·\s+(?:Ctrl|Alt|Shift|Enter|Esc|Delete|Space|[A-Z]\b)[^·]*$/,""):t;
+/* iPad menüleri sade: kısayol ve parantez içi açıklama yok ("Kilitle (silinmez, …)" → "Kilitle") */
+const kbStrip=t=>NOKBD&&typeof t==="string"?t.replace(/\s+·\s+(?:Ctrl|Alt|Shift|Enter|Esc|Delete|Space|[A-Z]\b)[^·]*$/,"").replace(/\s*\((?!\d+\))[^)]*\)\s*$/,""):t;
 function toast(msg,action,force){if(NOKBD&&typeof msg==="string")msg=msg.replace(/\s*·\s*[^·]*\b(?:Ctrl|Alt N|Esc)\b[^·]*$/,"");if(!action&&!force&&quietNow())return;
   $("toastT").textContent=msg;const b=$("toastB");b.hidden=!action;
   if(action){b.textContent=action.label||"Geri al";b.onclick=()=>{action.fn();$("toast").hidden=true}}
@@ -1791,6 +1795,7 @@ $("tools").addEventListener("click",e=>{
   const t=e.target.closest("[data-tool]");if(!t)return;const r=stage.getBoundingClientRect();
   const tl=t.dataset.tool;
   if(INK_TOOLS.includes(tl)){setTool(tl);return}
+  if(tl==="undo"){undo();return}if(tl==="redo"){redo();return}
   if(tl==="note"||tl==="image"||tl==="link")setTool("select");
   switch(tl){
     case "note":{if(!api)return;const p=centerWorld();addNote(p.x-120+Math.random()*40,p.y-60+Math.random()*40);break}
@@ -2137,12 +2142,21 @@ function toggleLock(ids){
   cs.forEach(c=>{c.locked=v;run(api.update(c.id,{locked:v}))});if(v)selClear();syncCards();toast(v?(cs.length>1?cs.length+" kart kilitlendi":"Kilitlendi"):"Kilit açıldı");
 }
 
+/* ---------- iki parmakla dokun = geri al, üç parmakla = yinele (iPad, Procreate gibi) ---------- */
+const TT={pts:new Map(),t0:0,max:0,moved:false};
+stage.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch")return;if(!TT.pts.size){TT.t0=performance.now();TT.max=0;TT.moved=false}
+  TT.pts.set(e.pointerId,{x:e.clientX,y:e.clientY});TT.max=Math.max(TT.max,TT.pts.size)},true);
+stage.addEventListener("pointermove",e=>{const p=TT.pts.get(e.pointerId);if(p&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>14)TT.moved=true},true);
+const ttEnd=e=>{if(!TT.pts.delete(e.pointerId)||TT.pts.size)return;
+  if(e.type==="pointerup"&&!TT.moved&&TT.max>=2&&performance.now()-TT.t0<380){lpCancel();if(TT.max===2)undo();else redo()}};
+stage.addEventListener("pointerup",ttEnd,true);stage.addEventListener("pointercancel",ttEnd,true);
+
 /* ---------- uzun basma = sağ tık (iPad) ---------- */
 let lp=null;
 const lpCancel=()=>{if(lp){clearTimeout(lp.t);lp=null}};
 document.addEventListener("pointerdown",e=>{
   if(e.pointerType==="mouse"||!e.isPrimary)return lpCancel();
-  if(!e.target.closest('#stage,.pcard[data-go],#phead .st[data-sub^="b:"]'))return;
+  if(!e.target.closest('#stage,.pcard[data-go],#phead .st[data-sub^="b:"],#rdir [data-rdb],#tabs .tab[data-go]:not([data-go="home"])'))return;
   if(e.target.closest("#stage")&&S.tool!=="select")return;
   lpCancel();const x=e.clientX,y=e.clientY;
   lp={id:e.pointerId,x,y,t:setTimeout(()=>{lp=null;
