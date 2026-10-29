@@ -1,7 +1,7 @@
 {
   "name": "workshop-app",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Workshop – kişisel planlama ve referans panosu",
   "scripts": {
     "tauri": "tauri"
