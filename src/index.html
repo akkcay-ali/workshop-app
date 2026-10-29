@@ -3628,7 +3628,7 @@ async function shareStart(){if(!V.pid)return;const o=sharerOf(V.pid);if(o&&o!==C
   const q=sq();let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:{width:{ideal:q.w},height:{ideal:q.h},frameRate:{ideal:q.f,max:q.f}},audio:false})}
   catch(e){if(e&&e.name!=="NotAllowedError"&&e.name!=="AbortError")toast("Ekran paylaşılamadı: "+((e&&e.message)||e),null,true);return}
   if(!V.pid){st.getTracks().forEach(t=>t.stop());return}
-  const tr=st.getVideoTracks()[0];try{tr.contentHint=q.hint}catch(_){}tr.onended=()=>shareStop();V.screen=st;
+  const tr=st.getVideoTracks()[0];try{tr.contentHint=q.hint}catch(_){}tr.onended=()=>shareStop();V.screen=st;await hwCodecs().catch(()=>{});
   for(const p of V.peers.values()){p.ssnd=p.pc.addTrack(tr,st);prefCodec(p)}presTrack(true);drawVoice();statsLoop();toast("Ekranını paylaşıyorsun · "+q.l,null,true)}
 /* görüntü düşük hızdan yavaş tırmanmasın: karşı tarafın SDP'sine başlangıç hızı ekle (Chromium) */
 function fastStart(sdp){try{const L=sdp.split("\r\n");let vid=false;const out=[];const pts=new Set();
@@ -3637,8 +3637,14 @@ function fastStart(sdp){try{const L=sdp.split("\r\n");let vid=false;const out=[]
     out.push(l);const r=/^a=rtpmap:(\d+) /.exec(l);if(r&&pts.has(r[1])&&!L.some(x=>x.startsWith("a=fmtp:"+r[1]+" ")))out.push("a=fmtp:"+r[1]+" x-google-start-bitrate=2500")}
   return out.join("\r\n")}catch(_){return sdp}}
 /* ekran içeriği için VP9 (yazı keskin kalır), yoksa H264, en son VP8 */
+/* ekran kartı kodlayabiliyorsa onu seç (ör. NVIDIA/Intel'de H264 donanımda): işlemci rahatlar, kalite artar */
+let HWC=null;async function hwCodecs(){if(HWC)return HWC;HWC={};const q=sq();
+  for(const [k,ct] of [["vp9","video/VP9"],["h264","video/H264"],["av1","video/AV1"]]){try{const r=await navigator.mediaCapabilities.encodingInfo({type:"webrtc",video:{contentType:ct,width:q.w,height:q.h,bitrate:q.b,framerate:q.f}});HWC[k]=!!(r&&r.supported&&r.powerEfficient)}catch(_){HWC[k]=false}}
+  return HWC}
 function prefCodec(p){try{if(!p.ssnd||!window.RTCRtpReceiver||!RTCRtpReceiver.getCapabilities)return;const t=p.pc.getTransceivers().find(x=>x.sender===p.ssnd);if(!t||!t.setCodecPreferences)return;
-  const cs=RTCRtpReceiver.getCapabilities("video").codecs;const rank=c=>{const m=c.mimeType.toLowerCase();return m==="video/vp9"?0:m==="video/h264"?1:m==="video/vp8"?2:m==="video/av1"?3:4};
+  const hw=HWC||{};const cs=RTCRtpReceiver.getCapabilities("video").codecs;
+  const order=hw.vp9?["vp9","h264","vp8"]:hw.h264?["h264","vp9","vp8"]:["vp9","h264","vp8"];
+  const rank=c=>{const m=c.mimeType.toLowerCase().replace("video/","");const i=order.indexOf(m);return i<0?(m==="av1"?order.length:order.length+1):i};
   t.setCodecPreferences(cs.slice().sort((a,b)=>rank(a)-rank(b)))}catch(_){}}
 /* gerçek kalite: izleyicide çözünürlük/fps/hız, paylaşanda sınır nedeni */
 let statT=null;const prevB=new Map();
@@ -3647,10 +3653,12 @@ async function readStats(){const now=Date.now();
   for(const p of V.peers.values()){let st;try{st=await p.pc.getStats()}catch(_){continue}
     st.forEach(r=>{if(r.kind!=="video")return;
       if(r.type==="inbound-rtp"&&p.video){const k="in"+p.u,o=prevB.get(k);prevB.set(k,{b:r.bytesReceived,t:now});const mbps=o?((r.bytesReceived-o.b)*8/((now-o.t)/1000)/1e6):0;
-        const el=$("scrQ");if(el)el.textContent=r.frameWidth?`${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} fps · ${mbps.toFixed(1)} Mbps`:""}
+        const dec=r.powerEfficientDecoder===true?" · ekran kartı":r.powerEfficientDecoder===false?" · işlemci":"";
+        const el=$("scrQ");if(el)el.textContent=r.frameWidth?`${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} fps · ${mbps.toFixed(1)} Mbps${dec}`:""}
       if(r.type==="outbound-rtp"&&V.screen&&p.ssnd){const k="out"+p.u,o=prevB.get(k);prevB.set(k,{b:r.bytesSent,t:now});const mbps=o?((r.bytesSent-o.b)*8/((now-o.t)/1000)/1e6):0;
         const why={cpu:"işlemci yetmiyor",bandwidth:"bağlantı yavaş",other:"",none:""}[r.qualityLimitationReason||"none"];
-        V.sstat=r.frameWidth?`${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} fps · ${mbps.toFixed(1)} Mbps${why?" · "+why:""}`:"";const el=$("vsQ");if(el)el.textContent=V.sstat}})}}
+        const enc=r.powerEfficientEncoder===true?" · ekran kartı":r.powerEfficientEncoder===false?" · işlemci":"";
+        V.sstat=r.frameWidth?`${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} fps · ${mbps.toFixed(1)} Mbps${enc}${why?" · "+why:""}`:"";const el=$("vsQ");if(el)el.textContent=V.sstat}})}}
 function shareStop(){if(!V.screen)return;const st=V.screen;V.screen=null;st.getTracks().forEach(t=>{t.onended=null;t.stop()});
   for(const p of V.peers.values())if(p.ssnd){try{p.pc.removeTrack(p.ssnd)}catch(_){}p.ssnd=null}V.sstat="";presTrack(true);drawVoice()}
 async function setQuality(k){if(!SQ[k])return;LS.set("vQ",k);if(V.screen){const q=sq(),tr=V.screen.getVideoTracks()[0];

@@ -35,7 +35,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   sohbet `public.messages` (genel/özel, her pazartesi silinir: `private.prune_messages`).
 - Sesli oda: WebRTC kişiden kişiye (`V` nesnesi), sinyal `proj:<pid>` kanalında broadcast `rtc`, odadakiler presence `v:true`.
   Bağlantı "perfect negotiation" (iki taraf teklif yapabilir). Ekran paylaşımı: tek paylaşan (presence `s`), kalite `SQ`
-  (1080p30/720p30/720p60/Düşük, `vQ`), izleyici penceresi `#scr` (varsayılan büyük, `scrQ` gerçek çözünürlük/fps/hız; paylaşanda `vsQ` + sınır nedeni). Ekran için codec sırası VP9 > H264 > VP8 (`prefCodec`), karşı SDP'ye `x-google-start-bitrate=2500` (`fastStart`). Ses/üst çubuk: kulaklık düğmesi `#voiceBtn` + `#voicePop`.
+  (1080p30/720p30/720p60/Düşük, `vQ`), izleyici penceresi `#scr` (varsayılan büyük, `scrQ` gerçek çözünürlük/fps/hız; paylaşanda `vsQ` + sınır nedeni). Ekran için codec: ekran kartı kodlayabiliyorsa o (`hwCodecs`, mediaCapabilities powerEfficient), yoksa VP9 > H264 > VP8 (`prefCodec`); göstergede ekran kartı/işlemci, karşı SDP'ye `x-google-start-bitrate=2500` (`fastStart`). Ses/üst çubuk: kulaklık düğmesi `#voiceBtn` + `#voicePop`.
   TURN: edge function `turn-ice` (anahtarlar `CF_TURN_KEY_ID`, `CF_TURN_TOKEN`: function secret ya da Vault → `public.turn_secrets()`; yoksa yalnızca STUN). macOS mikrofon izni `src-tauri/Info.plist`.
 - Görevler (ortak projede): sekmeler Merkez · Görevlerim (`tasks`: özel + bana atanan) · Ekip (`team`: Kanban, özel hariç) · panolar · Takvim.
   Özel görev = `data.private` + satırda `items.private_to` (RLS: yalnızca sahibi okur/yazar; akış ve bildirim tetikleyicileri atlar).
