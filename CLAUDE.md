@@ -34,7 +34,9 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   `target`, `mentions`), referans onayı (`card.review`), `public.notifications` (tetikleyici `private.notify_items`),
   sohbet `public.messages` (genel/özel, her pazartesi silinir: `private.prune_messages`).
 - Sesli oda: WebRTC kişiden kişiye (`V` nesnesi), sinyal `proj:<pid>` kanalında broadcast `rtc`, odadakiler presence `v:true`.
-  TURN: edge function `turn-ice` (secret `CF_TURN_KEY_ID`, `CF_TURN_TOKEN`; yoksa yalnızca STUN). macOS mikrofon izni `src-tauri/Info.plist`.
+  Bağlantı "perfect negotiation" (iki taraf teklif yapabilir). Ekran paylaşımı: tek paylaşan (presence `s`), kalite `SQ`
+  (1080p30/720p30/720p60/Düşük, `vQ`), izleyici penceresi `#scr`. Ses/üst çubuk: kulaklık düğmesi `#voiceBtn` + `#voicePop`.
+  TURN: edge function `turn-ice` (anahtarlar `CF_TURN_KEY_ID`, `CF_TURN_TOKEN`: function secret ya da Vault → `public.turn_secrets()`; yoksa yalnızca STUN). macOS mikrofon izni `src-tauri/Info.plist`.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 
 ## Derleme
