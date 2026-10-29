@@ -53,7 +53,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Ekran alıntısı (masaüstü): Ctrl+Alt+W (global-shortcut, `snip` olayı) ya da araç çubuğu "Alıntı" → `snip_start` (Windows ms-screenclip / macOS screencapture) → `clip_seq`/`clip_image` (arboard+png) → açık ya da son panoya eklenir.
 - Ekip bildirimleri `teamNotify` (LS `tnotify`, zil menüsünden): bahsetme/atama/onay/özel mesaj/adın geçtiği mesaj. Kalem basıncı: `draw` kartında `pr` dizisi, `inkOutline` dolu şekil.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
-- Drive API anahtarı: `public.app_config` (`drive_key`, okuma herkes, yazma `set_app_config` yalnızca proje sahibi), istemcide LS `dkey`; varsa Drive ses/video `googleapis.com/drive/v3/files/<id>?alt=media&key=` ile akış (büyük dosya uyarısına takılmaz). Ayarlar › Google Drive anahtarı.
+- Drive API anahtarı: `public.app_config` (`drive_key`, okuma herkes, yazma `set_app_config` yalnızca proje sahibi), istemcide LS `dkey`; varsa Drive ses/video `googleapis.com/drive/v3/files/<id>?alt=media&key=` ile akış (büyük dosya uyarısına takılmaz). Anahtar uygulamada görünmez; Supabase panelinden `app_config` tablosuna (`key`=`drive_key`) girilir.
 
 ## Giriş ve pencere (masaüstü + web)
 - Web (Pages) de aynı giriş ekranını gösterir; hesapsız modda yerel projeler tarayıcıda (öğeler localStorage `wloose`, görseller IndexedDB `ws-local` → `idbAssets`).

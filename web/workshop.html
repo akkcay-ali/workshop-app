@@ -974,9 +974,6 @@ body.frameless .app{padding-top:8px}
   <div class="cfgsec"><span class="small">Tema · bu cihazda hatırlanır</span><div class="themes" id="themes">
     <button class="thm dark" data-theme="dark"><i></i>Koyu</button><button class="thm light" data-theme="light"><i></i>Açık</button><button class="thm vivid" data-theme="vivid"><i></i>Renkli</button></div></div>
   <div class="cfgsec"><span class="small">Yazı tipi · bu cihazda hatırlanır</span><div id="fontList" class="fontgrid"></div></div>
-  <div class="cfgsec" id="dkSec" hidden><span class="small">Google Drive anahtarı · büyük ses ve video dosyaları için, ekipteki herkese uygulanır</span>
-    <div class="row" id="dkRow"><input class="field" id="dkIn" type="password" placeholder="AIza…" autocomplete="off" style="flex:1" aria-label="Drive API anahtarı"><button class="btn" id="dkSave">Kaydet</button></div>
-    <span class="small" id="dkMsg"></span></div>
   <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
@@ -2842,11 +2839,7 @@ $("stoClean").onclick=async()=>{const btn=$("stoClean");
   btn.disabled=true;const refs=assetRefs();let n=0;
   for(const a of stoOrphans){if(refs.has(a.id))continue;try{const r=await assets.delete(a.id);if(r&&r.deleted)n++}catch(e){if(e&&e.code==="rate_limited")break}}
   btn.disabled=false;toast(n+" kullanılmayan görsel silindi");drawStorage()};
-function drawDk(){const on=!!CL.me;$("dkSec").hidden=!on;if(!on)return;const own=CL.own.size>0;$("dkRow").hidden=!own;
-  $("dkMsg").textContent=DKEY()?"✓ Ayarlı · büyük dosyalar akış olarak çalar":own?"Ayarlı değil · nasıl alınacağını Claude'a sorabilirsin":"Ayarlı değil · proje sahibi ekleyebilir"}
-$("dkSave").onclick=async()=>{const v=$("dkIn").value.trim();$("dkSave").disabled=true;const {error}=await CL.sb.rpc("set_app_config",{k:"drive_key",v});$("dkSave").disabled=false;
-  if(error){$("dkMsg").textContent="Kaydedilemedi: "+error.message;return}$("dkIn").value="";LS.set("dkey",v);drawDk();toast(v?"Drive anahtarı kaydedildi · ekipte herkese uygulanır":"Drive anahtarı kaldırıldı",null,true);if(boardVisible())syncCards()};
-function drawCfg(){drawStorage();drawLib();drawDk();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
@@ -3694,7 +3687,7 @@ function auToggle(id){const c=S.items.find(i=>i.id===id);if(!c)return;
   if(AU.el){AU.el.pause();AU.el.src=""}const a=new Audio();AU.el=a;AU.id=id;a.preload="auto";a.src=audioSrc(c.url);
   a.ontimeupdate=auDraw;a.onplay=auDraw;a.onpause=auDraw;a.onended=()=>{a.currentTime=0;auDraw()};a.onloadedmetadata=auDraw;a.onerror=()=>auErr();a.play().catch(()=>{});auDraw()}
 function auErr(){const c=S.items.find(i=>i.id===AU.id);AU.id=null;auDraw();
-  toast(DKEY()?"Ses çalınamadı. Drive'da dosyayı 'Bağlantıya sahip olan herkes' ile paylaş.":"Ses çalınamadı. Dosyayı 'Bağlantıya sahip olan herkes' ile paylaş; büyük dosyalar için Ayarlar'dan Drive anahtarı eklenmeli.",c?{label:"Drive'da aç",fn:()=>window.open(c.url,"_blank")}:null,true)}
+  toast(DKEY()?"Ses çalınamadı. Drive'da dosyayı 'Bağlantıya sahip olan herkes' ile paylaş.":"Ses çalınamadı. Dosyayı 'Bağlantıya sahip olan herkes' ile paylaş; çok büyük dosyalar Drive anahtarı olmadan çalmayabilir.",c?{label:"Drive'da aç",fn:()=>window.open(c.url,"_blank")}:null,true)}
 function auDraw(){document.querySelectorAll("[data-au]").forEach(w=>{const on=w.dataset.au===AU.id&&AU.el;const a=AU.el;
   const p=w.querySelector("[data-aplay]");if(p)p.classList.toggle("on",!!(on&&!a.paused));
   const bar=w.querySelector(".aubar i");if(bar)bar.style.width=on&&a.duration?(a.currentTime/a.duration*100)+"%":"0%";
