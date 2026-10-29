@@ -896,7 +896,7 @@ body.frameless .app{padding-top:8px}
   <div class="wcard">
     <div class="wclogo" id="wcLogo"></div>
     <h2 id="wcT">Hoş geldin</h2>
-    <p class="small">Ekip hesabınla giriş yaparsan ortak projeler, sohbet ve sesli oda açılır. Hesapsız da her şey bu bilgisayarda çalışır.</p>
+    <p class="small" id="wcLead"></p>
     <form class="acform" id="wcForm" autocomplete="on">
       <input class="field" id="wcEmail" type="email" placeholder="e-posta" autocomplete="email" aria-label="E-posta">
       <input class="field" id="wcPass" type="password" placeholder="şifre" autocomplete="current-password" aria-label="Şifre">
@@ -905,7 +905,7 @@ body.frameless .app{padding-top:8px}
     </form>
     <div class="wcor"><span>ya da</span></div>
     <button class="btn" id="wcGuest">Hesapsız devam et</button>
-    <span class="small wcnote">Projelerin bu bilgisayarda kalır. Sonra istediğin zaman sağ üstteki hesap simgesinden giriş yapabilirsin. Davet edildiysen hesabını orada “Hesap oluştur” ile açarsın.</span>
+    <span class="small wcnote" id="wcNote"></span>
   </div>
 </div>
 <div class="pop" id="acctPop" hidden role="dialog" aria-label="Hesap">
@@ -1014,7 +1014,7 @@ const isCloud=pid=>!!pid&&CL.pids.has(pid);
 const KIND_IC={local:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M3 3.8A.8.8 0 013.8 3h6.9L13 5.3v6.9a.8.8 0 01-.8.8H3.8a.8.8 0 01-.8-.8z"/><path d="M5.5 3v2.6h4V3M5 13V9.6h6V13"/></svg>',
   cloud:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M4.6 12.5h6.8a2.8 2.8 0 00.4-5.57 3.8 3.8 0 00-7.3-.8A3.2 3.2 0 004.6 12.5z"/></svg>',
   shared:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="5.8" cy="5.6" r="2.2"/><circle cx="11" cy="6.4" r="1.7"/><path d="M1.8 13c.5-2.1 2-3.3 4-3.3s3.5 1.2 4 3.3M10.2 9.7c1.7 0 3 1 3.6 3"/></svg>'};
-const KIND_TX={local:"Yerel · bu bilgisayarda dosya",cloud:"Bulut · sadece sen, tüm cihazlarında",shared:"Ortak · ekiple düzenleniyor"};
+const KIND_TX={get local(){return S.mode==="cloud"?"Yerel · bu tarayıcıda":"Yerel · bu bilgisayarda dosya"},cloud:"Bulut · sadece sen, tüm cihazlarında",shared:"Ortak · ekiple düzenleniyor"};
 const projKind=pid=>isShared(pid)?"shared":isCloud(pid)?"cloud":"local";
 function kindIcon(pid){if(!cloudAvail())return "";const k=projKind(pid);return `<span class="pkind ${k}" title="${KIND_TX[k]}">${KIND_IC[k]}</span>`}
 const isShared=pid=>isCloud(pid)&&(CL.mc.get(pid)||1)>1;/* başka üye ya da bekleyen davet var */
@@ -1153,18 +1153,18 @@ $("tabs").addEventListener("click",e=>{
   const t=e.target.closest("[data-go]");if(t)go(t.dataset.go);
 });
 /* yeni proje: bulut varsa önce tür sorulur (yerel / bulut / ortak) */
-const projKinds=()=>!cloudAvail()?["local"]:S.mode==="cloud"?["cloud","shared"]:["local","cloud","shared"];
+const projKinds=()=>!cloudAvail()?["local"]:["local","cloud","shared"];
 function newProject(){if(!api)return;closePops();const ks=projKinds();if(ks.length<2){createProject(ks[0]);return}
   const last=ks.includes(LS.get("npLast",""))?LS.get("npLast",""):ks[0];
   $("npOpts").innerHTML=ks.map((k,i)=>`<button class="npo${k===last?" last":""}" data-np="${k}"><span class="npi ${k}">${KIND_IC[k]}</span><b>${{local:"Yerel",cloud:"Bulut",shared:"Ortak"}[k]}</b>
-    <span class="small">${{local:"Bu bilgisayarda .workshop dosyası. İnternet gerekmez.",cloud:"Sadece sen. PC, iPad ve web'de eşitlenir.",shared:"Ekiple birlikte düzenlenir. Oluşturunca davet edersin."}[k]}</span><kbd>${i+1}</kbd></button>`).join("");
+    <span class="small">${{local:S.mode==="cloud"?"Bu tarayıcıda saklanır. Hesap ve internet gerekmez.":"Bu bilgisayarda .workshop dosyası. İnternet gerekmez.",cloud:"Sadece sen. PC, iPad ve web'de eşitlenir.",shared:"Ekiple birlikte düzenlenir. Oluşturunca davet edersin."}[k]}</span><kbd>${i+1}</kbd></button>`).join("");
   $("npMsg").textContent=!CL.me?"Bulut ve ortak projeler için hesabına giriş yapman gerekir.":"";
   animShow($("npk"));setTimeout(()=>{const b=$("npOpts").querySelector(".last");if(b)b.focus()},60)}
 function closeNP(){animHide($("npk"))}
 async function createProject(kind){closeNP();
   if(kind!=="local"&&!CL.me){toast("Bulut ve ortak projeler için önce hesabına giriş yap",null,true);openAcct();return}
   LS.set("npLast",kind);const d={type:"project",name:"Yeni proje",created:Date.now()};
-  const ref=await run(kind==="local"?api.add(d):cNewProject(d));
+  const ref=await run(kind==="local"?(CL.base||api).add(d):cNewProject(d));
   if(!ref)return;S.fresh.add(ref.id);setTimeout(()=>S.fresh.delete(ref.id),10000);S.sub[ref.id]=kind==="shared"?"hub":"tasks";go(ref.id);
   if(kind==="shared"){CL.mc.set(ref.id,1);renameAfterShare=ref.id;setTimeout(()=>openShare(ref.id),250)}else{S.renaming="project";renderHead()}}
 $("npOpts").addEventListener("click",e=>{const b=e.target.closest("[data-np]");if(b)createProject(b.dataset.np)});
@@ -1301,7 +1301,7 @@ function weekBlock(){
       const pn=id=>{const p=projects().find(x=>x.id===id);return p?p.name||"Proje":""};
       return `<div class="fnl"><span class="small">Odak notları</span>${ns.map(f=>`<div><b title="${esc(f.note)}">${esc(f.note)}</b><span class="small">${esc([pn(f.project),fmtMin(f.mins||0)].filter(Boolean).join(" · "))}</span></div>`).join("")}</div>`})()}</div>`;
 }
-function renderHome(){renderHome0();drawHere();presTrack();if(S.mode==="cloud"&&!CL.me)$("vHome").insertAdjacentHTML("afterbegin",`<div class="cbanner"><span>${WLOCK}<span class="small" style="display:block;margin-top:6px">Ortak projelerini görmek ve yeni proje açmak için ekip hesabınla giriş yap.</span></span><button class="btn primary" data-acct>Giriş yap</button></div>`)}
+function renderHome(){renderHome0();drawHere();presTrack();if(S.mode==="cloud"&&!CL.me&&LS.get("welcome","")!=="guest"&&$("welcome").hidden)$("vHome").insertAdjacentHTML("afterbegin",`<div class="cbanner"><span>${WLOCK}<span class="small" style="display:block;margin-top:6px">Ortak projelerini görmek ve yeni proje açmak için ekip hesabınla giriş yap.</span></span><button class="btn primary" data-acct>Giriş yap</button></div>`)}
 function renderHome0(){
   const ps=projects();const all=S.items.filter(i=>i.type==="task");
   const cardsHtml=ps.map(p=>{
@@ -3041,8 +3041,17 @@ async function cBoot(){if(CL.sb||!window.supabase)return;
   drawAcct()}
 
 /* --- web sürümü (uygulama ve claude.ai dışı): yalnızca bulut --- */
-async function cloudOnly(){S.mode="cloud";S.items=LS.get("wloose",[]);S.loaded=true;api=lsApi();assets=null;
-  setSync("ok","Workshop web");renderAll();await cBoot();flushFocus()}
+/* web sürümünde hesapsız (yerel) projelerin görselleri: tarayıcının IndexedDB'si */
+function idbOpen(){return new Promise((ok,no)=>{const r=indexedDB.open("ws-local",1);r.onupgradeneeded=()=>r.result.createObjectStore("blobs");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function idbAssets(){let db=null;try{db=await idbOpen()}catch(_){return null}
+  const tx=(m,f)=>new Promise((ok,no)=>{const t=db.transaction("blobs",m);const st=t.objectStore("blobs");const r=f(st);t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>no(t.error)});
+  /* var olanları önceden yükle */
+  try{await new Promise(ok=>{const t=db.transaction("blobs");const c=t.objectStore("blobs").openCursor();c.onsuccess=()=>{const k=c.result;if(!k)return ok();if(!BLOB.has(k.key))BLOB.set(k.key,URL.createObjectURL(k.value));k.continue()};c.onerror=()=>ok()})}catch(_){}
+  return {upload:async f=>{const id=fid()+fid();await tx("readwrite",st=>st.put(f,id));BLOB.set(id,URL.createObjectURL(f));return {id,url:null,sizeBytes:f.size,contentType:f.type}},
+    list:async()=>({assets:[],usage:{files:0,bytes:0,maxFiles:0,maxBytes:1}}),
+    delete:async id=>{await tx("readwrite",st=>st.delete(id)).catch(()=>{});const u=BLOB.get(id);if(u)URL.revokeObjectURL(u);BLOB.delete(id);return {deleted:true}}}}
+async function cloudOnly(){S.mode="cloud";S.items=LS.get("wloose",[]);S.loaded=true;api=lsApi();assets=await idbAssets();
+  setSync("ok","Workshop web");renderAll();await cBoot();flushFocus();maybeWelcome()}
 async function cNewProject(d){
   if(!CL.me){toast("Proje oluşturmak için önce giriş yap",null,true);openAcct();return null}
   const v=Object.assign(JSON.parse(JSON.stringify(d)),{id:fid()});
@@ -3117,8 +3126,11 @@ async function acct(kind){const email=$("acEmail").value.trim(),password=$("acPa
 /* --- masaüstü: ilk açılışta giriş ekranı (hesapla çevrimiçi, ya da hesapsız çevrimdışı) --- */
 async function maybeWelcome(){if(!CL.sb||LS.get("welcome",""))return;
   try{const {data}=await CL.sb.auth.getSession();if(data&&data.session){LS.set("welcome","acct");return}}catch(_){}
-  $("wcLogo").innerHTML=WLOCK;const w=$("welcome");w.hidden=false;requestAnimationFrame(()=>w.classList.add("on"));setTimeout(()=>$("wcEmail").focus(),250)}
-function closeWelcome(v){LS.set("welcome",v);const w=$("welcome");w.classList.remove("on");setTimeout(()=>w.hidden=true,260)}
+  $("wcLogo").innerHTML=WLOCK;const here=S.mode==="cloud"?"bu tarayıcıda":"bu bilgisayarda";
+  $("wcLead").textContent=`Ekip hesabınla giriş yaparsan ortak projeler, sohbet ve sesli oda açılır. Hesapsız da her şey ${here} çalışır.`;
+  $("wcNote").textContent=`Projelerin ${here} kalır. Sonra istediğin zaman sağ üstteki hesap simgesinden giriş yapabilirsin. Davet edildiysen hesabını orada “Hesap oluştur” ile açarsın.`;
+  const w=$("welcome");w.hidden=false;requestAnimationFrame(()=>w.classList.add("on"));setTimeout(()=>$("wcEmail").focus(),250)}
+function closeWelcome(v){LS.set("welcome",v);const w=$("welcome");w.classList.remove("on");setTimeout(()=>{w.hidden=true;if(S.view==="home")renderHome()},260)}
 $("wcForm").addEventListener("submit",async e=>{e.preventDefault();const email=$("wcEmail").value.trim(),password=$("wcPass").value;const m=$("wcMsg");
   if(!email||!password){m.textContent="E-posta ve şifre gerekli";return}m.textContent="Giriş yapılıyor…";$("wcIn").disabled=true;
   try{const r=await CL.sb.auth.signInWithPassword({email,password});if(r.error){m.textContent=AUTH_TR(r.error.message||"");return}
