@@ -518,6 +518,14 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
   background:var(--ink);color:var(--accent-ink);font-size:13px;font-weight:500;z-index:60;box-shadow:0 12px 30px -10px rgb(0 0 0 / .7);max-width:calc(100% - 32px)}
 .toast button{border:0;background:var(--accent-ink);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
+/* çerçevesiz pencere (Windows): kendi pencere düğmeleri */
+.wctl{display:flex;gap:2px;margin-left:4px}
+.wctl button{width:34px;height:30px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2);background:transparent;border:0;transition:background .12s,color .12s,transform .25s cubic-bezier(.34,1.56,.64,1)}
+.wctl button:hover{background:var(--glass);color:var(--ink)}
+.wctl button:active{transform:scale(.88)}
+.wctl button.cls:hover{background:#c42b1c;color:#fff}
+.wctl svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round}
+body.frameless .app{padding-top:8px}
 @media (prefers-reduced-motion:no-preference){.tab,.check,.pill,.tool,.st,.pcard{transition:background .12s,border-color .12s,color .12s}}
 </style>
 
@@ -533,6 +541,11 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
       <button class="ibtn" id="skBtn" title="Ara (Ctrl+K)" aria-label="Ara"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg></button>
       <button class="ibtn" id="cfgBtn" aria-expanded="false" aria-controls="cfgPop" title="Ayarlar" aria-label="Ayarlar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.6M8 12.6v1.6M14.2 8h-1.6M3.4 8H1.8M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7L3.6 3.6"/></svg></button>
       <span class="sync" id="sync" title="bağlanıyor"></span>
+      <div class="wctl" id="wctl" hidden>
+        <button id="wMin" title="Simge durumuna küçült" aria-label="Küçült"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
+        <button id="wMax" title="Ekranı kapla / küçült" aria-label="Büyüt"><svg viewBox="0 0 12 12"><rect x="2.3" y="2.3" width="7.4" height="7.4" rx="1.2"/></svg></button>
+        <button id="wClose" class="cls" title="Kapat" aria-label="Kapat"><svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+      </div>
     </div>
   </div>
 
@@ -736,7 +749,8 @@ const SYNC_IC={
   pend:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 2.5a5.5 5.5 0 105.5 5.5"/></svg>',
   off:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 12.5h6.8a2.8 2.8 0 00.4-5.57 3.8 3.8 0 00-7.3-.8A3.2 3.2 0 004.6 12.5z"/><path d="M2.5 2.5l11 11"/></svg>',
   err:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="5.8"/><path d="M8 5v3.4M8 10.8v.1"/></svg>',
-  demo:'<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>'
+  demo:'<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>',
+  disk:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M3 3.8A.8.8 0 013.8 3h6.9L13 5.3v6.9a.8.8 0 01-.8.8H3.8a.8.8 0 01-.8-.8z"/><path d="M5.5 3v2.6h4V3M5 13V9.6h6V13"/></svg>'
 };
 const SYNC_TXT={ok:["eşitlendi","Bulutla eşitlendi: tüm değişiklikler kaydedildi"],pend:["kaydediliyor","Değişiklikler buluta kaydediliyor"],
   off:["çevrimdışı","Bağlantı yok: değişiklikler bağlantı gelince eşitlenecek"],err:["kaydedilemedi","Son değişiklik kaydedilemedi, tekrar dene"],demo:["önizleme","Önizleme modu: değişiklikler kaydedilmiyor"]};
@@ -758,7 +772,8 @@ function syncBadge(pid){
   if(S.mode==="file"){const f=FS.files.get(pid);tip=st==="ok"?"Kaydedildi: "+(f?f.path:""):st==="pend"?"Dosyaya kaydediliyor…":tip}const f=SY.flash.get(pid);const age=f?Date.now()-f:1e9;
   const show=false;/* yazı yok: durum ikonun renginden anlaşılır, ayrıntı üzerine gelince */
   const label=show?`<span class="ssl${st==="ok"?" fade":""}"${st==="ok"?` style="animation-delay:-${age}ms"`:""}>${lbl}</span>`:"";
-  return `<span class="sst ${st}" title="${tip}" aria-label="${tip}">${SYNC_IC[st]}${label}</span>`;
+  const ic=S.mode==="file"&&st==="ok"?SYNC_IC.disk:SYNC_IC[st];/* yerel dosyada bulut değil disk */
+  return `<span class="sst ${st}" title="${tip}" aria-label="${tip}">${ic}${label}</span>`;
 }
 addEventListener("online",()=>renderTabs());addEventListener("offline",()=>renderTabs());
 function renderTabs(){
@@ -2094,7 +2109,7 @@ function drawCfg(){drawStorage();drawLib();const on=hqOn();$("hqSw").setAttribut
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
   run(api.set("settings",Object.assign({},c,{type:"settings",hq:v})));drawCfg();toast(v?"Görseller yüksek kalitede eklenecek":"Görseller optimize edilerek eklenecek")};
 const KB=[
-  ["Genel",[["Hızlı arama","Ctrl K"],["Yeni proje","Alt N"],["Kısayolları göster","?"],["Menüyü / seçimi kapat","Esc"]]],
+  ["Genel",[["Hızlı arama","Ctrl K"],...(TA?[["Uygulamayı tam ekran yap / çık","Ctrl F"]]:[]),["Yeni proje","Alt N"],["Kısayolları göster","?"],["Menüyü / seçimi kapat","Esc"]]],
   ["Pano · araçlar",[["Seç / taşı","V"],["Kalem","P"],["Ok","A"],["Dikdörtgen","R"],["Çerçeve","F"],["Silgi","E"]]],
   ["Pano · seçim",[["Kutuyla seç","sürükle"],["Seçime ekle / çıkar","Shift tık"],["Hepsini seç","Ctrl A"],["Seçimi çerçevele","Ctrl G"],["Sil","Delete"],["Kopyasını oluştur","Ctrl D"],["Geri al","Ctrl Z"],["Yinele","Ctrl Shift Z"],["Kilitle / kilidi aç","L"]]],
   ["Pano · görünüm",[["Panoyu tam ekran yap / çık","Ctrl Space"],["Kaydır","Space sürükle"],["Kaydır","orta tuş sürükle"],["Kaydır","tekerlek"],["Yakınlaş / uzaklaş","Ctrl tekerlek"],["Sürükleyerek zoom","Ctrl orta tuş sürükle"]]],
@@ -2266,6 +2281,22 @@ async function fileMode(){
   win.onCloseRequested(async ev=>{if(closing)return;const pending=[...FS.files.values()].some(f=>f.dirty||f.saving||f.timer);
     if(!pending)return;ev.preventDefault();closing=true;toast("Kaydediliyor…");try{await flushAll()}catch(_){}await win.destroy()});
 }
+/* ---------- çerçevesiz pencere: sürükleme, düğmeler, Ctrl+F tam ekran ---------- */
+function winChrome(){
+  const w=TA.window.getCurrentWindow(),win=/Windows/i.test(navigator.userAgent);
+  const fs=async()=>{const on=!(await w.isFullscreen());await w.setFullscreen(on);syncMax()};
+  const syncMax=async()=>{try{const m=await w.isMaximized()||await w.isFullscreen();$("wMax").innerHTML=m
+    ?'<svg viewBox="0 0 12 12"><rect x="2.3" y="3.7" width="6" height="6" rx="1"/><path d="M4.3 3.7V3a.8.8 0 01.8-.8h4a.8.8 0 01.8.8v4a.8.8 0 01-.8.8h-.8"/></svg>'
+    :'<svg viewBox="0 0 12 12"><rect x="2.3" y="2.3" width="7.4" height="7.4" rx="1.2"/></svg>'}catch(_){}};
+  document.addEventListener("keydown",e=>{if(((e.ctrlKey||e.metaKey)&&e.code==="KeyF"&&!e.shiftKey&&!e.altKey)||e.code==="F11"){e.preventDefault();fs()}});
+  if(!win)return;/* macOS kendi çubuğunu kullanır */
+  document.body.classList.add("frameless");$("wctl").hidden=false;
+  for(const el of [document.querySelector(".app"),document.querySelector(".topbar"),$("tabs"),document.querySelector(".topbar .right")])el.setAttribute("data-tauri-drag-region","");
+  $("wMin").onclick=()=>w.minimize();
+  $("wMax").onclick=async()=>{if(await w.isFullscreen())await w.setFullscreen(false);else await w.toggleMaximize();syncMax()};
+  $("wClose").onclick=()=>w.close();
+  w.onResized(()=>syncMax());syncMax();
+}
 /* ---------- kendi kendini güncelleme (GitHub sürümleri, imzalı) ---------- */
 let UPD=null;
 function drawUpd(){$("updBtn").hidden=!UPD;if(UPD)$("updBtn").title=`Workshop ${UPD.version} hazır · tıkla, indirip kursun`}
@@ -2346,7 +2377,7 @@ function rerender(){
 renderAll();
 (async()=>{
   const c=window.claude;
-  if(TA){fileMode().catch(e=>{console.error(e);demoMode("Proje klasörü açılamadı: "+(e&&e.message||e))});return}
+  if(TA){try{winChrome()}catch(e){console.error(e)}fileMode().catch(e=>{console.error(e);demoMode("Proje klasörü açılamadı: "+(e&&e.message||e))});return}
   if(!c||!c.use){demoMode("Önizleme: örnek verilerle çalışıyor, kaydedilmiyor");return}
   const [db,user]=await Promise.all([c.use("db"),c.use("user")]);
   const uid=user?await user.id():null;

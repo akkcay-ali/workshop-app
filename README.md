@@ -23,7 +23,9 @@ Güncelleme paketleri imzalıdır; uygulama sadece bu deponun imza anahtarıyla 
   panodaki görseller (`images/`) bulunur; aslında bir zip arşividir.
 - Varsayılan klasör: **Belgeler\Workshop**. Ayarlar → *Proje klasörü* bölümünden değiştirilebilir
   (ör. OneDrive içindeki bir klasör seçilirse dosyalar bulutta da yedeklenir).
-- Değişiklikler otomatik kaydedilir. Sekmedeki bulut ikonu yeşilse dosya güncel, griyse kaydediliyor.
+- Değişiklikler otomatik kaydedilir. Sekmedeki disk ikonu yeşilse dosya güncel, dönen halka kaydediliyor demektir.
+- Windows'ta pencere çerçevesizdir: küçült/büyüt/kapat düğmeleri üst çubuktadır, üst çubuktan sürüklenir.
+  **Ctrl+F** (ya da F11) uygulamayı tam ekran yapar/çıkar.
 - `.workshop` dosyasına çift tıklamak onu Workshop'ta açar. Kütüphane dışındaki dosyalar
   yerinde düzenlenir ve sonraki açılışlarda da listelenir.
 - Silinen projeler Geri Dönüşüm Kutusu'na gider.

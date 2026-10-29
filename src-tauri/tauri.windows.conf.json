@@ -1,0 +1,21 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Workshop",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true,
+        "maximized": true,
+        "decorations": false,
+        "shadow": true,
+        "theme": "Dark",
+        "dragDropEnabled": false,
+        "backgroundColor": "#0D0E10"
+      }
+    ]
+  }
+}
