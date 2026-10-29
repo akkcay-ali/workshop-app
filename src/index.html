@@ -106,7 +106,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
   background:var(--glass);border:1px solid var(--stroke)}
 .tab:hover{color:var(--ink);border-color:var(--stroke-2)}
 .tab[aria-selected="true"]{background:var(--glass-3);color:var(--ink);border-color:var(--stroke-2)}
-.tab.home{padding:6px 12px}
+.tab.home{padding:5px 11px}
 .tab svg{width:14px;height:14px;flex:0 0 auto}
 .sst{display:inline-flex;align-items:center;gap:5px;color:var(--ink-3);margin-left:-2px}
 .sst svg{width:13px;height:13px}
@@ -534,7 +534,7 @@ button:disabled{cursor:var(--cur)}
 
 /* logo */
 .wmark{width:18px;height:16px;flex:0 0 auto}
-.tab.home .wmark{width:16px;height:15px;margin-right:1px}
+.tab.home .wmark{width:21px;height:19px;margin:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}.tab.home:hover .wmark{transform:scale(1.12) rotate(-4deg)}
 :root[data-theme="light"] .wmark{--wm:#3E4A6B}
 .wlock{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:400;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
 .wlock .wmark{width:24px;height:22px}.wlock.sm{font-size:14px;gap:7px}.wlock.sm .wmark{width:18px;height:16px}
@@ -577,7 +577,27 @@ button:disabled{cursor:var(--cur)}
 .rv{font-size:10.5px;padding:2px 8px;border-radius:6px;background:rgb(13 14 16 / .78);white-space:nowrap}.rv.wait{color:var(--t2)}.rv.ok{color:var(--t5)}.rv.rev{color:#E6A3B4}
 .rv.big{font-size:12px;padding:4px 10px;background:var(--glass-2)}
 .card[data-rv="wait"] .badges span:nth-last-child(1),.card .badges span{transition:none}
-.tvbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px 0}
+.tvbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 22px 0}.tvbar .afbar{margin:0}.tvbar .sp{flex:1}
+.pvb{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:1px 6px;border-radius:5px;border:1px solid var(--stroke);color:var(--ink-3)}
+.pvb.team{border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent)}
+.pvtog{flex:0 0 auto;border:1px solid var(--stroke);background:transparent;color:var(--ink-3);border-radius:999px;padding:0 11px 0 9px;font-size:12px;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.pvtog::before{content:"";width:7px;height:7px;border-radius:50%;border:1.5px solid currentColor;transition:inherit}
+.pvtog[aria-pressed="true"]{color:var(--ink);border-color:var(--stroke-2);background:var(--glass-2)}
+.pvtog[aria-pressed="true"]::before{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
+.pvtog:active{transform:scale(.94)}
+/* Merkez takvimi: iki hafta */
+.hcbar{display:flex;align-items:center;gap:6px;margin-left:auto}
+.hcal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.hcd{min-height:84px;border:1px solid var(--stroke);border-radius:10px;background:var(--field);padding:6px;display:flex;flex-direction:column;gap:3px;min-width:0;overflow:hidden;cursor:var(--cur-pt);transition:border-color .15s}
+.hcd:hover{border-color:var(--stroke-2)}.hcd.past{opacity:.5}.hcd.is-today{border-color:var(--accent)}
+.hcd .n{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);display:flex;gap:5px}.hcd .n b{font-weight:400;color:var(--ink-2)}.hcd.is-today .n,.hcd.is-today .n b{color:var(--accent)}
+.hct,.hcm{display:flex;align-items:center;gap:5px;border:0;background:none;padding:1px 0;color:var(--ink-2);font-size:11.5px;text-align:left;min-width:0;line-height:1.3}
+.hct>span:first-child,.hcm>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.hct .av{width:15px;height:15px;font-size:8px;flex:0 0 auto}.hct.done{color:var(--ink-3);text-decoration:line-through}.hct:hover,.hcm:hover{color:var(--ink)}
+.hcm{color:#E4C485;font-weight:500}.hcm::before{content:"";width:7px;height:7px;transform:rotate(45deg);background:currentColor;border-radius:1px;flex:0 0 auto}
+.hcd .more{font-family:var(--f-mono);font-size:10px;color:var(--ink-3)}
+.cell .cms2{font-size:11px;color:#E4C485;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){.hcal{grid-template-columns:repeat(7,minmax(38px,1fr));overflow-x:auto}.hcd{min-height:56px}.hct,.hcm{font-size:0;gap:0}.hct .av{width:12px;height:12px}}
 .seg{display:inline-flex;gap:2px;background:var(--glass);border:1px solid var(--stroke);border-radius:10px;padding:3px}
 .seg button{border:0;background:transparent;color:var(--ink-2);border-radius:7px;padding:6px 11px;font-size:12.5px;transition:background .15s,color .15s}
 .seg button[aria-pressed="true"]{background:var(--glass-3);color:var(--ink)}.seg.sm button{padding:4px 10px;font-size:12px}
@@ -1006,13 +1026,16 @@ function boards(pid){
 }
 const boardIds=pid=>new Set(boards(pid).map(b=>b.id));
 const tasksOf=pid=>S.items.filter(i=>i.type==="task"&&projOf(i)===pid);
+/* ortak projede: özel görev (yalnızca sahibi görür, veritabanı RLS) ve ekip görevi */
+const teamOf=pid=>tasksOf(pid).filter(t=>!t.private);
+const isMineT=t=>!!t.private||t.assignee===CL.me;
 const REFK=["image","note","link","audio"];
 function cardsOfProject(pid){const ids=boardIds(pid);return S.items.filter(i=>i.type==="card"&&REFK.includes(i.kind)&&ids.has(i.board))}
 const cards=b=>S.items.filter(i=>i.type==="card"&&i.kind!=="draw"&&i.board===b);
 const inks=b=>S.items.filter(i=>i.type==="card"&&i.kind==="draw"&&i.board===b);
 const imgSrc=c=>(c.assetId&&BLOB.get(c.assetId))||c.assetUrl||(c.assetId&&S.mode!=="file"&&S.mode!=="cloud"?"/_blob/"+c.assetId:"")||c.localUrl||c.extUrl||"";
 const curP=()=>S.view==="home"?null:S.view;
-const subOf=pid=>{const s=S.sub[pid];if(s==="hub"&&!isShared(pid))return "tasks";return s||(isShared(pid)?"hub":"tasks")};
+const subOf=pid=>{const s=S.sub[pid];if((s==="hub"||s==="team")&&!isShared(pid))return "tasks";return s||(isShared(pid)?"hub":"tasks")};
 const curBoard=()=>{const s=subOf(curP());return s.startsWith("b:")?s.slice(2):null};
 const boardVisible=()=>curP()&&curBoard();
 
@@ -1073,7 +1096,7 @@ addEventListener("online",()=>renderTabs());addEventListener("offline",()=>rende
 function renderTabs(){
   const ps=projects();
   if(S.loaded){const ok=id=>S.fresh.has(id)||ps.some(p=>p.id===id);S.open=S.open.filter(ok);if(S.view!=="home"&&!ok(S.view))S.view="home"}
-  let h=`<button class="tab home" role="tab" data-go="home" aria-selected="${S.view==="home"}">${ICON.home}Ana sayfa</button>`;
+  let h=`<button class="tab home" role="tab" data-go="home" aria-selected="${S.view==="home"}" aria-label="Ana sayfa" title="Ana sayfa">${ICON.home}</button>`;
   h+=S.open.map(id=>{const p=ps.find(x=>x.id===id)||{name:"…"};return `<button class="tab" role="tab" data-go="${esc(id)}" aria-selected="${S.view===id}">${ICON.proj}${esc(p.name||"Proje")}${syncBadge(id)}<span class="x" data-close="${esc(id)}" aria-label="Sekmeyi kapat">×</span></button>`}).join("");
   h+=`<button class="tab add" data-newp title="Yeni proje (Alt+N)">+</button>`;
   $("tabs").innerHTML=h;
@@ -1152,10 +1175,10 @@ function taskRow(t,o={}){
   return `<div class="task${t.done?" done":""}">
     <button class="check" role="checkbox" aria-checked="${!!t.done}" data-toggle="${t.id}" aria-label="Tamamlandı"></button>
     <div>${isShared(projOf(t))?`<button class="tt ttb" data-topen="${t.id}">${esc(t.title)}</button>`:`<div class="tt">${esc(t.title)}</div>`}
-      <div class="meta">${isShared(projOf(t))?asgBtn(t)+(statusOf(t)==="doing"||statusOf(t)==="review"?stPill(statusOf(t)):"")+(commentsOf(t.id).length?`<span class="fmin">${CM_IC}${commentsOf(t.id).length}</span>`:""):""}${t.time?`<span class="time">${esc(t.time)}</span>`:""}${late&&o.showLate?`<span class="late">${parse(t.date).getDate()} ${MSH[parse(t.date).getMonth()]}</span>`:""}${tagH(t.tag)}${t.rep?`<span class="fmin">↻ ${REP[t.rep]||""}</span>`:""}${t.focus||TM.task===t.id?`<span class="fmin${TM.task===t.id?" on":""}">${TM.task===t.id?"odakta":""}${t.focus&&TM.task===t.id?" · ":""}${t.focus?fmtMin(t.focus):""}</span>`:""}${o.home?"":refThumbs(t)}</div></div>
+      <div class="meta">${isShared(projOf(t))&&t.private?`<span class="pvb">özel</span>`:isShared(projOf(t))?(o.mine?`<span class="pvb team">ekip</span>`:"")+asgBtn(t)+(statusOf(t)==="doing"||statusOf(t)==="review"?stPill(statusOf(t)):"")+(commentsOf(t.id).length?`<span class="fmin">${CM_IC}${commentsOf(t.id).length}</span>`:""):""}${t.time?`<span class="time">${esc(t.time)}</span>`:""}${late&&o.showLate?`<span class="late">${parse(t.date).getDate()} ${MSH[parse(t.date).getMonth()]}</span>`:""}${tagH(t.tag)}${t.rep?`<span class="fmin">↻ ${REP[t.rep]||""}</span>`:""}${t.focus||TM.task===t.id?`<span class="fmin${TM.task===t.id?" on":""}">${TM.task===t.id?"odakta":""}${t.focus&&TM.task===t.id?" · ":""}${t.focus?fmtMin(t.focus):""}</span>`:""}${o.home?"":refThumbs(t)}</div></div>
     <div class="acts">${o.pull?`<button class="mini" data-move="${t.id}" data-to="${S.sel}">${S.sel===TODAY?"bugüne al":"bu güne al"}</button>`:""}
       ${!o.pull&&!o.home&&!t.done?`<button class="mini" data-move="${t.id}" data-to="${ymd(addDays(parse(t.date||S.sel),1))}">yarına</button>`:""}
-      ${!t.done&&TM.task!==t.id?`<button class="mini" data-focus="${t.id}">odak</button>`:""}${o.home?"":`<button class="mini" data-rep="${t.id}">tekrar</button>`}${o.home?"":`<button class="mini" data-refpick="${t.id}">referans</button>`}<button class="mini danger" data-tdel="${t.id}">sil</button></div></div>`;
+      ${!t.done&&TM.task!==t.id?`<button class="mini" data-focus="${t.id}">odak</button>`:""}${t.private&&isShared(projOf(t))&&!o.home?`<button class="mini" data-toteam="${t.id}" title="Ekip görevine çevir; herkes görür, sana atanır">ekibe aç →</button>`:""}${o.home?"":`<button class="mini" data-rep="${t.id}">tekrar</button>`}${o.home?"":`<button class="mini" data-refpick="${t.id}">referans</button>`}<button class="mini danger" data-tdel="${t.id}">sil</button></div></div>`;
 }
 function refMini(c,cls){
   if(c.kind==="image")return `<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`;
@@ -1195,7 +1218,7 @@ function nextDate(rep,from){let d=parse(from||TODAY);
 function spawnNext(t){const nd=nextDate(t.rep,t.date);const pid=projOf(t);
   if(S.items.some(i=>i.type==="task"&&projOf(i)===pid&&i.title===t.title&&i.date===nd))return;
   const doc={type:"task",project:t.project||undefined,title:t.title,time:t.time||"",tag:t.tag||"",date:nd,done:false,rep:t.rep,created:Date.now()};
-  if(t.refs&&t.refs.length)doc.refs=t.refs.slice();if(!doc.project)delete doc.project;
+  if(t.refs&&t.refs.length)doc.refs=t.refs.slice();if(!doc.project)delete doc.project;if(t.private)doc.private=true;if(t.assignee)doc.assignee=t.assignee;if(t.milestone)doc.milestone=t.milestone;
   run(api.add(doc));const d=parse(nd);toast(`Sonraki: ${d.getDate()} ${MSH[d.getMonth()]} ${DSH[d.getDay()]}`);
 }
 const sortTasks=(a,b)=>(a.done-b.done)||((a.time||"99").localeCompare(b.time||"99"))||((a.created||0)-(b.created||0));
@@ -1205,6 +1228,7 @@ document.addEventListener("click",e=>{
   const rp=e.target.closest("[data-rep]");if(rp){const t=S.items.find(i=>i.id===rp.dataset.rep);if(!t)return;const r=rp.getBoundingClientRect();
     openCtx(r.left,r.bottom+4,"Tekrar",[["","Tekrar yok"],["daily","Her gün"],["weekdays","Hafta içi her gün"],["weekly","Her hafta"]].map(([v,l])=>({label:((t.rep||"")===v?"✓ ":"")+l,fn:()=>{run(api.update(t.id,{rep:v||null,date:t.date||(v?TODAY:"")}));if(v)toast(l+" tekrarlanacak · tamamlayınca sonraki oluşur")}})));return}
   const mv=e.target.closest("[data-move]");if(mv){run(api.update(mv.dataset.move,{date:mv.dataset.to}));return}
+  const tt=e.target.closest("[data-toteam]");if(tt){const t=S.items.find(i=>i.id===tt.dataset.toteam);if(t){run(api.update(t.id,{private:false,assignee:t.assignee||CL.me}));toast("Ekibe açıldı · sana atandı",null,true)}return}
   const del=e.target.closest("[data-tdel]");if(del){
     if(del.dataset.armed!=="1"){del.dataset.armed="1";del.textContent="emin misin?";setTimeout(()=>{if(del.isConnected){del.dataset.armed="";del.textContent="sil"}},3000);return}
     const t=S.items.find(i=>i.id===del.dataset.tdel);if(t){const {id,...data}=t;run(api.remove(id));toast("Görev silindi",{fn:()=>run(api.set(id,data))})}}
@@ -1324,11 +1348,11 @@ function renderHead(){
   const pid=curP();const p=proj(pid)||{name:"…"};const s=subOf(pid);
   const bs=boards(pid);
   let name=S.renaming==="project"?`<input class="pname-in" id="pnameIn" maxlength="60" value="${esc(p.name||"")}" aria-label="Proje adı">`:`<button class="pname" id="pname" title="Yeniden adlandırmak için tıkla">${esc(p.name||"Proje")}</button>`;
-  let st=(isShared(pid)?`<button class="st" data-sub="hub" aria-selected="${s==="hub"}">Merkez</button>`:"")+`<button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevler</button>`;
+  let st=isShared(pid)?`<button class="st" data-sub="hub" aria-selected="${s==="hub"}">Merkez</button><button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevlerim</button><button class="st" data-sub="team" aria-selected="${s==="team"}">Ekip</button>`:`<button class="st" data-sub="tasks" aria-selected="${s==="tasks"}">Görevler</button>`;
   st+=bs.map(b=>`<button class="st" data-sub="b:${esc(b.id)}" aria-selected="${s==="b:"+b.id}">${esc(b.name||"Pano")}</button>`).join("");
   st+=`<button class="st plus" data-newb title="Yeni pano">+ pano</button><button class="st" data-sub="cal" aria-selected="${s==="cal"}">Takvim</button>`;
   let right="";
-  if(s==="tasks"){const ts=tasksOf(pid);
+  if(s==="tasks"){const ts=isShared(pid)?tasksOf(pid).filter(isMineT):tasksOf(pid);
     right=`<button class="arrow" data-wk="-1" aria-label="Önceki hafta">‹</button>`;
     for(let i=0;i<7;i++){const d=addDays(S.week,i),k=ymd(d);const has=ts.some(t=>t.date===k&&!t.done);
       right+=`<button class="wk${k===TODAY?" is-today":""}" data-day="${k}" aria-pressed="${k===S.sel}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}"><span class="d">${DSH[d.getDay()]}</span><span class="n">${d.getDate()}</span><span class="c${has?" on":""}"></span></button>`}
@@ -1363,15 +1387,15 @@ addEventListener("resize",()=>{if(curP())placeInd(curP())});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(curP()){S.ind=null;placeInd(curP())}});
 function renderSub(){
   const s=subOf(curP());const key=curP()+":"+s;
-  if(S.shownSub!==key){S.shownSub=key;const el=s==="hub"?$("sHub"):s==="tasks"?$("sTasks"):s==="cal"?$("sCal"):$("sBoard");
+  if(S.shownSub!==key){S.shownSub=key;const el=s==="hub"?$("sHub"):s==="tasks"||s==="team"?$("sTasks"):s==="cal"?$("sCal"):$("sBoard");
     requestAnimationFrame(()=>{el.classList.remove("enter");void el.offsetWidth;el.classList.add("enter");el.addEventListener("animationend",()=>el.classList.remove("enter"),{once:true})})}
-  $("sHub").hidden=s!=="hub";$("sTasks").hidden=s!=="tasks";$("sCal").hidden=s!=="cal";$("sBoard").hidden=!s.startsWith("b:");
-  if(s==="hub")renderHub();else if(s==="tasks")renderTasks();else if(s==="cal")renderCal();else renderBoard();drawChatBadge();
+  $("sHub").hidden=s!=="hub";$("sTasks").hidden=s!=="tasks"&&s!=="team";$("sCal").hidden=s!=="cal";$("sBoard").hidden=!s.startsWith("b:");
+  if(s==="hub")renderHub();else if(s==="tasks")renderTasks();else if(s==="team")renderTeam();else if(s==="cal")renderCal();else renderBoard();drawChatBadge();
 }
 
 /* tasks */
 function renderTasks(){
-  const pid=curP();const sd=parse(S.sel);const shared=isShared(pid);const all=tasksOf(pid).filter(t=>!shared||asgPass(t));
+  const pid=curP();const sd=parse(S.sel);const shared=isShared(pid);const all=shared?tasksOf(pid).filter(isMineT):tasksOf(pid);const ro=shared?{mine:true}:{};
   const day=all.filter(t=>t.date===S.sel).sort(sortTasks);const done=day.filter(t=>t.done).length;
   const late=all.filter(t=>!t.done&&t.date&&t.date<TODAY).sort((a,b)=>a.date.localeCompare(b.date));
   const later=all.filter(t=>!t.date&&!t.done).sort((a,b)=>(a.created||0)-(b.created||0));
@@ -1381,29 +1405,34 @@ function renderTasks(){
     <div class="col"><div class="block">
       <div class="bhead"><div class="dayh"><span class="d">${rel}</span><span class="count">${sd.getDate()} ${MONTHS[sd.getMonth()]}</span></div><span class="count">${day.length?done+"/"+day.length+" tamam":""}</span></div>
       ${day.length?`<div class="progress"><i style="width:${Math.round(done/day.length*100)}%"></i></div>`:""}
-      <form class="add" data-add="day" autocomplete="off"><input id="dayIn" placeholder="Görev ekle…" maxlength="200" aria-label="Görev ekle"><button class="btn" type="submit">Ekle</button></form>
-      <div class="hint">Saat ve etiket yazabilirsin: <code>14:30 Işık pass #sahne</code></div>${shared?asgBar(pid):""}
-      <div class="list">${day.length?day.map(t=>taskRow(t)).join(""):`<div class="empty">Bu gün için görev yok.</div>`}</div>
+      <form class="add" data-add="day" autocomplete="off"><input id="dayIn" placeholder="${shared&&!privOn()?"Ekip görevi ekle (sana atanır)…":"Görev ekle…"}" maxlength="200" aria-label="Görev ekle">${shared?privTog():""}<button class="btn" type="submit">Ekle</button></form>
+      <div class="hint">${shared?(privOn()?"Özel görevlerini yalnızca sen görürsün. ":"Ekip görevini projedeki herkes görür. "):""}Saat ve etiket yazabilirsin: <code>14:30 Işık pass #sahne</code></div>
+      <div class="list">${day.length?day.map(t=>taskRow(t,ro)).join(""):`<div class="empty">Bu gün için görev yok.</div>`}</div>
     </div></div>
     <div class="col">
-      ${late.length?`<div class="block"><div class="bhead"><h2>Gecikenler</h2><span class="count">${late.length}</span></div><div class="list">${late.map(t=>taskRow(t,{pull:true,showLate:true})).join("")}</div></div>`:""}
+      ${late.length?`<div class="block"><div class="bhead"><h2>Gecikenler</h2><span class="count">${late.length}</span></div><div class="list">${late.map(t=>taskRow(t,{...ro,pull:true,showLate:true})).join("")}</div></div>`:""}
       <div class="block"><div class="bhead"><h2>Sonra</h2><span class="count">${later.length||""}</span></div>
         <form class="add" data-add="later" autocomplete="off"><input id="laterIn" placeholder="Tarihsiz bir iş bırak…" maxlength="200" aria-label="Sonraya ekle"><button class="btn" type="submit">Ekle</button></form>
-        <div class="list">${later.length?later.map(t=>taskRow(t,{pull:true})).join(""):`<div class="empty">Günü belli olmayan işler burada bekler.</div>`}</div></div>
+        <div class="list">${later.length?later.map(t=>taskRow(t,{...ro,pull:true})).join(""):`<div class="empty">Günü belli olmayan işler burada bekler.</div>`}</div></div>
       <div class="block"><div class="bhead"><h2>Son referanslar</h2></div>
         ${refs.length?`<div class="thumbs">${refs.map(c=>c.kind==="image"?`<button class="thumb" data-goto="${c.id}" aria-label="Panoda aç"><img src="${esc(imgSrc(c))}" alt="" loading="lazy"></button>`
           :`<button class="thumb note" data-goto="${c.id}">${esc((c.text||"").slice(0,90))}</button>`).join("")}</div>`:`<div class="empty">Panoya eklediğin son görseller ve notlar burada görünür.</div>`}</div>
     </div></div></div>`;
-  if(shared){const tv=(S.tv&&S.tv[pid])||"list";$("sTasks").insertAdjacentHTML("afterbegin",`<div class="tvbar"><div class="seg sm"><button data-tv="list" aria-pressed="${tv==="list"}">Liste</button><button data-tv="kanban" aria-pressed="${tv==="kanban"}">Kanban</button></div>${tv==="kanban"?asgBar(pid):""}</div>`);
-    if(tv==="kanban"){$("sTasks").querySelector(".desk").outerHTML=kanbanHtml(pid)}}
 }
+/* Ekip: tüm ekip görevleri Kanban'da (özel görevler burada yok) */
+function renderTeam(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";renderSub();return}
+  $("sTasks").innerHTML=`<div class="tvbar">${asgBar(pid)}<span class="sp"></span><span class="small">Özel görevler burada görünmez</span></div>${kanbanHtml(pid)}`}
+const privOn=()=>S.privAdd!==false; /* her açılışta "Yalnızca ben" açık başlar */
+const privTog=()=>`<button type="button" class="pvtog" data-privtog aria-pressed="${privOn()}" title="Açıkken görevi yalnızca sen görürsün">Yalnızca ben</button>`;
+document.addEventListener("click",e=>{if(e.target.closest("[data-privtog]")){S.privAdd=!privOn();const v=$("dayIn")&&$("dayIn").value;renderTasks();if(v!=null&&$("dayIn")){$("dayIn").value=v;$("dayIn").focus()}}});
 $("sTasks").addEventListener("submit",e=>{
   e.preventDefault();if(!api)return;const f=e.target;const inp=f.querySelector("input");if(!inp.value.trim())return;
   const p=parseTask(inp.value);
-  const af=isShared(curP())?asgF(curP()):"all";const asg=af==="me"?CL.me:af!=="all"&&af!=="none"?af:null;
-  const msx=f.dataset.add==="kan"&&S.msf?{milestone:S.msf}:{};
-  run(api.add(Object.assign({type:"task",project:curP(),title:p.title,time:p.time,tag:p.tag,date:f.dataset.add==="day"?S.sel:"",done:false,status:"todo",created:Date.now()},asg?{assignee:asg}:{},msx)));
-  const id=inp.id;inp.value="";setTimeout(()=>{const el=$(id);if(el)el.focus()},0);
+const sh=isShared(curP()),kan=f.dataset.add==="kan";let x={};
+  if(sh&&kan){const af=asgF(curP());const asg=af==="me"?CL.me:af!=="all"&&af!=="none"?af:null;if(asg)x.assignee=asg;if(S.msf)x.milestone=S.msf}
+  else if(sh){if(privOn())x.private=true;else x.assignee=CL.me}
+  const id=inp.id;inp.value="";
+  run(api.add(Object.assign({type:"task",project:curP(),title:p.title,time:p.time,tag:p.tag,date:f.dataset.add==="day"?S.sel:"",done:false,status:"todo",created:Date.now()},x)));setTimeout(()=>{const el=$(id);if(el)el.focus()},0);
 });
 $("sTasks").addEventListener("click",e=>{
   const g=e.target.closest("[data-goto]");if(g){const c=S.items.find(i=>i.id===g.dataset.goto);if(c){S.sub[curP()]="b:"+c.board;save();S.selSet=new Set([c.id]);renderProject();centerOn(c)}}
@@ -1411,10 +1440,10 @@ $("sTasks").addEventListener("click",e=>{
 
 /* calendar */
 function renderCal(){
-  const first=new Date(S.cy,S.cm,1);const start=monday(first);const all=tasksOf(curP());let g="";
+  const first=new Date(S.cy,S.cm,1);const start=monday(first);const all=tasksOf(curP());const msOn=isShared(curP());let g="";
   for(let i=0;i<42;i++){const d=addDays(start,i);if(i===35&&d.getMonth()!==S.cm)break;const k=ymd(d);const ts=all.filter(t=>t.date===k).sort(sortTasks);
     g+=`<button class="cell${d.getMonth()!==S.cm?" out":""}${k===TODAY?" is-today":""}" data-cday="${k}" aria-label="${d.getDate()} ${MONTHS[d.getMonth()]}, ${ts.length} görev">
-      <span class="n">${d.getDate()}</span>${ts.slice(0,3).map(t=>`<span class="ct${t.done?" done":""}">${t.time?esc(t.time)+" ":""}${esc(t.title)}</span>`).join("")}${ts.length>3?`<span class="more">+${ts.length-3}</span>`:""}</button>`}
+      <span class="n">${d.getDate()}</span>${msOn?milestones(curP()).filter(m=>m.date===k).map(m=>`<span class="cms2">◆ ${esc(m.name||"Hedef")}</span>`).join(""):""}${ts.slice(0,3).map(t=>`<span class="ct${t.done?" done":""}">${t.time?esc(t.time)+" ":""}${esc(t.title)}</span>`).join("")}${ts.length>3?`<span class="more">+${ts.length-3}</span>`:""}</button>`}
   $("sCal").innerHTML=`<div class="scroll"><div class="calhead"><div class="dayh"><span class="d">${MONTHS[S.cm]} ${S.cy}</span></div>
     <div class="row"><button class="arrow" data-cm="-1" aria-label="Önceki ay">‹</button><button class="arrow" data-cm="0">bugün</button><button class="arrow" data-cm="1" aria-label="Sonraki ay">›</button></div></div>
     <div class="dow"><span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span></div><div class="grid">${g}</div>
@@ -2770,7 +2799,7 @@ const saveOut=()=>LS.set("cl_out",[...CL.out.values()]);
 
 /* --- gönderim kuyruğu --- */
 function cPush(v,pid,del){const id=v.id;
-  CL.out.set(id,{id,project_id:pid,data:Object.assign(strip(v),{_cl:CLIENT}),deleted:!!del});saveOut();
+  CL.out.set(id,{id,project_id:pid,data:Object.assign(strip(v),{_cl:CLIENT}),deleted:!!del,private_to:v.private?CL.me:null});saveOut();
   clearTimeout(CL.timers.get(id));CL.timers.set(id,setTimeout(()=>{CL.timers.delete(id);cFlush()},del?0:350));
   if(!del)CL.items.set(id,v);else CL.items.delete(id);cCacheSave();renderTabs()}
 let cFlushing=false;
@@ -3046,7 +3075,7 @@ function presTrack(force){if(!CL.me)return;const pid=curP();const w=pid?subOf(pi
   for(const [p,ch] of CL.pres){try{if(p===pid||p===V.pid)ch.track({w:p===pid?w:"",n:pname(CL.me),t:Date.now(),v:V.pid===p,m:V.pid===p&&V.muted,s:V.pid===p&&!!V.screen});else ch.untrack()}catch(_){}}}
 function drawHere(){
   const pid=curP();const box=$("hereBox");
-  if(box&&pid){const l=CL.here.get(pid)||[];box.innerHTML=l.filter(h=>h.w||h.v).map(h=>`<span class="hp${h.v?" inv":""}" title="${esc(pname(h.u))} · ${esc(h.v?"sesli odada":h.w==="hub"?"Merkez":h.w==="tasks"?"Görevler":h.w==="cal"?"Takvim":"panoda")}">${avatar(h.u)}</span>`).join("");
+  if(box&&pid){const l=CL.here.get(pid)||[];box.innerHTML=l.filter(h=>h.w||h.v).map(h=>`<span class="hp${h.v?" inv":""}" title="${esc(pname(h.u))} · ${esc(h.v?"sesli odada":h.w==="hub"?"Merkez":h.w==="tasks"?"Görevlerim":h.w==="team"?"Ekip":h.w==="cal"?"Takvim":"panoda")}">${avatar(h.u)}</span>`).join("");
     document.querySelectorAll(".subtabs .st .hd").forEach(x=>x.remove());
     for(const h of l){const st=document.querySelector(`.subtabs .st[data-sub="${CSS.escape(h.w||"")}"]`);if(st)st.insertAdjacentHTML("beforeend",`<span class="hd" style="--c:${pcol(h.u)}" title="${esc(pname(h.u))}"></span>`)}}
   document.querySelectorAll(".pcard[data-go]").forEach(c=>{const l=CL.here.get(c.dataset.go)||[];const ph=c.querySelector(".phere");if(ph)ph.innerHTML=l.slice(0,4).map(h=>avatar(h.u)).join("")})}
@@ -3090,7 +3119,7 @@ const dShort=d=>{const x=parse(d);return x.getDate()+" "+MSH[x.getMonth()]};
 
 /* ---------- MERKEZ görünümü ---------- */
 function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";renderSub();return}
-  const all=tasksOf(pid);const mine=all.filter(t=>t.assignee===CL.me&&statusOf(t)!=="done").sort((a,b)=>STS.findIndex(s=>s[0]===statusOf(b))-STS.findIndex(s=>s[0]===statusOf(a))||(a.date||"9").localeCompare(b.date||"9"));
+  const all=teamOf(pid);const mine=all.filter(t=>t.assignee===CL.me&&statusOf(t)!=="done").sort((a,b)=>STS.findIndex(s=>s[0]===statusOf(b))-STS.findIndex(s=>s[0]===statusOf(a))||(a.date||"9").localeCompare(b.date||"9"));
   const ms=milestones(pid);const next=ms.find(m=>m.date&&m.date>=TODAY)||ms[ms.length-1];
   const prog=m=>{const ts=all.filter(t=>t.milestone===m.id);return {n:ts.length,d:ts.filter(t=>t.done).length,r:ts.filter(t=>statusOf(t)==="review").length}};
   let msH;if(next){const p=prog(next),dd=next.date?daysTo(next.date):null;
@@ -3113,27 +3142,40 @@ function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";rend
     <section class="block hb span2 fixh"><div class="bhead"><h2>İş akışı</h2><button class="mini" data-kanban>Panoyu aç →</button></div>
       ${asgBar(pid)}<div class="mkgrid">${STS.map(s=>col(s[0])).join("")}</div></section>
     <section class="block hb fixh"><div class="bhead"><h2>Son hareketler</h2></div><div class="actlist" id="actList"></div></section>
+    ${hubCal(pid)}
     <section class="block hb span3"><div class="bhead"><h2>Referanslar</h2><span class="count">${wait?wait+" onay bekliyor":""}</span></div>
       ${refs.length?`<div class="hrefs">${refs.map(c=>`<button class="href" data-copen="${esc(c.id)}">${c.kind==="audio"?`<span class="hau">${AU_IC}<span>${esc(c.text||"Ses")}</span></span>`:`<img src="${esc(imgSrc(c))}" alt="" loading="lazy">`}${rvChip(c)}${commentsOf(c.id).length?`<span class="hcc">${commentsOf(c.id).length}</span>`:""}</button>`).join("")}</div>`
         :`<div class="empty">Panolara görsel ya da ses eklendikçe burada görünür.</div>`}</section>
   </div>${chatBlock(pid)}</div></div>`;
   fitBrief();drawAct(pid);loadAct(pid);drawVoice();if(CL.msgs.has(pid))drawChat(pid);else loadMsgs(pid)}
 $("sHub").addEventListener("click",e=>{const pid=curP();
+  const hw=e.target.closest("[data-hw]");if(hw){S.hw=S.hw||{};S.hw[pid]=+hw.dataset.hw?(S.hw[pid]||0)+ +hw.dataset.hw:0;renderHub();return}
+  const hd=e.target.closest("[data-hcal],[data-hday]");if(hd&&!e.target.closest("[data-topen],[data-ms]")){const k=hd.dataset.hday;if(k){const d=parse(k);S.cy=d.getFullYear();S.cm=d.getMonth()}S.sub[pid]="cal";save();renderProject();return}
   if(e.target.closest("[data-msadd]")){const f=$("msForm");f.hidden=!f.hidden;if(!f.hidden)f.n.focus();return}
-  if(e.target.closest("[data-kanban]")){S.sub[pid]="tasks";S.tv=S.tv||{};S.tv[pid]="kanban";save();renderProject();return}
+  if(e.target.closest("[data-kanban]")){S.sub[pid]="team";save();renderProject();return}
   const m=e.target.closest("[data-ms]");if(m){msMenu(m.dataset.ms,e.clientX,e.clientY);return}
   const c=e.target.closest("[data-copen]");if(c){openDrawer(c.dataset.copen);return}});
 $("sHub").addEventListener("submit",e=>{if(e.target.id!=="msForm")return;e.preventDefault();const f=e.target;const n=f.n.value.trim();if(!n)return;
   run(api.add({type:"milestone",project:curP(),name:n,date:f.d.value||"",created:Date.now()}));toast("Kilometre taşı eklendi",null,true)});
 function msMenu(id,x,y){const m=S.items.find(i=>i.id===id);if(!m)return;
-  openCtx(x,y,m.name||"Hedef",[{label:"Bu hedefin görevleri",fn:()=>{const pid=curP();S.sub[pid]="tasks";S.tv=S.tv||{};S.tv[pid]="kanban";S.msf=id;save();renderProject()}},
+  openCtx(x,y,m.name||"Hedef",[{label:"Bu hedefin görevleri",fn:()=>{const pid=curP();S.sub[pid]="team";S.msf=id;save();renderProject()}},
     {label:"Adını değiştir",fn:()=>{const n=prompt("Kilometre taşı adı",m.name||"");if(n&&n.trim())run(api.update(id,{name:n.trim()}))}},
     {label:"Tarihi değiştir",fn:()=>{const d=prompt("Tarih (YYYY-AA-GG)",m.date||"");if(d!==null&&(!d||/^\d{4}-\d\d-\d\d$/.test(d)))run(api.update(id,{date:d}))}},"-",
     {label:"Sil",danger:true,confirm:"Emin misin? Görevler kalır",fn:()=>{S.items.filter(t=>t.milestone===id).forEach(t=>run(api.update(t.id,{milestone:null})));run(api.remove(id))}}])}
 
-/* ---------- Kanban (Görevler sekmesi, ortak projeler) ---------- */
+function hubCal(pid){const off=(S.hw&&S.hw[pid])||0;const start=addDays(monday(now),off*7);const ts=teamOf(pid),ms=milestones(pid);let g="";
+  for(let i=0;i<14;i++){const d=addDays(start,i),k=ymd(d);const m=ms.filter(x=>x.date===k);const l=ts.filter(t=>t.date===k).sort(sortTasks);const room=Math.max(0,3-m.length);
+    g+=`<div class="hcd${k===TODAY?" is-today":""}${k<TODAY?" past":""}" data-hday="${k}"><span class="n"><b>${DSH[d.getDay()]}</b>${d.getDate()}${d.getDate()===1||i===0?" "+MSH[d.getMonth()]:""}</span>
+      ${m.map(x=>`<button class="hcm" data-ms="${esc(x.id)}" title="${esc(x.name||"Hedef")}"><span>${esc(x.name||"Hedef")}</span></button>`).join("")}
+      ${l.slice(0,room).map(t=>`<button class="hct${t.done?" done":""}" data-topen="${esc(t.id)}" title="${esc(t.title)}"><span>${esc(t.title)}</span>${t.assignee?avatar(t.assignee):""}</button>`).join("")}${l.length>room?`<span class="more">+${l.length-room}</span>`:""}</div>`}
+  const e=addDays(start,13);
+  return `<section class="block hb span3"><div class="bhead"><h2>Takvim</h2><span class="count">${start.getDate()} ${MSH[start.getMonth()]} – ${e.getDate()} ${MSH[e.getMonth()]}</span>
+    <div class="hcbar"><button class="arrow" data-hw="-1" aria-label="Önceki hafta">‹</button><button class="mini" data-hw="0">bugün</button><button class="arrow" data-hw="1" aria-label="Sonraki hafta">›</button><button class="mini" data-hcal>Takvimi aç →</button></div></div>
+    <div class="hcal">${g}</div></section>`}
+
+/* ---------- Kanban (Ekip sekmesi, ortak projeler) ---------- */
 function kanbanHtml(pid){const msf=S.msf&&milestones(pid).find(m=>m.id===S.msf);
-  const ts=tasksOf(pid).filter(t=>asgPass(t)&&(!msf||t.milestone===msf.id));
+  const ts=teamOf(pid).filter(t=>asgPass(t)&&(!msf||t.milestone===msf.id));
   return `${msf?`<div class="msfbar">Hedef: <b>${esc(msf.name)}</b> <button class="mini" data-msclear>filtreyi kaldır</button></div>`:""}<div class="kb">${STS.map(([st,nm])=>{const l=ts.filter(t=>statusOf(t)===st).sort((a,b)=>(a.order||a.created||0)-(b.order||b.created||0));
     return `<div class="kcol" data-kst="${st}"><div class="mkh ${st}"><span>${nm}</span><span class="mono">${l.length}</span></div>
       ${st==="todo"?`<form class="add kadd" data-add="kan" autocomplete="off"><input id="kanIn" placeholder="Görev ekle…" maxlength="200"></form>`:""}
@@ -3150,7 +3192,7 @@ document.addEventListener("drop",e=>{if(!kdrag)return;const col=e.target.closest
 let drId=null;
 function openDrawer(id){const it=S.items.find(i=>i.id===id);if(!it)return;drId=id;drawDrawer();animShow($("drw"));setTimeout(()=>{const i=$("cmIn");if(i)i.focus()},80)}
 function closeDrawer(){animHide($("drw"));drId=null;$("mentionBox").hidden=true}
-function drawDrawer(){const it=S.items.find(i=>i.id===drId);if(!it){if(drId)closeDrawer();return}const pid=itemProject(it);const sh=isShared(pid);const D=$("drwBody");
+function drawDrawer(){const it=S.items.find(i=>i.id===drId);if(!it){if(drId)closeDrawer();return}const pid=itemProject(it);const sh=isShared(pid)&&!it.private;const D=$("drwBody");
   const keep=document.activeElement&&document.activeElement.id==="cmIn"?$("cmIn").value:null;
   let head="";
   if(it.type==="task"){const st=statusOf(it);const ms=milestones(pid);

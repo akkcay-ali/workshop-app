@@ -37,6 +37,9 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Bağlantı "perfect negotiation" (iki taraf teklif yapabilir). Ekran paylaşımı: tek paylaşan (presence `s`), kalite `SQ`
   (1080p30/720p30/720p60/Düşük, `vQ`), izleyici penceresi `#scr`. Ses/üst çubuk: kulaklık düğmesi `#voiceBtn` + `#voicePop`.
   TURN: edge function `turn-ice` (anahtarlar `CF_TURN_KEY_ID`, `CF_TURN_TOKEN`: function secret ya da Vault → `public.turn_secrets()`; yoksa yalnızca STUN). macOS mikrofon izni `src-tauri/Info.plist`.
+- Görevler (ortak projede): sekmeler Merkez · Görevlerim (`tasks`: özel + bana atanan) · Ekip (`team`: Kanban, özel hariç) · panolar · Takvim.
+  Özel görev = `data.private` + satırda `items.private_to` (RLS: yalnızca sahibi okur/yazar; akış ve bildirim tetikleyicileri atlar).
+  "Ekibe aç" özel görevi ekip görevine çevirir ve bana atar. Merkez'de iki haftalık takvim (`hubCal`, kilometre taşları + ekip görevleri).
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 
 ## Derleme
