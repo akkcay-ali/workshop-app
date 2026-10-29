@@ -709,7 +709,8 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vshare.on .vsh svg{color:#E6A3B4}.vshare .btn.danger{background:#c42b1c;border-color:#c42b1c;color:#fff}.vq{align-self:flex-start}.vq button{padding:4px 8px;font-size:11px}
 .vcb.sharing::after{content:"";position:absolute;left:5px;top:5px;width:7px;height:7px;border-radius:50%;background:#E6604F;box-shadow:0 0 0 2px var(--bar,#111)}
 .scr{position:fixed;right:20px;bottom:20px;z-index:58;width:min(460px,calc(100vw - 40px));border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--stroke-2);box-shadow:0 24px 50px -18px rgb(0 0 0 / .8);display:flex;flex-direction:column;transition:width .35s cubic-bezier(.34,1.3,.64,1)}
-.scr.big{width:min(72vw,1280px)}
+.scr.big{width:min(72vw,1280px)}.scrq{font-family:var(--f-mono);font-size:10.5px;color:rgb(255 255 255 / .55);margin-left:8px;white-space:nowrap}
+.vsq{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);margin-top:2px}.vsq:empty{display:none}
 .scrh{display:flex;align-items:center;gap:8px;padding:7px 8px 7px 12px;background:var(--surface);font-size:12px;color:var(--ink-2);cursor:grab;user-select:none}.scrh:active{cursor:grabbing}
 .scrh .dot{width:7px;height:7px;border-radius:50%;background:#E6604F}.scrh .sp{flex:1}
 .scrh button{width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--ink-2);display:grid;place-items:center;font-size:16px}.scrh button:hover{background:var(--glass-2);color:var(--ink)}.scrh svg{width:14px;height:14px}
@@ -947,7 +948,7 @@ body.frameless .app{padding-top:8px}
 
 <aside class="drw" id="drw" hidden aria-label="Ayrıntılar"><button class="btn drx" id="drwClose">Kapat <kbd>Esc</kbd></button><div class="drb" id="drwBody"></div></aside>
 <div class="mbox" id="mentionBox" hidden></div>
-<div class="scr" id="scr" hidden><div class="scrh" id="scrH"><span class="dot"></span><span id="scrT"></span><span class="sp"></span>
+<div class="scr" id="scr" hidden><div class="scrh" id="scrH"><span class="dot"></span><span id="scrT"></span><span class="scrq" id="scrQ"></span><span class="sp"></span>
   <button data-scrsize title="Büyüt / küçült" aria-label="Büyüt / küçült"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5l-4.5 4.5M2.5 13.5L7 9"/></svg></button>
   <button data-scrfs title="Tam ekran" aria-label="Tam ekran"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
   <button data-scrx title="Gizle" aria-label="Gizle">×</button></div><video id="scrV" autoplay playsinline muted></video></div>
@@ -3579,7 +3580,7 @@ function chimeJoin(on){if(!sndOn())return;ensureAudio();if(!actx)return;try{cons
 function peerFor(u){if(!V.pid||u===CL.me)return null;let p=V.peers.get(u);if(p)return p;
   const pc=new RTCPeerConnection({iceServers:V.ice?V.ice.list:STUN});p={pc,u,audio:null,an:null,pend:[],making:false,ignore:false,polite:CL.me>u,video:null,ssnd:null};V.peers.set(u,p);
   V.stream.getTracks().forEach(t=>pc.addTrack(t,V.stream));
-  if(V.screen){p.ssnd=pc.addTrack(V.screen.getVideoTracks()[0],V.screen)}
+  if(V.screen){p.ssnd=pc.addTrack(V.screen.getVideoTracks()[0],V.screen);prefCodec(p)}
   pc.onnegotiationneeded=async()=>{try{p.making=true;await pc.setLocalDescription();rtcSend(u,{k:pc.localDescription.type,sdp:pc.localDescription.sdp})}catch(_){}finally{p.making=false}};
   pc.onsignalingstatechange=()=>{if(pc.signalingState==="stable"&&p.ssnd)applyEnc(p.ssnd)};
   pc.onicecandidate=e=>{if(e.candidate)rtcSend(u,{k:"ice",c:e.candidate.toJSON()})};
@@ -3597,7 +3598,7 @@ async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||p
   if(m.k==="bye"){peerClose(m.from);return}
   try{if(m.k==="offer"||m.k==="answer"){if(!p)p=peerFor(m.from);const pc=p.pc;
       const collision=m.k==="offer"&&(p.making||pc.signalingState!=="stable");p.ignore=!p.polite&&collision;if(p.ignore)return;
-      await pc.setRemoteDescription({type:m.k,sdp:m.sdp});for(const c of p.pend.splice(0))await pc.addIceCandidate(c).catch(()=>{});
+      await pc.setRemoteDescription({type:m.k,sdp:fastStart(m.sdp)});for(const c of p.pend.splice(0))await pc.addIceCandidate(c).catch(()=>{});
       if(m.k==="offer"){await pc.setLocalDescription();rtcSend(m.from,{k:pc.localDescription.type,sdp:pc.localDescription.sdp})}}
     else if(m.k==="ice"&&p){if(p.pc.remoteDescription)await p.pc.addIceCandidate(m.c).catch(()=>{});else p.pend.push(m.c)}}catch(_){}}
 
@@ -3606,7 +3607,7 @@ const SQ={"1080p30":{w:1920,h:1080,f:30,b:4500e3,hint:"detail",l:"1080p · 30"},
   "720p60":{w:1280,h:720,f:60,b:3500e3,hint:"motion",l:"720p · 60"},"low":{w:854,h:480,f:15,b:600e3,hint:"detail",l:"Düşük"}};
 const sq=()=>SQ[LS.get("vQ","1080p30")]||SQ["1080p30"];
 const sharerOf=pid=>V.screen&&V.pid===pid?CL.me:((CL.here.get(pid)||[]).find(h=>h.s&&h.v)||{}).u||null;
-function applyEnc(snd){const q=sq();try{const pr=snd.getParameters();if(!pr.encodings||!pr.encodings.length)return;pr.encodings[0].maxBitrate=q.b;pr.encodings[0].maxFramerate=q.f;
+function applyEnc(snd){const q=sq();try{const pr=snd.getParameters();if(!pr.encodings||!pr.encodings.length)return;pr.encodings[0].maxBitrate=q.b;pr.encodings[0].maxFramerate=q.f;pr.encodings[0].scaleResolutionDownBy=1;pr.encodings[0].priority="high";pr.encodings[0].networkPriority="high";
   pr.degradationPreference=q.hint==="motion"?"maintain-framerate":"maintain-resolution";snd.setParameters(pr).catch(()=>{})}catch(_){}}
 async function shareStart(){if(!V.pid)return;const o=sharerOf(V.pid);if(o&&o!==CL.me){toast(pname(o)+" şu an ekranını paylaşıyor",null,true);return}
   if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast("Bu cihazda ekran paylaşımı desteklenmiyor",null,true);return}
@@ -3614,9 +3615,30 @@ async function shareStart(){if(!V.pid)return;const o=sharerOf(V.pid);if(o&&o!==C
   catch(e){if(e&&e.name!=="NotAllowedError"&&e.name!=="AbortError")toast("Ekran paylaşılamadı: "+((e&&e.message)||e),null,true);return}
   if(!V.pid){st.getTracks().forEach(t=>t.stop());return}
   const tr=st.getVideoTracks()[0];try{tr.contentHint=q.hint}catch(_){}tr.onended=()=>shareStop();V.screen=st;
-  for(const p of V.peers.values()){p.ssnd=p.pc.addTrack(tr,st)}presTrack(true);drawVoice();toast("Ekranını paylaşıyorsun · "+q.l,null,true)}
+  for(const p of V.peers.values()){p.ssnd=p.pc.addTrack(tr,st);prefCodec(p)}presTrack(true);drawVoice();statsLoop();toast("Ekranını paylaşıyorsun · "+q.l,null,true)}
+/* görüntü düşük hızdan yavaş tırmanmasın: karşı tarafın SDP'sine başlangıç hızı ekle (Chromium) */
+function fastStart(sdp){try{const L=sdp.split("\r\n");let vid=false;const out=[];const pts=new Set();
+  for(const l of L){if(l.startsWith("m="))vid=l.startsWith("m=video");const r=vid&&/^a=rtpmap:(\d+) (VP8|VP9|H264|AV1)\/90000/i.exec(l);if(r)pts.add(r[1])}
+  const has=new Set();for(const l of L){const f=/^a=fmtp:(\d+) /.exec(l);if(f&&pts.has(f[1])){has.add(f[1]);out.push(l.includes("x-google-start-bitrate")?l:l+";x-google-start-bitrate=2500");continue}
+    out.push(l);const r=/^a=rtpmap:(\d+) /.exec(l);if(r&&pts.has(r[1])&&!L.some(x=>x.startsWith("a=fmtp:"+r[1]+" ")))out.push("a=fmtp:"+r[1]+" x-google-start-bitrate=2500")}
+  return out.join("\r\n")}catch(_){return sdp}}
+/* ekran içeriği için VP9 (yazı keskin kalır), yoksa H264, en son VP8 */
+function prefCodec(p){try{if(!p.ssnd||!window.RTCRtpReceiver||!RTCRtpReceiver.getCapabilities)return;const t=p.pc.getTransceivers().find(x=>x.sender===p.ssnd);if(!t||!t.setCodecPreferences)return;
+  const cs=RTCRtpReceiver.getCapabilities("video").codecs;const rank=c=>{const m=c.mimeType.toLowerCase();return m==="video/vp9"?0:m==="video/h264"?1:m==="video/vp8"?2:m==="video/av1"?3:4};
+  t.setCodecPreferences(cs.slice().sort((a,b)=>rank(a)-rank(b)))}catch(_){}}
+/* gerçek kalite: izleyicide çözünürlük/fps/hız, paylaşanda sınır nedeni */
+let statT=null;const prevB=new Map();
+function statsLoop(){clearTimeout(statT);if(!V.pid||(!V.screen&&$("scr").hidden))return;statT=setTimeout(async()=>{await readStats();statsLoop()},2000)}
+async function readStats(){const now=Date.now();
+  for(const p of V.peers.values()){let st;try{st=await p.pc.getStats()}catch(_){continue}
+    st.forEach(r=>{if(r.kind!=="video")return;
+      if(r.type==="inbound-rtp"&&p.video){const k="in"+p.u,o=prevB.get(k);prevB.set(k,{b:r.bytesReceived,t:now});const mbps=o?((r.bytesReceived-o.b)*8/((now-o.t)/1000)/1e6):0;
+        const el=$("scrQ");if(el)el.textContent=r.frameWidth?`${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} fps · ${mbps.toFixed(1)} Mbps`:""}
+      if(r.type==="outbound-rtp"&&V.screen&&p.ssnd){const k="out"+p.u,o=prevB.get(k);prevB.set(k,{b:r.bytesSent,t:now});const mbps=o?((r.bytesSent-o.b)*8/((now-o.t)/1000)/1e6):0;
+        const why={cpu:"işlemci yetmiyor",bandwidth:"bağlantı yavaş",other:"",none:""}[r.qualityLimitationReason||"none"];
+        V.sstat=r.frameWidth?`${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} fps · ${mbps.toFixed(1)} Mbps${why?" · "+why:""}`:"";const el=$("vsQ");if(el)el.textContent=V.sstat}})}}
 function shareStop(){if(!V.screen)return;const st=V.screen;V.screen=null;st.getTracks().forEach(t=>{t.onended=null;t.stop()});
-  for(const p of V.peers.values())if(p.ssnd){try{p.pc.removeTrack(p.ssnd)}catch(_){}p.ssnd=null}presTrack(true);drawVoice()}
+  for(const p of V.peers.values())if(p.ssnd){try{p.pc.removeTrack(p.ssnd)}catch(_){}p.ssnd=null}V.sstat="";presTrack(true);drawVoice()}
 async function setQuality(k){if(!SQ[k])return;LS.set("vQ",k);if(V.screen){const q=sq(),tr=V.screen.getVideoTracks()[0];
     try{tr.contentHint=q.hint;await tr.applyConstraints({width:{ideal:q.w},height:{ideal:q.h},frameRate:{ideal:q.f,max:q.f}})}catch(_){}
     for(const p of V.peers.values())if(p.ssnd)applyEnc(p.ssnd);toast("Kalite: "+q.l,null,true)}drawVoice()}
@@ -3624,7 +3646,7 @@ async function setQuality(k){if(!SQ[k])return;LS.set("vQ",k);if(V.screen){const 
 function drawScreen(){const w=$("scr");let src=null,who=null;for(const p of V.peers.values())if(p.video&&p.video.getVideoTracks().some(t=>t.readyState==="live"&&!t.muted)){src=p.video;who=p.u;break}
   if(!src||S.scrHide){if(!w.hidden)animHide(w);const v=$("scrV");if(!src&&v.srcObject)v.srcObject=null;drawVoice();return}
   const v=$("scrV");if(v.srcObject!==src){v.srcObject=src;v.play().catch(()=>{})}$("scrT").textContent=pname(who)+" ekranını paylaşıyor";
-  if(w.hidden)animShow(w);drawVoice()}
+  if(w.hidden){if(LS.get("scrBig",true))w.classList.add("big");animShow(w);statsLoop()}drawVoice()}
 /* odadaki kişiler değişince bağlan / kopar */
 function voiceSync(pid){if(V.pid!==pid)return;const inn=new Set(voiceIn(pid));for(const u of inn)if(u!==CL.me&&!V.peers.has(u))peerFor(u);
   /* presence'ta görünmeyen kişiyi yalnızca bağlantısı da kopmuşsa kapat (çıkış "bye" ile gelir) */
@@ -3662,7 +3684,7 @@ function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(is
         <span class="vavs">${inn.map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join("")}</span><button class="btn sm primary" data-vjoinp="${esc(p)}">Katıl</button></div>`}).join("")}</div>`}}
 function shareBlock(){const o=sharerOf(V.pid),k=LS.get("vQ","1080p30");
   const seg=`<div class="seg sm vq" role="group" aria-label="Kalite">${Object.entries(SQ).map(([id,q])=>`<button data-vq="${id}" aria-pressed="${id===k}">${q.l}</button>`).join("")}</div>`;
-  if(o===CL.me)return `<div class="vshare on"><div class="vsh">${SCR_IC}<span><b>Ekranını paylaşıyorsun</b></span><span class="sp"></span><button class="btn sm danger" data-sstop>Durdur</button></div>${seg}</div>`;
+  if(o===CL.me)return `<div class="vshare on"><div class="vsh">${SCR_IC}<span><b>Ekranını paylaşıyorsun</b><span class="vsq" id="vsQ">${esc(V.sstat||"")}</span></span><span class="sp"></span><button class="btn sm danger" data-sstop>Durdur</button></div>${seg}</div>`;
   if(o)return `<div class="vshare"><div class="vsh">${SCR_IC}<span><b>${esc(pname(o))}</b> ekranını paylaşıyor</span><span class="sp"></span>${S.scrHide?`<button class="btn sm" data-swatch>İzle</button>`:""}</div></div>`;
   return `<div class="vshare"><div class="vsh">${SCR_IC}<span>Ekran paylaşımı</span><span class="sp"></span><button class="btn sm primary" data-sstart>Paylaş</button></div>${seg}</div>`}
 const SCR_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.8" y="2.5" width="12.4" height="8.5" rx="1.5"/><path d="M5.5 14h5M8 11v3"/></svg>';
@@ -3679,7 +3701,7 @@ document.addEventListener("click",e=>{
   const vq=e.target.closest("[data-vq]");if(vq){setQuality(vq.dataset.vq);return}
   if(e.target.closest("[data-swatch]")){S.scrHide=false;closePops();drawScreen();return}
   if(e.target.closest("[data-scrx]")){S.scrHide=true;drawScreen();toast("Paylaşım gizlendi · kulaklık menüsünden yeniden izleyebilirsin",null,true);return}
-  if(e.target.closest("[data-scrsize]")){$("scr").classList.toggle("big");return}
+  if(e.target.closest("[data-scrsize]")){LS.set("scrBig",$("scr").classList.toggle("big"));return}
   if(e.target.closest("[data-scrfs]")){const v=$("scrV");(v.requestFullscreen?v.requestFullscreen():Promise.reject()).catch(()=>{$("scr").classList.add("big")});return}
   if(e.target.closest("[data-vleave]")){voiceLeave();return}
   if(e.target.closest("[data-vmute]")){voiceMute();return}
