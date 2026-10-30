@@ -353,6 +353,8 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 .card.sel{outline:2px solid var(--accent);outline-offset:3px}
 .card.k-image{background:var(--glass-2);border:1px solid var(--stroke);overflow:hidden;box-shadow:0 14px 34px -14px rgb(0 0 0 / .7)}
 .card.k-image img{display:block;width:100%;height:auto;pointer-events:none}
+.card.k-text{width:max-content!important;background:none;border:0;padding:0 3px;color:var(--ink);font-family:var(--f-display);font-weight:500;line-height:1.12;letter-spacing:-.015em;white-space:pre}
+.card.k-text .txt{min-width:.5em;outline:none}.card.k-text .txt:empty::before{content:"Yazı";color:var(--ink-3)}.card.k-text .rs{right:-6px;bottom:-6px}
 .card.k-note{background:var(--paper);color:var(--paper-ink);padding:14px 16px 16px;box-shadow:0 14px 30px -16px rgb(0 0 0 / .8);font-size:15px;line-height:1.45}
 .card .txt{white-space:pre-wrap;overflow-wrap:anywhere;min-height:1.4em;outline:none}
 .card.k-note .txt:empty::before{content:"Not yaz…";color:var(--paper-ink-2)}
@@ -981,6 +983,7 @@ body.frameless .app{padding-top:8px}
             <button class="tool ic" data-tool="erase" aria-pressed="false" title="Silgi (E)" aria-label="Silgi"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M9 2.8l4.2 4.2-6 6H4.4L2.8 11.4a1.4 1.4 0 010-2z"/><path d="M6 5.8l4.2 4.2M7.5 13.5h6"/></svg></button>
             <span class="sep"></span>
             <button class="tool" data-tool="note" title="Not ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2.5h10v8l-3 3H3z"/><path d="M10 13.5v-3h3"/></svg><span class="lbl">Not</span></button>
+            <button class="tool" data-tool="text" title="Yazı ekle · çerçevesiz, büyütülebilir başlık (T)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 3.5h10M8 3.5v9.5M6 13h4"/></svg><span class="lbl">Yazı</span></button>
             <button class="tool" data-tool="image" title="Görsel ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><circle cx="6" cy="6.5" r="1.2"/><path d="M2.5 12l4-4 3 3 2-2 2.5 2.5"/></svg><span class="lbl">Görsel</span></button>
             <button class="tool" data-tool="link" title="Link ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 9.5l3-3"/><path d="M7 4.5l1.2-1.2a2.6 2.6 0 013.7 3.7L10.7 8.2"/><path d="M9 11.5l-1.2 1.2a2.6 2.6 0 01-3.7-3.7L5.3 7.8"/></svg><span class="lbl">Link</span></button>
             <button class="tool" data-tool="rec" title="Sesli not kaydet · tekrar bas, bitir"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5.5" y="1.8" width="5" height="8" rx="2.5"/><path d="M3.2 7.6a4.8 4.8 0 009.6 0M8 12.4v2"/></svg><span class="lbl" id="recL">Ses</span></button>
@@ -1720,11 +1723,12 @@ function syncCards(){
   if(!boardVisible())return;
   const cs=cards(curBoard());const seen=new Set();$("bempty").hidden=cs.length>0||inks(curBoard()).length>0;syncInk();
   for(const c of cs){seen.add(c.id);
-    let el=world.querySelector(`[data-id="${c.id}"]`);
+    let el=world.querySelector(`[data-id="${c.id}"]`);if(el&&!el.classList.contains("k-"+c.kind)){el.remove();el=null}
     if(!el){el=document.createElement("div");el.className="card k-"+c.kind;el.dataset.id=c.id;el.innerHTML=cardHTML(c);world.appendChild(el)}
     if(drag&&(drag.id===c.id||(drag.ids&&drag.ids.has(c.id))))continue;
     el.style.left=c.x+"px";el.style.top=c.y+"px";el.style.width=(c.w||260)+"px";el.style.zIndex=c.kind==="frame"?0:(c.z||1);
     if(c.kind==="frame")el.style.height=(c.h||300)+"px";
+    if(c.kind==="text")el.style.fontSize=(c.fs||72)+"px";
     if(c.kind==="palette"){const key=(c.colors||[]).join();if(el.dataset.k!==key){el.dataset.k=key;
       el.querySelector(".pal").innerHTML=(c.colors||[]).map(h=>`<button class="psw" data-hex="${esc(h)}" style="background:${esc(h)};color:${lum(h)>.55?"#18191C":"#F2F3F5"}" title="Kopyala">${esc(h.toUpperCase())}</button>`).join("")}}
     el.classList.toggle("sel",S.selSet.has(c.id));el.classList.toggle("locked",!!c.locked);
@@ -1814,7 +1818,7 @@ stage.addEventListener("pointerdown",e=>{
   if(id&&!e.shiftKey){const it=S.items.find(i=>i.id===id);if(it&&it.locked)id=null}
   if(id){
     if(card&&t.closest("[data-rs]")){const c=S.items.find(i=>i.id===id);if(!c)return;selOnly(id);card.style.zIndex=maxZ()+1;
-      drag={mode:c.kind==="frame"?"fresize":"resize",id,el:card,sx:e.clientX,sy:e.clientY,w0:c.w||260,h0:c.h||300,moved:false};return}
+      drag={mode:c.kind==="frame"?"fresize":c.kind==="text"?"tresize":"resize",id,el:card,sx:e.clientX,sy:e.clientY,w0:c.kind==="text"?Math.max(20,card.offsetWidth):c.w||260,h0:c.h||300,fs0:c.fs||72,moved:false};return}
     if(e.shiftKey||e.ctrlKey||e.metaKey){selToggle(id);return}
     const wasSel=S.selSet.has(id);if(!wasSel)selOnly(id);
     const sw=t.closest(".psw");drag=startMove(e,wasSel&&S.selSet.size>1?id:null,sw&&!e.shiftKey?sw.dataset.hex:null);return;
@@ -1839,6 +1843,7 @@ stage.addEventListener("pointermove",e=>{
   else if(drag.mode==="move"){drag.dx=dx/z;drag.dy=dy/z;if(drag.moved&&!e.altKey)snapMove(drag,z);else clearGuides();
     for(const o of drag.items){o.el.style.left=(o.x0+drag.dx)+"px";o.el.style.top=(o.y0+drag.dy)+"px"}
     for(const o of drag.ks)o.g.setAttribute("transform",`translate(${drag.dx} ${drag.dy})`)}
+  else if(drag.mode==="tresize"){const k=Math.max(.05,(drag.w0+dx/z)/drag.w0);drag.el.style.fontSize=Math.round(Math.max(10,Math.min(800,drag.fs0*k)))+"px"}
   else if(drag.mode==="fresize"){drag.el.style.width=Math.max(120,drag.w0+dx/z)+"px";drag.el.style.height=Math.max(80,drag.h0+dy/z)+"px"}
   else drag.el.style.width=Math.max(120,Math.min(1400,drag.w0+dx/z))+"px";
 });
@@ -1853,6 +1858,8 @@ function endPointer(e){
     if(Math.abs(e.clientX-d.sx)<24||Math.abs(e.clientY-d.sy)<24){toast("Çerçeve için sürükleyerek bir alan çiz");return}
     const a=toWorld(Math.min(d.sx,e.clientX),Math.min(d.sy,e.clientY)),b=toWorld(Math.max(d.sx,e.clientX),Math.max(d.sy,e.clientY));
     setTool("select");addFrame(a.x,a.y,b.x-a.x,b.y-a.y);return}
+  if(d.mode==="tresize"){if(!d.moved)return;const c=S.items.find(i=>i.id===d.id);const fs=parseInt(d.el.style.fontSize)||d.fs0,w=Math.round(d.el.offsetWidth);
+    undoPatch("Yazı boyutu",[[d.id,{fs:d.fs0,w:c&&c.w}]]);if(c){c.fs=fs;c.w=w}run(api.update(d.id,{fs,w}));return}
   if(d.mode==="fresize"){if(!d.moved)return;const c=S.items.find(i=>i.id===d.id);const w=Math.round(parseFloat(d.el.style.width)),h=Math.round(parseFloat(d.el.style.height));
     undoPatch("Boyut",[[d.id,{w:d.w0,h:d.h0}]]);if(c){c.w=w;c.h=h}run(api.update(d.id,{w,h}));return}
   if(d.mode==="move"){
@@ -1880,7 +1887,7 @@ stage.addEventListener("wheel",e=>{e.preventDefault();const r=stage.getBoundingC
 stage.addEventListener("dblclick",e=>{
   if(S.tool!=="select")return;
   const hit=document.elementFromPoint(e.clientX,e.clientY)||e.target;const card=hit.closest(".card");
-  if(card){const c=S.items.find(i=>i.id===card.dataset.id);if(c&&(c.kind==="note"||c.kind==="link"||c.kind==="audio"||c.kind==="frame"))startEdit(c.id,c.kind==="frame");else if(c&&c.kind==="image")openLB(c.id);return}
+  if(card){const c=S.items.find(i=>i.id===card.dataset.id);if(c&&(c.kind==="note"||c.kind==="text"||c.kind==="link"||c.kind==="audio"||c.kind==="frame"))startEdit(c.id,c.kind==="frame");else if(c&&c.kind==="image")openLB(c.id);return}
   if(!api)return;const p=toWorld(e.clientX,e.clientY);addNote(p.x-110,p.y-30);
 });
 function startEdit(id,all){
@@ -1888,10 +1895,26 @@ function startEdit(id,all){
   el.setAttribute("contenteditable","plaintext-only");if(el.contentEditable!=="plaintext-only")el.setAttribute("contenteditable","true");
   el.focus();const r=document.createRange();r.selectNodeContents(el);if(!all)r.collapse(false);const s=getSelection();s.removeAllRanges();s.addRange(r);
   el.onblur=()=>{el.removeAttribute("contenteditable");el.onblur=null;S.editing=null;const c=S.items.find(i=>i.id===id);if(!c)return;const val=el.innerText.replace(/\n$/,"");
-    if(c.kind==="note"&&!val.trim()){run(api.remove(id));return}
+    if((c.kind==="note"||c.kind==="text")&&!val.trim()){run(api.remove(id));return}
+    if(c.kind==="text"&&val!==(c.text||"")){const cel=world.querySelector(`[data-id="${id}"]`);undoPatch("Yazı",[[id,{text:c.text||""}]]);c.text=val;const w=cel?Math.round(cel.offsetWidth):c.w;c.w=w;run(api.update(id,{text:val,w}));return}
     if(val!==(c.text||"")){undoPatch(c.kind==="frame"?"Çerçeve adı":"Metin",[[id,{text:c.text||""}]]);c.text=val;run(api.update(id,{text:val}))}};
   el.onkeydown=ev=>{if(ev.key==="Escape"||(ev.key==="Enter"&&(ev.metaKey||ev.ctrlKey||el.closest(".k-frame")))){ev.preventDefault();el.blur()}};
 }
+/* çerçevesiz yazı: başlık gibi; köşeden sürükleyince ya da + / − ile büyür küçülür */
+async function addText(x,y,fs){if(!api||!curBoard())return;const ref=await run(api.add({type:"card",board:curBoard(),kind:"text",x:Math.round(x+Math.random()*60-30),y:Math.round(y+Math.random()*60-30),w:320,fs:fs||72,text:"",z:maxZ()+1,created:Date.now()}));
+  if(ref){selOnly(ref.id);setTimeout(()=>startEdit(ref.id),30)}}
+const TSIZES=[["Dev başlık",160],["Başlık",96],["Alt başlık",56],["Büyük",36],["Normal",24],["Küçük",16]];
+function setTextSize(ids,fn){const cs=S.items.filter(i=>ids.includes(i.id)&&i.kind==="text");if(!cs.length)return;undoPatch("Yazı boyutu",cs.map(c=>[c.id,{fs:c.fs||72}]));
+  for(const c of cs){c.fs=Math.round(Math.max(10,Math.min(800,fn(c.fs||72))))}syncCards();
+  requestAnimationFrame(()=>cs.forEach(c=>{const el=world.querySelector(`[data-id="${c.id}"]`);c.w=el?Math.round(el.offsetWidth):c.w;run(api.update(c.id,{fs:c.fs,w:c.w}))}))}
+function textSizeMenu(x,y){const ids=[...S.selSet];const cur=(S.items.find(i=>i.id===ids[0])||{}).fs||72;
+  openCtx(x,y,"Yazı boyutu",[...TSIZES.map(([n,v])=>({label:n+"  ·  "+v,on:cur===v,fn:()=>setTextSize(ids,()=>v)})),"-",{label:"Büyüt  ·  +",fn:()=>setTextSize(ids,f=>f*1.2)},{label:"Küçült  ·  −",fn:()=>setTextSize(ids,f=>f/1.2)}])}
+function convText(c,to){undoPatch("Dönüştür",[[c.id,{kind:c.kind,fs:c.fs,w:c.w}]]);const u=to==="text"?{kind:"text",fs:c.fs||56}:{kind:"note",w:Math.max(200,Math.min(420,c.w||260))};
+  Object.assign(c,u);const el=world.querySelector(`[data-id="${c.id}"]`);if(el)el.remove();run(api.update(c.id,u));syncCards()}
+document.addEventListener("keydown",e=>{if(S.editing||!boardVisible()||e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  if(e.key==="t"||e.key==="T"){if(!api)return;e.preventDefault();const p=centerWorld();addText(p.x-160,p.y-40);return}
+  const ids=[...S.selSet].filter(id=>{const c=S.items.find(i=>i.id===id);return c&&c.kind==="text"});if(!ids.length)return;
+  if(e.key==="+"||e.key==="="){e.preventDefault();setTextSize(ids,f=>f*1.15)}else if(e.key==="-"||e.key==="_"){e.preventDefault();setTextSize(ids,f=>f/1.15)}});
 async function addNote(x,y){
   const ref=await run(api.add({type:"card",board:curBoard(),kind:"note",x:Math.round(x),y:Math.round(y),w:240,text:"",z:maxZ()+1,created:Date.now()}));
   if(ref){undoRemove("Not",[ref.id]);S.selSet=new Set([ref.id]);requestAnimationFrame(()=>{syncCards();startEdit(ref.id)})}
@@ -2027,7 +2050,8 @@ $("tools").addEventListener("click",e=>{
   const tl=t.dataset.tool;
   if(INK_TOOLS.includes(tl)){setTool(tl);return}
   if(tl==="undo"){undo();return}if(tl==="redo"){redo();return}if(tl==="snip"){startSnip();return}if(tl==="rec"){recToggle();return}
-  if(tl==="note"||tl==="image"||tl==="link")setTool("select");
+  if(tl==="note"||tl==="image"||tl==="link"||tl==="text")setTool("select");
+  if(tl==="text"){if(!api)return;const p=centerWorld();addText(p.x-160,p.y-40);return}
   switch(tl){
     case "note":{if(!api)return;const p=centerWorld();addNote(p.x-120+Math.random()*40,p.y-60+Math.random()*40);break}
     case "image":$("fileIn").click();break;
@@ -2172,6 +2196,8 @@ stage.addEventListener("contextmenu",e=>{
   const items=[];
   if(c.kind==="image")items.push({label:"Odak görünümü",fn:()=>openLB(c.id)},{label:c.gray?"Gri tonu kapat  ·  G":"Gri ton  ·  G",fn:()=>toggleImg("gray",[c.id])},{label:c.flip?"Çevirmeyi kapat  ·  H":"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[c.id])},{label:"Renk paleti çıkar",fn:()=>makePalette(c)},{label:"Kompozisyon katmanı"+(c.guide?"  ·  "+GUIDES[c.guide]:"")+"…",fn:()=>guideMenu(c,e.clientX,e.clientY)},{label:"Bu görselden görev…",fn:()=>openRTask(c.id)});
   if(c.kind==="audio"&&c.assetId&&imgSrc(c))items.push({label:"Ses dosyasını indir",fn:()=>{const a=document.createElement("a");a.href=imgSrc(c);a.download=(c.text||"ses-notu").replace(/[\\/:*?"<>|]/g,"-")+"."+(IMG_EXT[(c.mime||"audio/webm")]||"webm");a.click()}});
+  if(c.kind==="text")items.push({label:"Düzenle  ·  çift tık",fn:()=>startEdit(id,true)},{label:"Yazı boyutu  ·  "+(c.fs||72)+" px…",fn:()=>textSizeMenu(e.clientX,e.clientY)},{label:"Not kartına çevir",fn:()=>convText(c,"note")});
+  if(c.kind==="note")items.push({label:"Başlık yazısına çevir",fn:()=>convText(c,"text")});
   if(c.kind==="frame"||c.kind==="note"||c.kind==="link"||c.kind==="audio"||c.kind==="video")items.push({label:c.kind==="frame"?"Yeniden adlandır":c.kind==="audio"||c.kind==="video"?"Adını düzenle":"Düzenle",fn:()=>startEdit(id,c.kind==="frame"||c.kind==="audio"||c.kind==="video")});
   if(c.kind==="image")items.push({label:c.note?"Notu düzenle":"Not ekle",fn:()=>openImgNote(c.id)});
   if(c.kind==="image"&&assets)items.push({label:"Yeni sürüm ekle…",fn:()=>addVersion(c.id)},...verItems(c));
@@ -2185,7 +2211,7 @@ stage.addEventListener("contextmenu",e=>{
   if(S.selSet.size>1)items.push({label:"Seçimi çerçevele  ·  Ctrl+G",fn:frameSelection});
   if(items.length)items.push("-");
   if(!c.locked)items.push({label:S.selSet.size>1?`Seçileni sil (${S.selSet.size})`:(c.kind==="frame"?"Çerçeveyi sil (içindekiler kalır)":"Sil"),danger:true,fn:deleteSelected});
-  openCtx(e.clientX,e.clientY,{image:"Görsel",note:"Not",link:"Link",audio:"Ses",video:"Video",frame:c.text||"Çerçeve",palette:"Palet",draw:"Çizim"}[c.kind]||"",items);
+  openCtx(e.clientX,e.clientY,{image:"Görsel",note:"Not",text:"Yazı",link:"Link",audio:"Ses",video:"Video",frame:c.text||"Çerçeve",palette:"Palet",draw:"Çizim"}[c.kind]||"",items);
 });
 
 /* ---------- kompozisyon katmanı: görselin üstünde geçici kılavuz (karta kaydedilir, ekip de görür) ---------- */
@@ -2354,6 +2380,7 @@ async function renderExport(ids){
         if(c.gray){const o=document.createElement("canvas");o.width=Math.min(iw,Math.round(w*sc*1.5));o.height=Math.round(o.width*ih/iw);const ox=o.getContext("2d");ox.drawImage(im,0,0,o.width,o.height);
           const d=ox.getImageData(0,0,o.width,o.height),a=d.data;for(let i=0;i<a.length;i+=4){const g=a[i]*.2126+a[i+1]*.7152+a[i+2]*.0722;a[i]=a[i+1]=a[i+2]=g}ox.putImageData(d,0,0);src=o}
         if(c.flip){cx.translate(bx*2+w,0);cx.scale(-1,1)}cx.drawImage(src,bx,by,w,h)}}
+    else if(c.kind==="text"){const fs=c.fs||72;cx.fillStyle=tok("--ink");cx.font=`500 ${fs}px ${fd}`;cx.textBaseline="top";String(c.text||"").split("\n").forEach((l,i)=>cx.fillText(l,bx+3,by+i*fs*1.12))}
     else if(c.kind==="note"){rr(cx,bx,by,w,h,10);cx.fillStyle=tok("--paper");cx.fill();cx.clip();cx.fillStyle=tok("--paper-ink");cx.font=`15px ${fb}`;cx.textBaseline="top";
       wrapText(cx,c.text,w-32).forEach((l,i)=>cx.fillText(l,bx+16,by+14+i*21.75))}
     else if(c.kind==="link"||c.kind==="audio"){rr(cx,bx,by,w,h,10);cx.fillStyle="#26282d";cx.fill();cx.strokeStyle="rgba(255,255,255,.16)";cx.lineWidth=1;cx.stroke();cx.clip();cx.textBaseline="top";

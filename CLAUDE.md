@@ -68,6 +68,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Odakta: presence `f` (bitiş zamanı ya da 1 = kronometre) → `.hp.fx`; odaktayken `teamNotify` yalnızca acil (bahsetme, özel mesaj).
 - Paylaş: yerel proje hemen taşınmaz (`shPre`); "Buluta taşı ve davet et" / "Yalnızca buluta taşı" (`shareMove`).
 - Ses cihazları ayarlarda (`drawAud`, LS `vMic`/`vOut`); çan ve ses kartları da `vOut`'a çalar. Yazı tipi sabit: Geist + Unbounded (seçenek kaldırıldı).
+- Yazı kartı `kind:"text"` (çerçevesiz başlık): `fs` px, genişlik içerikten (`max-content`, `w` ölçülüp saklanır); araç çubuğu "Yazı" / T, köşeden sürükle = boyut (`tresize`), seçiliyken +/−, sağ tık `textSizeMenu` (`TSIZES`), `convText` not ↔ yazı.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 - Drive API anahtarı: `public.app_config` (`drive_key`, okuma herkes, yazma `set_app_config` yalnızca proje sahibi), istemcide LS `dkey`; varsa Drive ses/video `googleapis.com/drive/v3/files/<id>?alt=media&key=` ile akış (büyük dosya uyarısına takılmaz). Ses/video eklenince dosya adı çekilir (`mediaName`: Drive API `fields=name`, ya da linkteki dosya adı); adı boş eski kartlara bir kez yazılır (`fillName`). Anahtar uygulamada görünmez; Supabase panelinden `app_config` tablosuna (`key`=`drive_key`) girilir.
 
