@@ -1,4 +1,8 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<script>/* iPad: arayüz sabit ölçekte kalsın (sayfa yakınlaştırması kapalı; panodaki iki parmak yakınlaştırma kendi kodumuzla çalışır) */
+["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.target.closest&&e.target.closest(".stage,.lb,#cmp,#ed")))e.preventDefault()},{passive:false});
+</script>
 <script>if(location.hash==="#mini"){window.__MINI=1;document.documentElement.classList.add("mini");window.addEventListener("error",e=>{if(e.error==="mini")e.preventDefault()})}</script>
 <title>Workshop</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -340,6 +344,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 @media (max-width:560px){.cell{min-height:52px;padding:5px}.cell .ct{display:none}}
 
 /* board */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .stage{position:absolute;inset:0;background-color:var(--canvas);background-image:radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px);touch-action:none;cursor:var(--cur);overflow:hidden}
 .stage.spacepan{cursor:grab}
 .stage.zooming{cursor:zoom-in}
