@@ -1372,6 +1372,7 @@ document.addEventListener("keydown",e=>{
     if((e.ctrlKey||e.metaKey)&&e.code==="KeyG"){e.preventDefault();frameSelection();return}
     if((e.ctrlKey||e.metaKey)&&e.code==="KeyA"){e.preventDefault();if(S.tool!=="select")setTool("select");selAll();return}
     if((e.ctrlKey||e.metaKey)&&e.code==="KeyD"){e.preventDefault();duplicateSel();return}
+    if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&(e.code==="KeyC"||e.code==="KeyX")&&S.selSet.size&&!getSelection().toString()){e.preventDefault();copySel(e.code==="KeyX");return}
     if(e.key==="Enter"&&S.selSet.size===1){const c=S.items.find(i=>i.id===[...S.selSet][0]);if(c&&c.kind==="image"){e.preventDefault();openEditor(c.id);return}}
     if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.code==="KeyL"){e.preventDefault();toggleLock([...S.selSet]);return}
     if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.code==="KeyN"||e.code==="KeyC")&&S.selSet.size===1){const c=S.items.find(i=>i.id===[...S.selSet][0]);
@@ -1929,6 +1930,30 @@ document.addEventListener("keydown",e=>{if(S.editing||!boardVisible()||e.ctrlKey
   if(e.key==="t"||e.key==="T"){if(!api)return;e.preventDefault();const p=centerWorld();addText(p.x-160,p.y-40);return}
   const ids=[...S.selSet].filter(id=>{const c=S.items.find(i=>i.id===id);return c&&c.kind==="text"});if(!ids.length)return;
   if(e.key==="+"||e.key==="="){e.preventDefault();setTextSize(ids,f=>f*1.15)}else if(e.key==="-"||e.key==="_"){e.preventDefault();setTextSize(ids,f=>f/1.15)}});
+/* ---------- kart kopyala / kes / yapıştır (projeler arası; görseller hedef projeye yeniden yüklenir) ---------- */
+const CLIPB={docs:null,at:0,src:null,bid:null,n:0,mouse:null,mt:0,last:null};
+stage.addEventListener("pointermove",e=>{CLIPB.mouse=toWorld(e.clientX,e.clientY);CLIPB.mt=Date.now()},{passive:true});
+function copySel(cut){const ids=[...S.selSet];const docs=S.items.filter(i=>i.type==="card"&&ids.includes(i.id)).map(d=>JSON.parse(JSON.stringify(d)));if(!docs.length)return false;
+  CLIPB.docs=docs;CLIPB.at=Date.now();CLIPB.src=curP();CLIPB.bid=curBoard();CLIPB.n=0;
+  try{navigator.clipboard&&navigator.clipboard.writeText("workshop:"+CLIPB.at).catch(()=>{})}catch(_){}
+  if(cut){const lk=docs.filter(d=>d.locked).length;deleteSelected();toast((docs.length-lk)+" kart kesildi · başka bir panoya Ctrl+V ile yapıştır",null,true)}
+  else toast(docs.length>1?docs.length+" kart kopyalandı · Ctrl+V ile yapıştır":"Kopyalandı · Ctrl+V ile yapıştır",null,true);return true}
+async function pasteCards(){const docs=CLIPB.docs;if(!docs||!api||!boardVisible())return;const pid=curP(),bid=curBoard();
+  /* yerleşim: kopyalananların sol üstü fareye ya da ekran ortasına; aynı panoya yapıştırırken kaydırarak */
+  let x0=1e9,y0=1e9;for(const d of docs){if(d.kind==="draw"){const p=d.pts||[];for(let i=0;i+1<p.length;i+=2){x0=Math.min(x0,p[i]);y0=Math.min(y0,p[i+1])}}else{x0=Math.min(x0,d.x||0);y0=Math.min(y0,d.y||0)}}
+  let at;if(bid===CLIPB.bid){CLIPB.n++;at={x:x0+24*CLIPB.n,y:y0+24*CLIPB.n}}
+  else if(CLIPB.last&&CLIPB.last.bid===bid&&CLIPB.last.at===CLIPB.at){at={x:CLIPB.last.x+24,y:CLIPB.last.y+24}}
+  else at=CLIPB.mouse&&Date.now()-CLIPB.mt<15000?CLIPB.mouse:centerWorld();CLIPB.last={bid,at:CLIPB.at,x:at.x,y:at.y};
+  const dx=at.x-x0,dy=at.y-y0;const cross=CLIPB.src!==pid||privB(CLIPB.bid)!==privB(bid);const z0=maxZ();const out=[];let k=0,miss=0;
+  if(cross&&docs.some(d=>d.assetId))toast("Yapıştırılıyor…",null,true);
+  for(const d of docs){const {id,...c}=d;const n=Object.assign({},c,{board:bid,created:Date.now()+k,locked:false});
+    delete n.private;delete n.ap;delete n.review;delete n.versions;delete n.vAt;
+    if(n.kind==="draw")n.pts=(n.pts||[]).map((v,i)=>r1(v+(i%2?dy:dx)));else{n.x=Math.round((n.x||0)+dx);n.y=Math.round((n.y||0)+dy);if(n.kind!=="frame")n.z=z0+1+k}
+    if(cross&&n.assetId&&assets){try{const b=await blobOf(n.assetId);if(!b)throw 0;const a=await assets.upload(new File([b],"kopya",{type:b.type}));n.assetId=a.id;n.assetUrl=a.url||null;
+        const ap=(CL.apre&&CL.apre.get(a.id))||null;if(ap)n.ap=ap}catch(_){miss++;continue}}
+    k++;const ref=await run(api.add(n));if(ref)out.push(ref.id)}
+  if(out.length){undoRemove("Yapıştır",out);S.selSet=new Set(out);syncCards();applySel()}
+  toast((out.length>1?out.length+" kart yapıştırıldı":"Yapıştırıldı")+(miss?" · "+miss+" görsel alınamadı":""),null,true)}
 async function addNote(x,y){
   const ref=await run(api.add({type:"card",board:curBoard(),kind:"note",x:Math.round(x),y:Math.round(y),w:240,text:"",z:maxZ()+1,created:Date.now()}));
   if(ref){undoRemove("Not",[ref.id]);S.selSet=new Set([ref.id]);requestAnimationFrame(()=>{syncCards();startEdit(ref.id)})}
@@ -1991,6 +2016,9 @@ async function addWebImage(url,at){
 }
 document.addEventListener("paste",e=>{
   if(!boardVisible()||S.editing||e.target.closest("input,textarea"))return;
+  /* panodan kopyalanan kartlar: başka projenin panosuna da yapıştırılır */
+  {const t0=(e.clipboardData?.getData("text")||"").trim(),nf=(e.clipboardData?.files||[]).length;
+   if(CLIPB.docs&&(t0==="workshop:"+CLIPB.at||(!t0&&!nf))){e.preventDefault();pasteCards();return}}
   const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();addImages(fs);return}
   const t=(e.clipboardData?.getData("text")||"").trim();
   if(/^https?:\/\/\S+$/i.test(t)){e.preventDefault();addLink(t)}
@@ -2203,10 +2231,11 @@ function frameSelection(){
 stage.addEventListener("contextmenu",e=>{
   const card=e.target.closest(".card");const g=e.target.closest&&e.target.closest("g[data-ink]");
   const id=card?card.dataset.id:g?g.getAttribute("data-ink"):null;
-  if(!id){if(S.selSet.size>1){e.preventDefault();openCtx(e.clientX,e.clientY,S.selSet.size+" öğe seçili",multiItems())}return}
+  if(!id){if(S.selSet.size>1){e.preventDefault();openCtx(e.clientX,e.clientY,S.selSet.size+" öğe seçili",[{label:"Kopyala  ·  Ctrl+C",fn:()=>copySel(false)},...multiItems()])}
+    else if(CLIPB.docs&&api){e.preventDefault();CLIPB.mouse=toWorld(e.clientX,e.clientY);CLIPB.mt=Date.now();openCtx(e.clientX,e.clientY,"Pano",[{label:"Yapıştır ("+CLIPB.docs.length+" kart)  ·  Ctrl+V",fn:pasteCards}])}return}
   e.preventDefault();const c=S.items.find(i=>i.id===id);if(!c)return;
   if(!S.selSet.has(id))selOnly(id);
-  if(S.selSet.size>1){multiItems.ref=id;const mi=multiItems();multiItems.ref=null;openCtx(e.clientX,e.clientY,S.selSet.size+" öğe seçili",mi);return}
+  if(S.selSet.size>1){multiItems.ref=id;const mi=multiItems();multiItems.ref=null;openCtx(e.clientX,e.clientY,S.selSet.size+" öğe seçili",[{label:"Kopyala  ·  Ctrl+C",fn:()=>copySel(false)},...mi]);return}
   const items=[];
   if(c.kind==="image")items.push({label:"Odak görünümü",fn:()=>openLB(c.id)},{label:c.gray?"Gri tonu kapat  ·  G":"Gri ton  ·  G",fn:()=>toggleImg("gray",[c.id])},{label:c.flip?"Çevirmeyi kapat  ·  H":"Yatay çevir  ·  H",fn:()=>toggleImg("flip",[c.id])},{label:"Renk paleti çıkar",fn:()=>makePalette(c)},{label:"Kompozisyon katmanı"+(c.guide?"  ·  "+GUIDES[c.guide]:"")+"…",fn:()=>guideMenu(c,e.clientX,e.clientY)},{label:"Bu görselden görev…",fn:()=>openRTask(c.id)});
   if(c.kind==="audio"&&c.assetId&&imgSrc(c))items.push({label:"Ses dosyasını indir",fn:()=>{const a=document.createElement("a");a.href=imgSrc(c);a.download=(c.text||"ses-notu").replace(/[\\/:*?"<>|]/g,"-")+"."+(IMG_EXT[(c.mime||"audio/webm")]||"webm");a.click()}});
@@ -2221,6 +2250,7 @@ stage.addEventListener("contextmenu",e=>{
   if(c.kind!=="draw"&&c.kind!=="palette")items.push({label:(c.tags&&c.tags.length?"Etiketler · "+c.tags.map(t=>"#"+t).join(" "):"Etiket ekle…"),fn:()=>editTags(c)});
   if(c.private)items.push(...sendItems([id]));
   if(c.kind!=="draw")items.push({label:"Kopyasını oluştur  ·  Ctrl+D",fn:()=>duplicateSel([id])});
+  items.push({label:"Kopyala  ·  Ctrl+C",fn:()=>copySel(false)});
   if(c.kind!=="draw")items.push({label:c.locked?"Kilidi aç  ·  L":"Kilitle  ·  L",fn:()=>toggleLock([id])});
   if(S.selSet.size>1)items.push({label:"Seçimi çerçevele  ·  Ctrl+G",fn:frameSelection});
   if(items.length)items.push("-");
