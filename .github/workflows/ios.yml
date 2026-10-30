@@ -69,18 +69,32 @@ jobs:
           ls src-tauri/gen/apple/build/ | while IFS= read -r l; do echo "::notice::build: $l"; done
           find src-tauri/gen/apple -name 'ExportOptions*.plist' -o -name 'exportOptions*.plist' | head -3 | while IFS= read -r f; do echo "::notice::export: $(tr -d '\n\t ' < "$f" | head -c 600)"; done
 
+      # Yükleme Xcode'un kendi dağıtım akışıyla: arşiv yeniden imzalanır ve doğrudan App Store Connect'e gider
       - name: TestFlight'a yükle
         run: |
-          IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
-          if [ -z "$IPA" ]; then echo "::error::IPA bulunamadı"; exit 1; fi
-          echo "::notice::Yüklenen: $IPA"
-          # hata olursa çıktıyı açıklama olarak yaz (kayıtlar dışarıdan okunamayabilir)
-          if ! OUT=$(xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER" 2>&1); then
+          ARC=$(find src-tauri/gen/apple -name '*.xcarchive' -maxdepth 6 | head -n 1)
+          if [ -z "$ARC" ]; then echo "::error::xcarchive bulunamadı"; find src-tauri/gen/apple/build -maxdepth 3 | head -30 | while IFS= read -r l; do echo "::error::$l"; done; exit 1; fi
+          echo "::notice::Arşiv: $ARC"
+          cat > /tmp/upload.plist <<PL
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${APPLE_DEVELOPMENT_TEAM}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PL
+          if ! OUT=$(xcodebuild -exportArchive -archivePath "$ARC" -exportOptionsPlist /tmp/upload.plist -exportPath /tmp/upload \
+              -allowProvisioningUpdates -authenticationKeyPath "$APPLE_API_KEY_PATH" -authenticationKeyID "$APPLE_API_KEY" -authenticationKeyIssuerID "$APPLE_API_ISSUER" 2>&1); then
             echo "$OUT"
-            echo "$OUT" | grep -v '^\s*$' | tail -25 | while IFS= read -r l; do echo "::error::$l"; done
+            echo "$OUT" | grep -iE 'error|fail|invalid|denied' | tail -20 | while IFS= read -r l; do echo "::error::$l"; done
             exit 1
           fi
-          echo "$OUT" | tail -5
+          echo "$OUT" | tail -15
+          echo "::notice::Yüklendi · App Store Connect'te birkaç dakika işlenir"
 
       - uses: actions/upload-artifact@v5
         if: always()
