@@ -51,6 +51,14 @@ jobs:
       - name: Xcode projesini oluştur
         run: npx tauri ios init --ci
 
+      # Apple hatası: sertifika adında Türkçe karakter (Ç) varsa imza gereksinimi Unicode farkı yüzünden tutmuyor
+      # (ITMS-90035). Gereksinimi addan değil takım kodundan kuruyoruz.
+      - name: İmza gereksinimini takım koduna bağla
+        run: |
+          printf 'designated => anchor apple generic and identifier "com.akkcay.workshop" and certificate leaf[subject.OU] = "%s"\n' "$APPLE_DEVELOPMENT_TEAM" > "$RUNNER_TEMP/dr.req"
+          printf 'OTHER_CODE_SIGN_FLAGS = $(inherited) --requirements %s\n' "$RUNNER_TEMP/dr.req" > "$RUNNER_TEMP/sign.xcconfig"
+          echo "XCODE_XCCONFIG_FILE=$RUNNER_TEMP/sign.xcconfig" >> "$GITHUB_ENV"
+
       - name: Derle ve imzala
         run: npx tauri ios build --export-method app-store-connect --build-number ${{ github.run_number }} --ci
 
@@ -62,38 +70,23 @@ jobs:
           rm -rf /tmp/ipa && mkdir /tmp/ipa && unzip -q "$IPA" -d /tmp/ipa
           APP=$(ls -d /tmp/ipa/Payload/*.app)
           codesign -dvvv "$APP" 2>&1 | grep -E 'Authority|TeamIdentifier|Identifier=' | while IFS= read -r l; do echo "::notice::imza: $l"; done
-          codesign --verify --deep --strict "$APP" 2>&1 | tail -5 | while IFS= read -r l; do echo "::notice::doğrulama: $l"; done
+          codesign --verify --deep --strict -R="$(codesign -d -r- "$APP" 2>&1 | sed -n 's/^designated => /designated => /p' | head -1 | sed 's/^designated => //')" "$APP" 2>&1 | tail -3 | while IFS= read -r l; do echo "::notice::doğrulama: $l"; done
+          codesign -d -r- "$APP" 2>&1 | grep designated | while IFS= read -r l; do echo "::notice::gereksinim: $l"; done
           security cms -D -i "$APP/embedded.mobileprovision" > /tmp/prof.plist 2>/dev/null && \
             echo "::notice::profil: $(/usr/libexec/PlistBuddy -c 'Print Name' /tmp/prof.plist) · get-task-allow=$(/usr/libexec/PlistBuddy -c 'Print Entitlements:get-task-allow' /tmp/prof.plist) · cihazlar=$(/usr/libexec/PlistBuddy -c 'Print ProvisionedDevices' /tmp/prof.plist >/dev/null 2>&1 && echo var || echo yok)"
           security find-identity -v -p codesigning | while IFS= read -r l; do echo "::notice::kimlik: $l"; done
           ls src-tauri/gen/apple/build/ | while IFS= read -r l; do echo "::notice::build: $l"; done
           find src-tauri/gen/apple -name 'ExportOptions*.plist' -o -name 'exportOptions*.plist' | head -3 | while IFS= read -r f; do echo "::notice::export: $(tr -d '\n\t ' < "$f" | head -c 600)"; done
 
-      # Yükleme Xcode'un kendi dağıtım akışıyla: arşiv yeniden imzalanır ve doğrudan App Store Connect'e gider
       - name: TestFlight'a yükle
         run: |
-          ARC=$(find src-tauri/gen/apple -name '*.xcarchive' -maxdepth 6 | head -n 1)
-          if [ -z "$ARC" ]; then echo "::error::xcarchive bulunamadı"; find src-tauri/gen/apple/build -maxdepth 3 | head -30 | while IFS= read -r l; do echo "::error::$l"; done; exit 1; fi
-          echo "::notice::Arşiv: $ARC"
-          cat > /tmp/upload.plist <<PL
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0"><dict>
-            <key>method</key><string>app-store-connect</string>
-            <key>destination</key><string>upload</string>
-            <key>teamID</key><string>${APPLE_DEVELOPMENT_TEAM}</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>uploadSymbols</key><true/>
-            <key>manageAppVersionAndBuildNumber</key><false/>
-          </dict></plist>
-          PL
-          if ! OUT=$(xcodebuild -exportArchive -archivePath "$ARC" -exportOptionsPlist /tmp/upload.plist -exportPath /tmp/upload \
-              -allowProvisioningUpdates -authenticationKeyPath "$APPLE_API_KEY_PATH" -authenticationKeyID "$APPLE_API_KEY" -authenticationKeyIssuerID "$APPLE_API_ISSUER" 2>&1); then
+          IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
+          if [ -z "$IPA" ]; then echo "::error::IPA bulunamadı"; exit 1; fi
+          if ! OUT=$(xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER" 2>&1); then
             echo "$OUT"
-            echo "$OUT" | grep -iE 'error|fail|invalid|denied' | tail -20 | while IFS= read -r l; do echo "::error::$l"; done
+            echo "$OUT" | grep -E 'ERROR|code =' | tail -4 | while IFS= read -r l; do echo "::error::$l"; done
             exit 1
           fi
-          echo "$OUT" | tail -15
           echo "::notice::Yüklendi · App Store Connect'te birkaç dakika işlenir"
 
       - uses: actions/upload-artifact@v5
