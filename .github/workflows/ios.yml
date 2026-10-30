@@ -9,6 +9,10 @@ name: iPad derlemesi (TestFlight)
 #   APPLE_API_KEY_P8        – indirilen AuthKey_….p8 dosyasının içeriği
 on:
   workflow_dispatch:
+    inputs:
+      imza:
+        description: "bulut = Apple'ın normal imzası · gecici = geçici sertifikayla yeniden imzala (ad sorunu için)"
+        default: bulut
 
 jobs:
   ios:
@@ -74,6 +78,7 @@ jobs:
       # sertifikasıyla kendimiz yeniden imzalıyoruz; gereksinim addan değil takım kodundan kurulur.
       # Anahtar yalnızca bu makinede oluşur, sertifika ve profil işin sonunda silinir.
       - name: Geçici sertifikayla yeniden imzala
+        if: ${{ inputs.imza == 'gecici' }}
         run: |
           set -e
           python3 -m pip install --quiet --break-system-packages "pyjwt[crypto]" 2>/dev/null || python3 -m pip install --quiet "pyjwt[crypto]"
@@ -107,6 +112,7 @@ jobs:
 
       - name: TestFlight'a yükle
         run: |
+          [ -z "$SIGNED_IPA" ] && SIGNED_IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
           if ! OUT=$(xcrun altool --upload-app --type ios --file "$SIGNED_IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER" 2>&1); then
             echo "$OUT"
             echo "$OUT" | grep -E 'ERROR|code =' | tail -4 | while IFS= read -r l; do echo "::error::$l"; done
