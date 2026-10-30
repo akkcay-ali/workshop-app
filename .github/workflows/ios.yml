@@ -70,16 +70,57 @@ jobs:
           ls src-tauri/gen/apple/build/ | while IFS= read -r l; do echo "::notice::build: $l"; done
           find src-tauri/gen/apple -name 'ExportOptions*.plist' -o -name 'exportOptions*.plist' | head -3 | while IFS= read -r f; do echo "::notice::export: $(tr -d '\n\t ' < "$f" | head -c 600)"; done
 
+      # Apple hatası (ITMS-90035): sertifika adındaki "Ç" imza gereksinimini bozuyor. Bu yüzden geçici bir dağıtım
+      # sertifikasıyla kendimiz yeniden imzalıyoruz; gereksinim addan değil takım kodundan kurulur.
+      # Anahtar yalnızca bu makinede oluşur, sertifika ve profil işin sonunda silinir.
+      - name: Geçici sertifikayla yeniden imzala
+        run: |
+          set -e
+          python3 -m pip install --quiet --break-system-packages "pyjwt[crypto]" 2>/dev/null || python3 -m pip install --quiet "pyjwt[crypto]"
+          W="$RUNNER_TEMP/rs"; mkdir -p "$W"; cd "$W"
+          openssl req -new -newkey rsa:2048 -nodes -keyout key.pem -out csr.pem -subj "/CN=Workshop CI/O=Workshop/C=TR" 2>/dev/null
+          CID=$(python3 "$GITHUB_WORKSPACE/tools/asc.py" cert-create csr.pem cert.cer); echo "ASC_CERT=$CID" >> "$GITHUB_ENV"
+          PID=$(python3 "$GITHUB_WORKSPACE/tools/asc.py" profile-create "$CID" com.akkcay.workshop app.mobileprovision); echo "ASC_PROF=$PID" >> "$GITHUB_ENV"
+          echo "::notice::geçici sertifika $CID · profil $PID"
+          # anahtarlık
+          KC="$W/ci.keychain-db"; KP=$(openssl rand -hex 12)
+          security create-keychain -p "$KP" "$KC"; security set-keychain-settings -lut 3600 "$KC"; security unlock-keychain -p "$KP" "$KC"
+          openssl x509 -inform der -in cert.cer -out cert.pem
+          openssl pkcs12 -export -inkey key.pem -in cert.pem -out id.p12 -passout pass:"$KP" -legacy 2>/dev/null || openssl pkcs12 -export -inkey key.pem -in cert.pem -out id.p12 -passout pass:"$KP"
+          security import id.p12 -k "$KC" -P "$KP" -T /usr/bin/codesign >/dev/null
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KP" "$KC" >/dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+          SHA=$(openssl x509 -in cert.pem -noout -fingerprint -sha1 | cut -d= -f2 | tr -d ':')
+          # IPA'yı aç, profili değiştir, yeniden imzala
+          IPA=$(find "$GITHUB_WORKSPACE/src-tauri/gen/apple/build" -name '*.ipa' | head -n 1)
+          rm -rf x && mkdir x && unzip -q "$IPA" -d x; APP=$(ls -d x/Payload/*.app)
+          security cms -D -i app.mobileprovision > prof.plist
+          /usr/libexec/PlistBuddy -x -c 'Print Entitlements' prof.plist > ent.plist
+          cp app.mobileprovision "$APP/embedded.mobileprovision"
+          REQ="designated => anchor apple generic and identifier \"com.akkcay.workshop\" and certificate leaf[subject.OU] = \"$APPLE_DEVELOPMENT_TEAM\""
+          find "$APP" -depth \( -name '*.framework' -o -name '*.dylib' -o -name '*.appex' \) -print0 | while IFS= read -r -d '' f; do codesign -f -s "$SHA" --keychain "$KC" "$f"; done
+          codesign -f -s "$SHA" --keychain "$KC" --entitlements ent.plist -r="$REQ" "$APP"
+          codesign --verify --deep --strict "$APP"
+          codesign -d -r- "$APP" 2>&1 | grep designated | while IFS= read -r l; do echo "::notice::yeni gereksinim: $l"; done
+          (cd x && zip -qry "$W/Workshop.ipa" Payload)
+          echo "SIGNED_IPA=$W/Workshop.ipa" >> "$GITHUB_ENV"
+
       - name: TestFlight'a yükle
         run: |
-          IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
-          if [ -z "$IPA" ]; then echo "::error::IPA bulunamadı"; exit 1; fi
-          if ! OUT=$(xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER" 2>&1); then
+          if ! OUT=$(xcrun altool --upload-app --type ios --file "$SIGNED_IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER" 2>&1); then
             echo "$OUT"
             echo "$OUT" | grep -E 'ERROR|code =' | tail -4 | while IFS= read -r l; do echo "::error::$l"; done
             exit 1
           fi
           echo "::notice::Yüklendi · App Store Connect'te birkaç dakika işlenir"
+
+      - name: Geçici sertifika ve profili sil
+        if: always()
+        run: |
+          [ -n "$ASC_PROF" ] && python3 tools/asc.py profile-delete "$ASC_PROF" || true
+          [ -n "$ASC_CERT" ] && python3 tools/asc.py cert-delete "$ASC_CERT" || true
+          [ -f "$RUNNER_TEMP/rs/ci.keychain-db" ] && security delete-keychain "$RUNNER_TEMP/rs/ci.keychain-db" || true
+          rm -rf "$RUNNER_TEMP/rs"
 
       - uses: actions/upload-artifact@v5
         if: always()
