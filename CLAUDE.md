@@ -92,6 +92,10 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Açılış hatası sessiz kalmaz: `lib.rs` `fatal()` Windows mesaj kutusu; WebView2 yoksa (`tauri::webview_version`) indirme sayfasını önerir; panic kancası da aynı kutuyu gösterir.
 - macOS derlemesi elle tetiklenir (`mac.yml`).
 - iPad: `ios.yml` (elle) GitHub macOS makinesinde `tauri ios init/build` + TestFlight'a `altool` ile yükler. Kimlik `com.akkcay.workshop` (`tauri.ios.conf.json`), `Info.ios.plist` (mikrofon, şifreleme beyanı, Dosyalar). Secret'lar: `APPLE_DEVELOPMENT_TEAM`, `APPLE_API_ISSUER`, `APPLE_API_KEY`, `APPLE_API_KEY_P8`. Masaüstüne özel izinler `capabilities/desktop.json`.
+  Apple hatası (ITMS-90035): hesap adındaki "Ç" yüzünden Apple'ın bulut imzasının gereksinimi tutmuyor. Çözüm `ios.yml`'de: `tools/asc.py` ile
+  geçici Apple Distribution sertifikası + App Store profili (App Store Connect API, anahtar yalnızca makinede), IPA bu kimlikle yeniden imzalanır;
+  designated requirement `certificate leaf[subject.OU] = <takım>` (ad yok). Yükleme `altool`; sertifika/profil iş sonunda silinir. Kayıtlar dışarıdan
+  okunamadığı için hatalar `::error::` açıklaması olarak yazılır.
 
 ## Kullanıcı tercihleri
 - Doğrudan, sade çözümler; riskler baştan söylenir.
