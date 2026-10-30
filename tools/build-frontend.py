@@ -32,7 +32,7 @@ head = """<!doctype html>
 <meta name="apple-mobile-web-app-title" content="Workshop">
 <meta name="theme-color" content="#0D0E10">
 <link rel="stylesheet" href="fonts.css">
-<style>html{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<style>html{box-sizing:border-box;background:#0D0E10}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="vendor/fflate.js"></script>
 <script src="vendor/supabase.js"></script>
 </head>

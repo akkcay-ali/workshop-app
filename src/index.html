@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Workshop">
 <meta name="theme-color" content="#0D0E10">
 <link rel="stylesheet" href="fonts.css">
-<style>html{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<style>html{box-sizing:border-box;background:#0D0E10}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <script src="vendor/fflate.js"></script>
 <script src="vendor/supabase.js"></script>
 </head>
@@ -101,6 +101,7 @@ body.boardfs .view{border-radius:0;border:0}
 .thm.vivid i::before{background:#9DB0FF}.thm.vivid i::after{background:linear-gradient(90deg,#FFC14D,#FF6F7D,#C08BFF)}
 *{box-sizing:border-box}
 html,body{height:100%}
+html{background:var(--bg,#0D0E10)}.stage,.world{-webkit-backface-visibility:hidden;backface-visibility:hidden}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;overflow:hidden}
 body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(55% 45% at 12% 8%, var(--glow1), transparent 70%),
@@ -1709,7 +1710,7 @@ $("sCal").addEventListener("click",e=>{
 const stage=$("stage"),world=$("world");
 const views=LS.get("views",{});
 function view(){const b=curBoard()||"_";return views[b]||(views[b]={x:60,y:70,z:1})}
-function applyView(){const v=view();world.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.z})`;
+function applyView(){const v=view();const dp=window.devicePixelRatio||1,rx=Math.round(v.x*dp)/dp,ry=Math.round(v.y*dp)/dp;world.style.transform=`translate(${rx}px,${ry}px) scale(${v.z})`;
   /* nokta ızgarası uzaklaştıkça seyrelir: ekranda aralık hep 16–48 px (iPad'de sık noktalar parazit gibi görünüyordu) */
   {let g=24*v.z;while(g<16)g*=2;while(g>48)g/=2;stage.style.backgroundSize=`${g}px ${g}px`;stage.style.backgroundPosition=`${v.x}px ${v.y}px`}$("zoomv").textContent=Math.round(v.z*100)+"%"}
 let svT;function saveView(){clearTimeout(svT);svT=setTimeout(()=>LS.set("views",views),300)}
