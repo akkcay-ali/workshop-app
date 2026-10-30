@@ -1702,7 +1702,8 @@ const stage=$("stage"),world=$("world");
 const views=LS.get("views",{});
 function view(){const b=curBoard()||"_";return views[b]||(views[b]={x:60,y:70,z:1})}
 function applyView(){const v=view();world.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.z})`;
-  stage.style.backgroundSize=`${24*v.z}px ${24*v.z}px`;stage.style.backgroundPosition=`${v.x}px ${v.y}px`;$("zoomv").textContent=Math.round(v.z*100)+"%"}
+  /* nokta ızgarası uzaklaştıkça seyrelir: ekranda aralık hep 16–48 px (iPad'de sık noktalar parazit gibi görünüyordu) */
+  {let g=24*v.z;while(g<16)g*=2;while(g>48)g/=2;stage.style.backgroundSize=`${g}px ${g}px`;stage.style.backgroundPosition=`${v.x}px ${v.y}px`}$("zoomv").textContent=Math.round(v.z*100)+"%"}
 let svT;function saveView(){clearTimeout(svT);svT=setTimeout(()=>LS.set("views",views),300)}
 function zoomAt(cx,cy,f){const v=view();const wx=(cx-v.x)/v.z,wy=(cy-v.y)/v.z;const nz=Math.min(8,Math.max(.05,v.z*f));v.x=cx-wx*nz;v.y=cy-wy*nz;v.z=nz;applyView();saveView()}
 function toWorld(cx,cy){const r=stage.getBoundingClientRect(),v=view();return {x:(cx-r.left-v.x)/v.z,y:(cy-r.top-v.y)/v.z}}
