@@ -3597,6 +3597,8 @@ function wrapApi(){if(CL.base)return;CL.base=api;CL.baseAssets=assets;
       if(v.type==="card"&&privB(v.board)){v.private=true;if(v.assetId&&CL.apre.get(v.assetId))v.ap=CL.apre.get(v.assetId)}S.items.push(v);cPush(v,pid);rerender();return {id:v.id}},
     update:async(id,p)=>{const v=S.items.find(i=>i.id===id);const pid=v&&(v.type==="project"?v.id:itemProject(v));
       if(!isCloud(pid))return CL.base.update(id,p);
+      /* görsel değişince (düzenleme, sürüm geri yükleme) dosyanın özel klasör yolu da kartla gitsin; yoksa diğer cihazlar bulamaz */
+      if(v.type==="card"&&p.assetId&&p.ap===undefined&&CL.apre.has(p.assetId))p=Object.assign({},p,{ap:CL.apre.get(p.assetId)||null});
       Object.assign(v,JSON.parse(JSON.stringify(p)));cPush(v,pid);rerender()},
     set:async(id,d)=>{const k=S.items.findIndex(i=>i.id===id);const old=S.items[k];const v=Object.assign(JSON.parse(JSON.stringify(d)),{id});
       const pid=docPid(v)||itemProject(old);if(!isCloud(pid))return CL.base.set(id,d);
@@ -3681,6 +3683,9 @@ async function cBoot(){if(CL.sb||!window.supabase)return;
   wrapApi();CL.out=new Map(LS.get("cl_out",[]).map(r=>[r.id,r]));
   CL.sb.auth.onAuthStateChange((ev,s)=>{setTimeout(()=>{if(s&&s.user&&CL.me!==s.user.id)cStart(s.user);else if(ev==="SIGNED_OUT"&&CL.me)cStop();drawAcct()},0)});
   window.addEventListener("online",()=>cLoad());
+  /* uygulama öne gelince (uyku, arka plan sonrası) buluttakini yeniden çek: kaçan değişiklik ve inmemiş görseller tamamlanır */
+  {let last=Date.now();const re=()=>{if(document.hidden||!CL.me||Date.now()-last<20000)return;last=Date.now();cLoad()};
+   document.addEventListener("visibilitychange",re);window.addEventListener("focus",re)}
   setInterval(()=>{if(CL.out.size&&CL.me)cFlush()},10000);
   drawAcct()}
 
