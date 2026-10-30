@@ -128,6 +128,12 @@ jobs:
           [ -f "$RUNNER_TEMP/rs/ci.keychain-db" ] && security delete-keychain "$RUNNER_TEMP/rs/ci.keychain-db" || true
           rm -rf "$RUNNER_TEMP/rs"
 
+      - name: Apple'daki derleme durumları
+        if: always()
+        run: |
+          python3 -m pip install --quiet --break-system-packages "pyjwt[crypto]" 2>/dev/null || python3 -m pip install --quiet "pyjwt[crypto]" || true
+          python3 tools/asc.py builds 6828763230 || true
+
       - uses: actions/upload-artifact@v5
         if: always()
         with:

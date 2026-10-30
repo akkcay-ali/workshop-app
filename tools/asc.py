@@ -47,6 +47,12 @@ elif cmd == "profile-create":
                           "certificates": {"data": [{"type": "certificates", "id": cid}]}}}})
     open(out, "wb").write(base64.b64decode(r["data"]["attributes"]["profileContent"]))
     print(r["data"]["id"])
+elif cmd == "builds":
+    # son derlemelerin Apple'daki işlenme durumu (salt okunur)
+    r = call("GET", "/builds?filter[app]=" + sys.argv[2] + "&sort=-uploadedDate&limit=6&fields[builds]=version,processingState,uploadedDate")
+    for b in r.get("data", []):
+        at = b["attributes"]
+        print("::notice::derleme " + str(at.get("version")) + " · " + str(at.get("processingState")) + " · " + str(at.get("uploadedDate")))
 elif cmd == "cert-delete":
     call("DELETE", "/certificates/" + sys.argv[2])
 elif cmd == "profile-delete":
