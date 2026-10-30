@@ -54,6 +54,21 @@ jobs:
       - name: Derle ve imzala
         run: npx tauri ios build --export-method app-store-connect --build-number ${{ github.run_number }} --ci
 
+      - name: İmzayı denetle
+        if: always()
+        run: |
+          IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
+          [ -z "$IPA" ] && exit 0
+          rm -rf /tmp/ipa && mkdir /tmp/ipa && unzip -q "$IPA" -d /tmp/ipa
+          APP=$(ls -d /tmp/ipa/Payload/*.app)
+          codesign -dvvv "$APP" 2>&1 | grep -E 'Authority|TeamIdentifier|Identifier=' | while IFS= read -r l; do echo "::notice::imza: $l"; done
+          codesign --verify --deep --strict "$APP" 2>&1 | tail -5 | while IFS= read -r l; do echo "::notice::doğrulama: $l"; done
+          security cms -D -i "$APP/embedded.mobileprovision" > /tmp/prof.plist 2>/dev/null && \
+            echo "::notice::profil: $(/usr/libexec/PlistBuddy -c 'Print Name' /tmp/prof.plist) · get-task-allow=$(/usr/libexec/PlistBuddy -c 'Print Entitlements:get-task-allow' /tmp/prof.plist) · cihazlar=$(/usr/libexec/PlistBuddy -c 'Print ProvisionedDevices' /tmp/prof.plist >/dev/null 2>&1 && echo var || echo yok)"
+          security find-identity -v -p codesigning | while IFS= read -r l; do echo "::notice::kimlik: $l"; done
+          ls src-tauri/gen/apple/build/ | while IFS= read -r l; do echo "::notice::build: $l"; done
+          find src-tauri/gen/apple -name 'ExportOptions*.plist' -o -name 'exportOptions*.plist' | head -3 | while IFS= read -r f; do echo "::notice::export: $(tr -d '\n\t ' < "$f" | head -c 600)"; done
+
       - name: TestFlight'a yükle
         run: |
           IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
