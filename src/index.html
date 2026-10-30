@@ -19,6 +19,12 @@
 </head>
 <body>
 <script>/* iPad: arayüz sabit ölçekte kalsın (sayfa yakınlaştırması kapalı; panodaki iki parmak yakınlaştırma kendi kodumuzla çalışır) */
+/* iPad: arayüz boyutu (LS uiScale, varsayılan %85) — sayfa ölçeği sabit, kullanıcı sıkıştırarak değiştiremez */
+(function(){if(!matchMedia("(pointer:coarse)").matches||Math.min(screen.width,screen.height)<700)return;let k=0.85;try{const v=JSON.parse(localStorage.getItem("atolye:uiScale")||"null");if(v>=.6&&v<=1.2)k=v}catch(_){}
+  const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute("content",`width=device-width,initial-scale=${k},minimum-scale=${k},maximum-scale=${k},user-scalable=no,viewport-fit=cover`);window.__UIK=k})();
+/* iPad: klavye kapanınca WebKit sayfayı kaydırılmış/kısalmış bırakabiliyor; düzeni geri al */
+if(matchMedia("(pointer:coarse)").matches){const fix=()=>{if(!/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||"")&&!(document.activeElement&&document.activeElement.isContentEditable)){window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body&&(document.body.scrollTop=0)}};
+  document.addEventListener("focusout",()=>setTimeout(fix,60));if(window.visualViewport)visualViewport.addEventListener("resize",()=>setTimeout(fix,60));document.documentElement.classList.add("coarse")}
 ["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.target.closest&&e.target.closest(".stage,.lb,#cmp,#ed")))e.preventDefault()},{passive:false});
 </script>
@@ -358,6 +364,7 @@ h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;letter-s
 @media (max-width:560px){.cell{min-height:52px;padding:5px}.cell .ct{display:none}}
 
 /* board */
+html.coarse,html.coarse body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .stage{position:absolute;inset:0;background-color:var(--canvas);background-image:radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px);touch-action:none;cursor:var(--cur);overflow:hidden}
 .stage.spacepan{cursor:grab}
@@ -1101,6 +1108,7 @@ body.frameless .app{padding-top:8px}
   </div>
   <div class="cfgsec"><span class="small">Tema · bu cihazda hatırlanır</span><div class="themes" id="themes">
     <button class="thm dark" data-theme="dark"><i></i>Koyu</button><button class="thm light" data-theme="light"><i></i>Açık</button><button class="thm vivid" data-theme="vivid"><i></i>Renkli</button></div></div>
+  <div class="cfgsec" id="uiSec" hidden><span class="small">Arayüz boyutu · bu cihazda</span><div class="seg sm" id="uiScale" role="group" aria-label="Arayüz boyutu"><button data-uik="0.75">%75</button><button data-uik="0.85">%85</button><button data-uik="0.95">%95</button><button data-uik="1">%100</button></div></div>
   <div class="cfgsec" id="audSec"><span class="small">Ses cihazları · sesli oda ve sesli notlar bunları kullanır</span>
     <label class="audrow"><span>Mikrofon</span><select class="field sm" id="audMic"></select></label>
     <label class="audrow" id="audOutRow"><span>Hoparlör / kulaklık</span><select class="field sm" id="audOut"></select></label>
@@ -3269,7 +3277,11 @@ async function drawAud(){const m=$("audMic"),o=$("audOut");if(!navigator.mediaDe
 $("audMic").onchange=e=>{const v=e.target.value;LS.set("vMic",v);if(V.stream)setMic(v);else toast("Mikrofon seçildi",null,true)};
 $("audOut").onchange=e=>{const v=e.target.value;LS.set("vOut",v);setOut(v)};
 $("audPerm").onclick=async()=>{try{const st=await navigator.mediaDevices.getUserMedia({audio:true});st.getTracks().forEach(t=>t.stop())}catch(_){toast("Mikrofon izni verilmedi",null,true)}drawAud()};
-function drawCfg(){drawStorage();drawLib();drawAud();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawUiScale(){const on=!!window.__UIK;$("uiSec").hidden=!on;if(on)$("uiScale").querySelectorAll("[data-uik]").forEach(b=>b.setAttribute("aria-pressed",Math.abs(+b.dataset.uik-window.__UIK)<.01))}
+$("uiScale").addEventListener("click",e=>{const b=e.target.closest("[data-uik]");if(!b)return;const k=+b.dataset.uik;LS.set("uiScale",k);window.__UIK=k;
+  const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute("content",`width=device-width,initial-scale=${k},minimum-scale=${k},maximum-scale=${k},user-scalable=no,viewport-fit=cover`);drawUiScale();
+  setTimeout(()=>{if(curP()&&boardVisible())applyView()},120)});
+function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
