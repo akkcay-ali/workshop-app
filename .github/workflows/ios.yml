@@ -57,8 +57,15 @@ jobs:
       - name: TestFlight'a yükle
         run: |
           IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
-          echo "Yüklenen: $IPA"
-          xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER"
+          if [ -z "$IPA" ]; then echo "::error::IPA bulunamadı"; exit 1; fi
+          echo "::notice::Yüklenen: $IPA"
+          # hata olursa çıktıyı açıklama olarak yaz (kayıtlar dışarıdan okunamayabilir)
+          if ! OUT=$(xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER" 2>&1); then
+            echo "$OUT"
+            echo "$OUT" | grep -v '^\s*$' | tail -25 | while IFS= read -r l; do echo "::error::$l"; done
+            exit 1
+          fi
+          echo "$OUT" | tail -5
 
       - uses: actions/upload-artifact@v5
         if: always()
