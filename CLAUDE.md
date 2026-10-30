@@ -51,6 +51,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   çıkarma: yönetici herkesi, yetkili yalnızca üyeleri (`members_delete`). İstemcide `CL.role`, `isAdmin(pid)`.
   Kullanım: `project_usage(p)` (yalnızca yetkili+; depolama, kişi başı, içerik, 30 gün etkinlik, plan doluluğu) → `drawUsage`; `purge_deleted(p)` 7 günden eski silinmişleri temizler.
   Sahipsiz panoları ortak projede proje sahibi yönetir.
+- Dosyalar Cloudflare R2'de (kova `workshop`): edge function `r2` (secrets `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`)
+  imzalı adres verir (`sign` toplu GET / PUT), `del`, `copy`, `purge` (proje sahibi), `migrate` (geliştirici). Yetki `public.r2_can(paths)` = assets RLS ile aynı kural.
+  İstemcide `ST` (up/get/del/copy/purge): R2 olmazsa Supabase `assets`'e düşer; okumada R2'de yoksa Supabase'ten (eski sürümler, taşınmamış dosyalar). R2 CORS: Pages + tauri kökenleri.
+- Hata bildirimi (yalnızca geliştirici, `private.devs` → `public.is_dev()`): hesap paneli "Hata bildir" → `#bug` (`openBug`, `sendBug`, bağlam `bugCtx` + son hatalar `ERRS`),
+  tablo `public.bug_reports` (status open/fixed/wontfix, `reply`), görseller kova `bugs`. Aynı pencerede "Eski dosyaları R2'ye taşı" (`migrateR2`, `dev_asset_names`).
 - Yedek: bulut projesi menüsünde "Yedek indir (.workshop)" (`cloudBackup`, `zipItems` + `blobOf`, sürüm görselleri dahil `assetIdsOf`).
 - İğneli yorum: yorumda `pin:{x,y}` (0–1); ayrıntı panelinde görsele tıkla (`pinAt`), panoda `.cpins`. Karşılaştır: iki görsel seç → `#cmp` (kaydır/üst üste/yan yana).
 - Sürüm yığını: kartta `versions:[{assetId,ap,at,by}]`, `vAt`; `addVersion`/`verRestore`/`verCompare`; ekibe gönderirken yalnızca güncel sürüm gider.

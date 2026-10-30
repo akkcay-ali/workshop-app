@@ -793,6 +793,10 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 /* sesli not */
 .tool.rec{color:#fff;background:#C8473B}.tool.rec:hover{background:#D5564A;color:#fff}.tool.rec svg{animation:recp 1s ease-in-out infinite}@keyframes recp{50%{opacity:.35}}
 /* pano şablonları */
+.bugbox{width:min(640px,100%)}.bugbody{padding:14px 18px 18px;display:flex;flex-direction:column;gap:10px}#bugTxt{resize:vertical;min-height:110px;font:inherit}
+.bugshot{display:flex;gap:10px;align-items:flex-start}.bugshot img{max-width:220px;max-height:140px;border-radius:8px;border:1px solid var(--line)}
+.buglist{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto}.bugit{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:9px;background:rgb(255 255 255 / .04)}
+.bugit p{flex:1;margin:0;white-space:pre-wrap;word-break:break-word}.bugit .bst{font-size:11px;padding:2px 7px;border-radius:99px;background:rgb(255 255 255 / .08);white-space:nowrap}.bugit .bst.fixed{background:rgb(80 200 120 / .2)}
 .tpbox{width:min(780px,100%)}.tpgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px 18px 18px}
 .tpl{position:relative;display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink);transition:transform .25s cubic-bezier(.34,1.6,.64,1),border-color .15s}
 .tpl:hover{border-color:var(--stroke-2);transform:translateY(-2px)}.tpl b{font-weight:600;font-size:13px}.tpl .small{line-height:1.35}
@@ -1081,7 +1085,7 @@ body.frameless .app{padding-top:8px}
     <div id="acctOut" class="acform"><input class="field" id="acEmail" type="email" placeholder="e-posta" autocomplete="email"><input class="field" id="acPass" type="password" placeholder="şifre (en az 6 karakter)" autocomplete="current-password">
       <div class="row"><button class="btn primary" id="acIn" style="flex:1">Giriş yap</button><button class="btn" id="acUp" style="flex:1">Hesap oluştur</button></div><span class="small" id="acMsg"></span></div>
     <div id="acctIn" class="acform" hidden><div class="libpath mono" id="acWho"></div>
-      <label class="small" for="acName">Görünen ad · ekip seni böyle görür</label><input class="field" id="acName" maxlength="40" placeholder="ör. Ali"><button class="btn" id="acOut">Çıkış yap</button></div></div>
+      <label class="small" for="acName">Görünen ad · ekip seni böyle görür</label><input class="field" id="acName" maxlength="40" placeholder="ör. Ali"><button class="btn" id="acBug" hidden>Hata bildir</button><button class="btn" id="acOut">Çıkış yap</button></div></div>
 </div>
 
 <div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
@@ -1124,6 +1128,12 @@ body.frameless .app{padding-top:8px}
   <span class="small" id="rtHint">İstersen görselde ilgili bölgeyi sürükleyerek seç; görevde o bölge görünür.</span>
   <form class="rtform" id="rtForm" autocomplete="off"><input class="field" id="rtTitle" maxlength="200" placeholder="Ne yapılacak? ör. Kemer detayını modelle">
     <div class="row" id="rtMeta"></div><div class="row" style="justify-content:flex-end"><button class="btn primary" type="submit">Görev oluştur</button></div></form></div></div></div>
+<div class="sk" id="bug" hidden role="dialog" aria-label="Hata bildir"><div class="skbox bugbox"><div class="kbhead"><h2>Hata bildir</h2><button class="btn" id="bugClose">Kapat <kbd>Esc</kbd></button></div>
+  <div class="bugbody"><textarea class="field" id="bugTxt" rows="5" maxlength="8000" placeholder="Ne oldu, ne bekliyordun? Ekran görüntüsünü Ctrl+V ile yapıştırabilirsin."></textarea>
+    <div class="bugshot" id="bugShot" hidden><img id="bugImg" alt=""><button class="btn" id="bugShotX">Görseli kaldır</button></div>
+    <div class="row"><button class="btn" id="bugPick">Görsel ekle</button><span class="small" id="bugMsg" style="flex:1">Sürüm, sayfa ve son hatalar otomatik eklenir.</span><button class="btn primary" id="bugSend">Gönder</button></div>
+    <div class="tphead">SON BİLDİRİMLER</div><div id="bugList" class="buglist"></div>
+    <div class="row" style="margin-top:6px"><button class="btn" id="bugMig">Eski dosyaları R2'ye taşı</button><span class="small" id="bugMigMsg"></span></div></div></div></div>
 <div class="sk" id="tpk" hidden role="dialog" aria-label="Yeni pano"><div class="skbox tpbox"><div class="kbhead"><h2 id="tpT">Yeni pano</h2><button class="btn" id="tpClose">Vazgeç <kbd>Esc</kbd></button></div><div id="tpBody"></div></div></div>
 <aside class="vhub" id="voicePop" hidden aria-label="Ses ve yayın"><div class="vhh"><b>Ses ve yayın</b><span class="sp"></span><button class="vhx" id="vhClose" title="Paneli gizle" aria-label="Paneli gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
   <div class="vhprev" id="vhPrev" hidden><video id="vhV" autoplay playsinline muted></video><div class="vhpb"><span class="dot"></span><span id="vhPl"></span><span class="sp"></span><button class="btn sm" data-vhbig>Büyük izle</button></div></div>
@@ -1170,6 +1180,10 @@ body.frameless .app{padding-top:8px}
 <div class="toast" id="toast" hidden><span id="toastT"></span><button id="toastB" hidden></button></div>
 
 <script>if(window.__MINI)throw "mini";
+/* son hatalar: hata bildirimine eklenir */
+const ERRS=[];const errPush=m=>{ERRS.push(new Date().toTimeString().slice(0,8)+" "+String(m).slice(0,400));if(ERRS.length>25)ERRS.shift()};
+addEventListener("error",e=>errPush((e.message||"hata")+(e.filename?" @"+e.filename.split("/").pop()+":"+e.lineno:"")));
+addEventListener("unhandledrejection",e=>errPush("promise: "+((e.reason&&(e.reason.message||e.reason))||"?")));
 
 (function(){
 const MONTHS=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
@@ -2161,8 +2175,7 @@ function sendItems(ids){const pid=curP();const tb=teamBoards(pid);if(!tb.length)
   return [{head:true,label:"Ekip panosuna gönder"},...tb.map(b=>({label:"→ "+(b.name||"Pano"),fn:()=>sendToBoard(ids,b.id,false)})),
     ...(tb.length===1?[{label:"→ "+(tb[0].name||"Pano")+" · buradan kaldır",fn:()=>sendToBoard(ids,tb[0].id,true)}]:[])]}
 /* özel görselin dosyası ekip klasörüne kopyalanır (aynı kimlikle) */
-async function pubAsset(pid,c){if(!c.ap||!c.assetId)return;const {error}=await CL.sb.storage.from("assets").copy(pid+"/"+c.ap+c.assetId,pid+"/"+c.assetId);
-  if(error&&!/exist|duplicate/i.test(error.message||""))throw error}
+async function pubAsset(pid,c){if(!c.ap||!c.assetId)return;await ST.copy(pid+"/"+c.ap+c.assetId,pid+"/"+c.assetId)}
 async function sendToBoard(ids,tb,rm){const pid=curP();if(!isCloud(pid))return;const src=ids.map(id=>S.items.find(i=>i.id===id)).filter(c=>c&&c.type==="card");if(!src.length)return;
   /* hedefte boş bir yere, göreli düzen korunarak */
   const there=S.items.filter(i=>i.type==="card"&&i.board===tb&&i.kind!=="draw");const right=there.length?Math.max(...there.map(c=>(c.x||0)+(c.w||240)))+80:0;
@@ -2170,7 +2183,7 @@ async function sendToBoard(ids,tb,rm){const pid=curP();if(!isCloud(pid))return;c
   try{for(const c of src){await pubAsset(pid,c);const {id,private:_p,ap:_a,review:_r,versions:_v,vAt:_va,vBy:_vb,...d}=c;const n=Object.assign(JSON.parse(JSON.stringify(d)),{board:tb,created:Date.now()});
       if(n.kind==="draw")n.pts=(n.pts||[]).map((v,i)=>i%2?v:r1(v+dx));else n.x=(n.x||0)+dx;
       await api.add(n);if(c.assetId)CL.apre.set(c.assetId,"")}
-    if(rm){for(const c of src){await api.remove(c.id);if(c.ap&&c.assetId)CL.sb.storage.from("assets").remove([pid+"/"+c.ap+c.assetId]).catch(()=>{})}}
+    if(rm){for(const c of src){await api.remove(c.id);if(c.ap&&c.assetId)ST.del([pid+"/"+c.ap+c.assetId])}}
     const b=boards(pid).find(x=>x.id===tb);toast(`${src.length} kart “${b&&b.name||"ekip"}” panosuna gönderildi`,{label:"Git",fn:()=>{S.sub[pid]="b:"+tb;save();renderProject()}})}
   catch(e){toast("Gönderilemedi: "+(e&&e.message||e),null,true)}}
 function dropToBoard(ids,tb){const pid=curP();const from=curBoard();
@@ -2181,13 +2194,13 @@ function dropToBoard(ids,tb){const pid=curP();const from=curBoard();
   for(const c of list){c.board=tb;run(api.update(c.id,{board:tb}))}S.selSet.clear();syncCards();renderDir();toast(list.length+" kart taşındı")}
 /* sahibi ekip panosunu tekrar gizliye alır: kartlar ve görselleri özel olur, ekipte anında kaybolur */
 async function boardToPrivate(pid,id){const b=boards(pid).find(x=>x.id===id);if(!b||b.owner!==CL.me)return;const cs=S.items.filter(i=>i.type==="card"&&i.board===id);const pre="p/"+CL.me+"/";
-  const toPriv=async a=>{const {error}=await CL.sb.storage.from("assets").copy(pid+"/"+a,pid+"/"+pre+a);if(error&&!/exist|duplicate/i.test(error.message||""))throw error};
+  const toPriv=a=>ST.copy(pid+"/"+a,pid+"/"+pre+a);
   try{for(const c of cs){if(c.assetId&&!c.ap){await toPriv(c.assetId);CL.apre.set(c.assetId,pre)}
       const vs=c.versions?await Promise.all(c.versions.map(async v=>{if(v.assetId&&!v.ap)await toPriv(v.assetId);return Object.assign({},v,{ap:v.assetId?pre:null})})):null;
       await api.update(c.id,Object.assign({private:true},c.assetId?{ap:pre}:{},vs?{versions:vs}:{}))}
     await api.update(id,{private:true});cHide(pid,[id,...cs.map(c=>c.id)]);
     /* ekip klasöründeki kopyayı kaldır (başka bir ekip kartı kullanmıyorsa) */
-    const rm=[...new Set(cs.filter(c=>c.assetId&&!S.items.some(o=>o.assetId===c.assetId&&!o.private)).map(c=>pid+"/"+c.assetId))];if(rm.length)CL.sb.storage.from("assets").remove(rm).catch(()=>{});toast("Pano gizlendi · yalnızca sen görüyorsun",null,true)}
+    const rm=[...new Set(cs.filter(c=>c.assetId&&!S.items.some(o=>o.assetId===c.assetId&&!o.private)).map(c=>pid+"/"+c.assetId))];if(rm.length)ST.del(rm);toast("Pano gizlendi · yalnızca sen görüyorsun",null,true)}
   catch(e){toast("Gizlenemedi: "+(e&&e.message||e),null,true)}}
 function cHide(pid,ids){const ch=CL.pres.get(pid);if(ch)try{ch.send({type:"broadcast",event:"hide",payload:{ids}})}catch(_){}}
 function onHide(pid,p){const ids=new Set((p&&p.ids)||[]);if(!ids.size)return;S.items=S.items.filter(i=>!ids.has(i.id)||i.private);for(const id of ids){const v=CL.items.get(id);if(v&&!v.private)CL.items.delete(id)}
@@ -3597,11 +3610,10 @@ function wrapApi(){if(CL.base)return;CL.base=api;CL.baseAssets=assets;
   };
   assets={
     upload:async f=>{const pid=curP();if(!isCloud(pid)){if(CL.baseAssets)return CL.baseAssets.upload(f);throw new Error("görsel deposu yok")}
-      const id=fid()+fid();const pre=privB(curBoard())?"p/"+CL.me+"/":"";const {error}=await CL.sb.storage.from("assets").upload(pid+"/"+pre+id,f,{contentType:f.type||"image/webp",upsert:true});
-      if(error)throw new Error(/fetch|network/i.test(error.message)?"bağlantı yok, görsel yüklenemedi":error.message);
+      const id=fid()+fid();const pre=privB(curBoard())?"p/"+CL.me+"/":"";try{await ST.up(pid+"/"+pre+id,f)}catch(error){throw new Error(/fetch|network/i.test(error.message||"")?"bağlantı yok, görsel yüklenemedi":error.message)}
       BLOB.set(id,URL.createObjectURL(f));CL.apid.set(id,pid);CL.apre.set(id,pre);return {id,url:null,sizeBytes:f.size,contentType:f.type}},
     list:async()=>CL.baseAssets?CL.baseAssets.list():{assets:[],usage:{files:0,bytes:0,maxFiles:0,maxBytes:1}},
-    delete:async id=>{const pid=CL.apid.get(id);if(pid){CL.apid.delete(id);await CL.sb.storage.from("assets").remove([pid+"/"+id,pid+"/p/"+CL.me+"/"+id]);return {deleted:true}}
+    delete:async id=>{const pid=CL.apid.get(id);if(pid){CL.apid.delete(id);await ST.del([pid+"/"+id,pid+"/p/"+CL.me+"/"+id]);return {deleted:true}}
       return CL.baseAssets?CL.baseAssets.delete(id):{deleted:false}}
   };
 }
@@ -3613,11 +3625,61 @@ function lsApi(){const save=()=>LS.set("wloose",S.items.filter(i=>!CL.items.has(
     set:async(id,d)=>{const k=find(id);const v=Object.assign(JSON.parse(JSON.stringify(d)),{id});if(k>-1)S.items[k]=v;else S.items.push(v);save();rerender()},
     remove:async id=>{S.items=S.items.filter(i=>i.id!==id);save();rerender()}}}
 
+/* --- hata bildirimi: yalnızca geliştirici hesabı (public.is_dev), başka kimse görmez --- */
+const BUG={shot:null};
+async function devCheck(){CL.dev=false;try{const {data}=await CL.sb.rpc("is_dev");CL.dev=data===true}catch(_){}$("acBug").hidden=!CL.dev}
+function bugCtx(){const tabs=[...document.querySelectorAll('[aria-selected="true"],.tab.on,.seg .on')].map(e=>e.textContent.trim()).filter(Boolean).slice(0,6);
+  return {surum:$("verTxt")?$("verTxt").textContent:"",ortam:TA?"masaüstü":NOKBD?"dokunmatik":"web",mod:S.mode,ua:navigator.userAgent,ekran:innerWidth+"x"+innerHeight+" @"+devicePixelRatio,
+    proje:curP()?((S.items.find(i=>i.type==="project"&&i.id===curP())||{}).name||curP()):"ana sayfa",bulut:curP()?isCloud(curP()):false,sekmeler:tabs,hatalar:ERRS.slice()}}
+function bugSetShot(b){BUG.shot=b||null;$("bugShot").hidden=!b;if(b)$("bugImg").src=URL.createObjectURL(b)}
+async function openBug(){if(!CL.dev)return;$("bugMsg").textContent="Sürüm, sayfa ve son hatalar otomatik eklenir.";animShow($("bug"));setTimeout(()=>$("bugTxt").focus(),80);drawBugs()}
+async function drawBugs(){const el=$("bugList");const {data}=await CL.sb.from("bug_reports").select("id,created_at,body,status,reply").order("id",{ascending:false}).limit(20);
+  const ST_TR={open:"açık",fixed:"düzeltildi",wontfix:"kapatıldı"};
+  el.innerHTML=(data||[]).map(r=>`<div class="bugit"><span class="small">${new Date(r.created_at).toLocaleDateString("tr-TR",{day:"numeric",month:"short"})}</span><p>${esc(r.body.slice(0,240))}${r.reply?`<br><span class="small">↳ ${esc(r.reply)}</span>`:""}</p><span class="bst ${r.status}">${ST_TR[r.status]||r.status}</span></div>`).join("")||`<span class="small">Henüz bildirim yok.</span>`}
+async function sendBug(){const body=$("bugTxt").value.trim();if(!body){$("bugTxt").focus();return}
+  $("bugSend").disabled=true;$("bugMsg").textContent="Gönderiliyor…";
+  try{const ctx=bugCtx();if(TA&&TA.app)try{ctx.surum=await TA.app.getVersion()}catch(_){}
+    let shot=null;if(BUG.shot){shot=CL.me+"/"+Date.now()+"."+((BUG.shot.type||"image/png").split("/")[1]||"png");const {error}=await CL.sb.storage.from("bugs").upload(shot,BUG.shot,{contentType:BUG.shot.type||"image/png"});if(error)throw error}
+    const {error}=await CL.sb.from("bug_reports").insert({body,ctx,shot});if(error)throw error;
+    $("bugTxt").value="";bugSetShot(null);$("bugMsg").textContent="Gönderildi, teşekkürler.";drawBugs()}
+  catch(e){$("bugMsg").textContent="Gönderilemedi: "+(e.message||e)}finally{$("bugSend").disabled=false}}
+async function migrateR2(){const m=$("bugMigMsg");$("bugMig").disabled=true;let after="",n=0,bad=0;
+  try{for(;;){const {data,error}=await CL.sb.rpc("dev_asset_names",{after});if(error)throw error;if(!data||!data.length)break;
+      const r=await ST.call({op:"migrate",names:data});for(const v of Object.values(r.res||{}))if(/hata|yok/.test(v))bad++;n+=data.length;after=data[data.length-1];
+      m.textContent=n+" dosya denetlendi…"}
+    m.textContent=`${n} dosya R2'de`+(bad?` · ${bad} sorunlu`:"")}catch(e){m.textContent="Olmadı: "+(e.message||e)}finally{$("bugMig").disabled=false}}
+$("acBug").onclick=()=>{animHide($("acctPop"));openBug()};
+$("bugClose").onclick=()=>animHide($("bug"));$("bug").addEventListener("click",e=>{if(e.target===$("bug"))animHide($("bug"))});
+$("bugSend").onclick=sendBug;$("bugShotX").onclick=()=>bugSetShot(null);$("bugMig").onclick=migrateR2;
+$("bugPick").onclick=()=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.onchange=()=>i.files[0]&&bugSetShot(i.files[0]);i.click()};
+document.addEventListener("paste",e=>{if($("bug").hidden)return;const f=[...(e.clipboardData||{}).items||[]].find(x=>x.type.startsWith("image/"));if(f){e.preventDefault();e.stopPropagation();bugSetShot(f.getAsFile())}},true);
+$("bugTxt").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))sendBug()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("bug").hidden){e.stopPropagation();animHide($("bug"))}},true);
+
+/* --- dosya deposu: Cloudflare R2 (edge function "r2" imzalı adres verir), olmazsa Supabase "assets" (eski sürümler, taşınmamış dosyalar) --- */
+const ST={q:[],t:0,
+  call:async b=>{const {data,error}=await CL.sb.functions.invoke("r2",{body:b});if(error)throw error;if(data&&data.error)throw new Error(data.error);return data},
+  /* okuma adresleri toplu imzalanır: aynı anda açılan görseller tek çağrıda */
+  signGet:path=>new Promise((res,rej)=>{ST.q.push({path,res,rej});if(!ST.t)ST.t=setTimeout(ST.flush,30)}),
+  async flush(){ST.t=0;while(ST.q.length){const q=ST.q.splice(0,100);
+    try{const {urls}=await ST.call({op:"sign",paths:q.map(x=>x.path)});q.forEach((x,i)=>x.res(urls[i]))}catch(e){q.forEach(x=>x.rej(e))}}},
+  async up(path,blob){const type=blob.type||"application/octet-stream";
+    try{const {urls}=await ST.call({op:"sign",put:true,paths:[path],type});const r=await fetch(urls[0],{method:"PUT",body:blob,headers:{"content-type":type}});if(!r.ok)throw new Error("r2 "+r.status);return}
+    catch(e){console.warn("R2 yükleme olmadı, Supabase'e",e)}
+    const {error}=await CL.sb.storage.from("assets").upload(path,blob,{contentType:type,upsert:true});if(error)throw error},
+  async get(path){try{const u=await ST.signGet(path);const r=await fetch(u);if(r.ok)return await r.blob()}catch(_){}
+    const {data,error}=await CL.sb.storage.from("assets").download(path);if(error)throw error;return data},
+  async del(paths){paths=paths.filter(Boolean);if(!paths.length)return;await Promise.all([ST.call({op:"del",paths}).catch(()=>{}),CL.sb.storage.from("assets").remove(paths).catch(()=>{})])},
+  /* kopya: R2'de ya da (eski dosya) Supabase'de; ikisinden biri olursa yeter */
+  async copy(from,to){const a=await ST.call({op:"copy",from,to}).then(()=>true,()=>false);if(a)return;
+    const {error}=await CL.sb.storage.from("assets").copy(from,to);const b=!error||/exist|duplicate/i.test(error.message||"");
+    if(!a&&!b)throw error||new Error("kopyalanamadı")},
+  purge:pid=>ST.call({op:"purge",pid}).catch(()=>{})};
 /* --- görseller: indir, cihazda önbellekle --- */
 async function cAsset(pid,id,pre){if(!id||BLOB.has(id)||CL.fetching.has(id)||!CL.sb)return;CL.fetching.add(id);CL.apid.set(id,pid);CL.apre.set(id,pre||"");
   const path=pid+"/"+(pre||"")+id,key="https://workshop-cache.local/"+path;
   try{let blob=null,cache=null;try{cache=await caches.open("ws-assets");const r=await cache.match(key);if(r)blob=await r.blob()}catch(_){}
-    if(!blob){const {data,error}=await CL.sb.storage.from("assets").download(path);if(error)throw error;blob=data;try{if(cache)await cache.put(key,new Response(blob))}catch(_){}}
+    if(!blob){blob=await ST.get(path);try{if(cache)await cache.put(key,new Response(blob))}catch(_){}}
     BLOB.set(id,URL.createObjectURL(blob));cRender()}catch(_){}finally{CL.fetching.delete(id)}}
 function cAssetsFor(list){for(const v of list)if(v.assetId){const pid=v.type==="card"?docPid(v):null;if(pid)cAsset(pid,v.assetId,v.ap)}}
 /* sürüm görselleri yalnızca bakıldığında indirilir (verLoad) */
@@ -3658,13 +3720,13 @@ function cSubscribe(){if(CL.chan)CL.sb.removeChannel(CL.chan);
 async function cStart(user){if(CL.me===user.id)return;CL.me=user.id;CL.email=user.email||"";
   const c=LS.get("cl_cache_"+CL.me,null);
   if(c){CL.pids=new Set(c.pids);CL.own=new Set(c.own);CL.role=new Map(c.role||[]);CL.mc=new Map(c.mc||[]);CL.prof=new Map(c.prof||[]);CL.people=new Map(c.people||[]);cMerge(c.items||[]);cAssetsFor(c.items||[]);renderAll()}
-  drawAcct();await cLoad();cSubscribe();loadNotifs();loadDriveKey()}
+  drawAcct();await cLoad();cSubscribe();loadNotifs();loadDriveKey();devCheck()}
 /* Google Drive API anahtarı (ekip geneli, app_config): büyük ses/video dosyaları uyarı sayfasına takılmadan akış olarak çalar */
 async function loadDriveKey(){try{const {data}=await CL.sb.from("app_config").select("value").eq("key","drive_key").maybeSingle();const k=(data&&data.value)||"";if(k!==LS.get("dkey","")){LS.set("dkey",k);if(boardVisible())syncCards()}}catch(_){}}
 function cStop(){try{voiceLeave()}catch(_){}if(CL.chan)CL.sb.removeChannel(CL.chan);CL.chan=null;for(const ch of CL.pres.values())CL.sb.removeChannel(ch);CL.pres.clear();CL.here.clear();presSent.clear();presAt.clear();
   [...CL.pids].forEach(p=>{if(S.open.includes(p))closeTab(p)});
   S.items=S.items.filter(i=>!CL.items.has(i.id));CL.items.clear();CL.pids.clear();CL.own.clear();CL.role.clear();CL.out.clear();saveOut();
-  CL.me=null;CL.email="";CL.notifs=[];CL.msgs.clear();renderAll();drawAcct();drawBell()}
+  CL.me=null;CL.email="";CL.dev=false;$("acBug").hidden=true;CL.notifs=[];CL.msgs.clear();renderAll();drawAcct();drawBell()}
 async function cBoot(){if(CL.sb||!window.supabase)return;
   CL.sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:S.mode==="cloud",storageKey:"ws-auth"}});
   wrapApi();CL.out=new Map(LS.get("cl_out",[]).map(r=>[r.id,r]));
@@ -3697,7 +3759,7 @@ async function cNewProject(d){
 /* --- proje silme / ayrılma --- */
 async function cDropProject(pid){
   if(CL.own.has(pid)){try{const {data}=await CL.sb.storage.from("assets").list(pid,{limit:1000});
-      if(data&&data.length)await CL.sb.storage.from("assets").remove(data.map(o=>pid+"/"+o.name))}catch(_){}
+      if(data&&data.length)await CL.sb.storage.from("assets").remove(data.map(o=>pid+"/"+o.name))}catch(_){}await ST.purge(pid);
     const {error}=await CL.sb.from("projects").delete().eq("id",pid);if(error)throw error}
   else{const {error}=await CL.sb.from("members").delete().eq("project_id",pid).eq("user_id",CL.me);if(error)throw error}
   const drop=new Set([...CL.items.values()].filter(v=>v.id===pid||docPid(v)===pid||v.project===pid).map(v=>v.id));
@@ -3722,7 +3784,7 @@ async function toCloud(pid,forShare){
     const imgs=its.filter(i=>i.assetId);let k=0;
     for(const c of imgs){let b=S.mode==="file"?FS.blobs.get(c.assetId):null;
       if(!b){try{b=await (await fetch(imgSrc(c))).blob()}catch(_){}}
-      if(b){const {error:e2}=await CL.sb.storage.from("assets").upload(pid+"/"+c.assetId,b,{contentType:b.type||"image/webp",upsert:true});if(e2)throw e2;
+      if(b){await ST.up(pid+"/"+c.assetId,b);
         CL.apid.set(c.assetId,pid);if(!BLOB.has(c.assetId))BLOB.set(c.assetId,URL.createObjectURL(b))}
       toast(`Görseller yükleniyor · ${++k}/${imgs.length}`,null,true)}
     const rows=its.map(v=>({id:v.id,project_id:pid,data:Object.assign(strip(v),{_cl:CLIENT}),deleted:false}));
