@@ -51,14 +51,6 @@ jobs:
       - name: Xcode projesini oluştur
         run: npx tauri ios init --ci
 
-      # Apple hatası: sertifika adında Türkçe karakter (Ç) varsa imza gereksinimi Unicode farkı yüzünden tutmuyor
-      # (ITMS-90035). Gereksinimi addan değil takım kodundan kuruyoruz.
-      - name: İmza gereksinimini takım koduna bağla
-        run: |
-          printf 'designated => anchor apple generic and identifier "com.akkcay.workshop" and certificate leaf[subject.OU] = "%s"\n' "$APPLE_DEVELOPMENT_TEAM" > "$RUNNER_TEMP/dr.req"
-          printf 'OTHER_CODE_SIGN_FLAGS = $(inherited) --requirements %s\n' "$RUNNER_TEMP/dr.req" > "$RUNNER_TEMP/sign.xcconfig"
-          echo "XCODE_XCCONFIG_FILE=$RUNNER_TEMP/sign.xcconfig" >> "$GITHUB_ENV"
-
       - name: Derle ve imzala
         run: npx tauri ios build --export-method app-store-connect --build-number ${{ github.run_number }} --ci
 
