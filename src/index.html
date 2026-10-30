@@ -1929,14 +1929,20 @@ async function addImages(files,at){
   files=[...files].filter(f=>/^image\//.test(f.type));if(!files.length||!api||!boardVisible())return;
   if(!assets&&S.mode!=="demo"){toast("Görsel yükleme bu görünümde kapalı.");return}
   let p=at||centerWorld();const bid=curBoard();
+  /* çok görsel birden: üst üste değil, bırakılan yerden başlayan düzgün bir ızgara */
+  const many=files.length>1,cols=Math.ceil(Math.sqrt(files.length*1.4)),GW=280,GAP=24;let col=0,gx=p.x,gy=p.y,rowH=0;
+  if(many&&files.length>8)toast(files.length+" görsel ekleniyor…",null,true);
   for(const f of files){
     const dims=await new Promise(res=>{const u=URL.createObjectURL(f);const im=new Image();im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight,u,im});im.onerror=()=>res({w:300,h:200,u});im.src=u});
     const w=Math.round(Math.min(320,Math.max(160,dims.w/2)));
-    const doc={type:"card",board:bid,kind:"image",x:Math.round(p.x-w/2),y:Math.round(p.y-w*dims.h/dims.w/2),w,z:maxZ()+1,created:Date.now()};
+    const doc=many?{type:"card",board:bid,kind:"image",x:Math.round(gx),y:Math.round(gy),w:GW,z:maxZ()+1,created:Date.now()}
+      :{type:"card",board:bid,kind:"image",x:Math.round(p.x-w/2),y:Math.round(p.y-w*dims.h/dims.w/2),w,z:maxZ()+1,created:Date.now()};
+    if(many){rowH=Math.max(rowH,GW*dims.h/Math.max(1,dims.w));if(++col>=cols){col=0;gx=p.x;gy+=rowH+GAP;rowH=0}else gx+=GW+GAP}
     try{if(assets){toast("Görsel yükleniyor…");const a=await assets.upload(await shrink(f,dims));doc.assetId=a.id;doc.assetUrl=a.url}else doc.localUrl=dims.u;
-      const ref=await api.add(doc);if(ref)undoRemove("Görsel",[ref.id]);$("toast").hidden=true}catch(err){toast("Görsel yüklenemedi: "+((err&&err.message)||"bilinmeyen hata"));return}
-    p={x:p.x+30,y:p.y+30};
+      const ref=await api.add(doc);if(ref)undoRemove("Görsel",[ref.id]);if(!many)$("toast").hidden=true}catch(err){toast("Görsel yüklenemedi: "+((err&&err.message)||"bilinmeyen hata"));if(!many)return}
+    if(!many)p={x:p.x+30,y:p.y+30};
   }
+  if(many)toast(files.length+" görsel eklendi",null,true);
 }
 stage.addEventListener("dragover",e=>{e.preventDefault();stage.classList.add("over")});
 stage.addEventListener("dragleave",()=>stage.classList.remove("over"));
