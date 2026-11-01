@@ -4114,7 +4114,7 @@ const nfmt=n=>(+n||0).toLocaleString("tr-TR");
 const ITEM_TR={task:"Görev",board:"Pano",comment:"Yorum",milestone:"Kilometre taşı","card:image":"Görsel","card:note":"Not","card:draw":"Çizim","card:audio":"Ses","card:video":"Video","card:link":"Bağlantı","card:frame":"Çerçeve","card:palette":"Palet",focus:"Odak seansı"};
 const ubar=(l,v,max,txt,warn)=>`<div class="ubar"><span class="l" title="${esc(l)}">${esc(l)}</span><span class="t"><i class="${warn?"warn":""}" style="width:${max?Math.max(1.5,Math.min(100,v/max*100)):0}%"></i></span><span class="v">${txt}</span></div>`;
 async function drawUsage(){const pid=shPid,U=$("shrUse");if(!pid)return;U.innerHTML=`<div class="small">yükleniyor…</div>`;
-  const {data:u,error}=await CL.sb.rpc("project_usage",{p:pid});if(shPid!==pid||shTab!=="use")return;
+  const [{data:u,error},r2]=await Promise.all([CL.sb.rpc("project_usage",{p:pid}),ST.call({op:"usage",pid}).catch(()=>null)]);if(shPid!==pid||shTab!=="use")return;
   if(error||!u){U.innerHTML=`<div class="small">${/not_admin/.test(error&&error.message||"")?"Kullanımı yalnızca yönetici ve yetkililer görebilir.":"Kullanım alınamadı: "+esc((error&&error.message)||"")}</div>`;return}
   const items=Object.entries(u.items||{}).filter(([k])=>k!=="project").sort((a,b)=>b[1]-a[1]),tot=items.reduce((s,[,n])=>s+n,0);
   const days=[],am=Object.fromEntries(u.activity_days||[]);for(let i=29;i>=0;i--){const d=new Date(Date.now()-i*864e5);const k=d.toLocaleDateString("sv-SE",{timeZone:"Europe/Istanbul"});days.push([k,am[k]||0])}
@@ -4122,9 +4122,9 @@ async function drawUsage(){const pid=shPid,U=$("shrUse");if(!pid)return;U.innerH
   const users=Object.entries(u.by_user||{}).sort((a,b)=>b[1].bytes-a[1].bytes),umax=Math.max(1,...users.map(x=>x[1].bytes));
   const act=Object.entries(u.activity_by_user||{}).sort((a,b)=>b[1]-a[1]),actmax=Math.max(1,...act.map(x=>x[1]));
   const who=id=>id==="?"||!CL.prof.has(id)?"ayrılmış üye":pname(id)+(id===CL.me?" (sen)":"");
-  const DB=500*1048576,ST=1024*1048576;
+  const DB=500*1048576,SB=1024*1048576,R2L=10*1073741824;
   U.innerHTML=`<div class="ugrid">
-      <div class="ustat"><b>${fmtB(u.storage_bytes)}</b><span>dosya alanı · ${nfmt(u.files)} dosya</span></div>
+      <div class="ustat"><b>${fmtB(r2?Math.max(r2.pbytes,u.storage_bytes):u.storage_bytes)}</b><span>dosya alanı · ${nfmt(r2?Math.max(r2.pfiles,u.files):u.files)} dosya</span></div>
       <div class="ustat"><b>${nfmt(tot)}</b><span>öğe${u.private_items?` · +${nfmt(u.private_items)} özel`:""}</span></div>
       <div class="ustat"><b>${nfmt(u.activity_30)}</b><span>işlem · son 30 gün</span></div>
       <div class="ustat"><b>${nfmt(u.messages)}</b><span>sohbet mesajı · bu hafta</span></div></div>
@@ -4134,10 +4134,12 @@ async function drawUsage(){const pid=shPid,U=$("shrUse");if(!pid)return;U.innerH
     <div class="usec"><h3>İçerik</h3>${items.length?items.map(([k,n])=>ubar(ITEM_TR[k]||k,n,items[0][1],nfmt(n))).join(""):`<span class="small">henüz içerik yok</span>`}</div>
     ${users.length?`<div class="usec"><h3>Dosya alanı · kişi başı</h3>${users.map(([id,x])=>ubar(who(id),x.bytes,umax,fmtB(x.bytes))).join("")}
       ${u.private_bytes?`<span class="small">${fmtB(u.private_bytes)} kadarı kişilerin özel panolarında.</span>`:""}</div>`:""}
-    <div class="usec"><h3>Ücretsiz plan doluluğu · tüm projeler</h3>
+    <div class="usec"><h3>Dosyalar · Cloudflare R2 · tüm projeler</h3>
+      ${r2?ubar("Depolama",r2.total,R2L,fmtB(r2.total)+" / 10 GB",r2.total>R2L*.8)+`<span class="small">${nfmt(r2.count)} dosya; bu projenin payı ${fmtB(r2.pbytes)}. İndirme trafiği ücretsiz ve sınırsız. Aylık işlem sınırları (1 milyon yükleme, 10 milyon okuma) Cloudflare panelinde görünür; bu boyutta yaklaşılması zor.</span>`:`<span class="small">R2 kullanımı alınamadı.</span>`}</div>
+    <div class="usec"><h3>Supabase · ücretsiz plan · tüm projeler</h3>
       ${ubar("Veritabanı",u.db_bytes,DB,fmtB(u.db_bytes)+" / 500 MB",u.db_bytes>DB*.8)}
-      ${ubar("Dosya depolama",u.all_storage_bytes,ST,fmtB(u.all_storage_bytes)+" / 1 GB",u.all_storage_bytes>ST*.8)}
-      <span class="small">Bu projenin kayıtları ${fmtB(u.data_bytes)} yer tutuyor. Aylık indirme trafiği (5 GB) buradan ölçülemiyor; Supabase panelinde görünür.</span></div>
+      ${ubar("Eski dosya deposu",u.all_storage_bytes,SB,fmtB(u.all_storage_bytes)+" / 1 GB",u.all_storage_bytes>SB*.8)}
+      <span class="small">Bu projenin kayıtları ${fmtB(u.data_bytes)} yer tutuyor. Eski dosya deposu, R2'den önce yüklenenlerin yedeği; yeni dosyalar oraya gitmiyor. Aylık indirme trafiği (5 GB) Supabase panelinde görünür.</span></div>
     <div class="row" style="justify-content:space-between;align-items:center"><span class="small">${nfmt(u.deleted_rows)} silinmiş kayıt geri alma için saklanıyor.</span>
       ${u.deleted_rows?`<button class="btn" id="usePurge">7 günden eskileri temizle</button>`:""}</div>`;
   const pb=$("usePurge");if(pb)pb.onclick=async()=>{if(pb.dataset.armed!=="1"){pb.dataset.armed="1";pb.textContent="Emin misin? Geri alınamaz";setTimeout(()=>{pb.dataset.armed="";pb.textContent="7 günden eskileri temizle"},4000);return}

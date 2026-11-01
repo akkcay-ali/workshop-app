@@ -85,6 +85,26 @@ Deno.serve(async (req) => {
       } while (token);
       return out({ ok: true, n });
     }
+    if (op === "usage") {
+      // proje üyesi görebilir: kovanın toplamı ve bu projenin payı (liste üzerinden, boyutlar R2'den)
+      const pid = String(body.pid ?? "");
+      if (!(await can([pid + "/_"]))) return out({ error: "forbidden" }, 403);
+      let token = "", total = 0, count = 0, pbytes = 0, pfiles = 0;
+      do {
+        const u = new URL(BASE);
+        u.searchParams.set("list-type", "2");
+        if (token) u.searchParams.set("continuation-token", token);
+        const x = await (await r2.fetch(u.toString())).text();
+        for (const m of x.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g)) {
+          const key = (m[1].match(/<Key>([^<]+)<\/Key>/) ?? [])[1] ?? "";
+          const size = +((m[1].match(/<Size>(\d+)<\/Size>/) ?? [])[1] ?? 0);
+          total += size; count++;
+          if (key.startsWith(pid + "/")) { pbytes += size; pfiles++; }
+        }
+        token = (x.match(/<NextContinuationToken>([^<]+)<\/NextContinuationToken>/) ?? [])[1] ?? "";
+      } while (token);
+      return out({ total, count, pbytes, pfiles });
+    }
     if (op === "migrate") {
       const { data: dev } = await sb.rpc("is_dev");
       if (dev !== true) return out({ error: "forbidden" }, 403);

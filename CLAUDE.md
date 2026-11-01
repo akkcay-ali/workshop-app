@@ -49,7 +49,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Roller `members.role`: `owner` (yönetici) · `admin` (yetkili) · `editor` (üye). Proje ayarları `#shr` (`openShare`, sekmeler Üyeler/Kullanım, `setShTab`).
   Yönetici `set_member_role` ile yetki verir/alır (yalnızca owner). Davet ve davet iptali yönetici + yetkili (`private.is_admin`, `invite_member` `not_admin`);
   çıkarma: yönetici herkesi, yetkili yalnızca üyeleri (`members_delete`). İstemcide `CL.role`, `isAdmin(pid)`.
-  Kullanım: `project_usage(p)` (yalnızca yetkili+; depolama, kişi başı, içerik, 30 gün etkinlik, plan doluluğu) → `drawUsage`; `purge_deleted(p)` 7 günden eski silinmişleri temizler.
+  Kullanım: `project_usage(p)` (yalnızca yetkili+; depolama, kişi başı, içerik, 30 gün etkinlik, plan doluluğu) + R2 `r2` op `usage` (kova toplamı/proje payı, 10 GB) → `drawUsage`; `purge_deleted(p)` 7 günden eski silinmişleri temizler.
   Sahipsiz panoları ortak projede proje sahibi yönetir.
 - Dosyalar Cloudflare R2'de (kova `workshop`): edge function `r2` (secrets `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`)
   imzalı adres verir (`sign` toplu GET / PUT), `del`, `copy`, `purge` (proje sahibi), `migrate` (geliştirici). Yetki `public.r2_can(paths)` = assets RLS ile aynı kural.
