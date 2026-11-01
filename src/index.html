@@ -190,17 +190,17 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .presets{display:flex;gap:6px;flex-wrap:wrap}
 .tmodes{display:flex;justify-content:center;gap:4px}.tmodes button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:5px 10px;border-radius:99px;cursor:pointer;transition:background .15s,color .15s}
 .tmodes button:hover{color:var(--ink)}.tmodes button[aria-pressed="true"]{background:var(--glass-2,rgb(255 255 255 / .08));color:var(--ink)}.tmodes.lock button:not([aria-pressed="true"]){opacity:.45;cursor:default}
-#tbig{display:flex;justify-content:center;align-items:center}#tbig .tsep{opacity:.6;margin:0 -.04em}
-#tbig .tseg{position:relative;display:inline-flex;border-radius:10px;transition:background .15s}#tbig .tseg:hover{background:rgb(255 255 255 / .05)}
-#tbig .troll{display:inline-flex}#tbig .dg{display:inline-block;width:1ch;height:1em;overflow:hidden}
-#tbig .dg i{display:flex;flex-direction:column;font-style:normal;transition:transform .6s cubic-bezier(.34,1.32,.64,1)}#tbig .dg i b{display:block;height:1em;line-height:1em;font-weight:inherit;text-align:center}
-#tbig .tnum{position:absolute;inset:0;width:100%;border:0;outline:0;background:transparent;color:transparent;caret-color:transparent;font:inherit;letter-spacing:inherit;text-align:center;padding:0;border-radius:10px;cursor:text}
-#tbig .tnum[readonly]{cursor:default}#tbig .tseg:has(.tnum[readonly]):hover{background:transparent}
-#tbig .tseg:focus-within{background:rgb(255 255 255 / .08)}#tbig .tseg:focus-within .troll{display:none}#tbig .tnum:focus{position:static;color:inherit;caret-color:auto;width:calc(var(--n,2) * 1ch + .15ch)}
-@media (prefers-reduced-motion:reduce){#tbig .dg i{transition:none}}
+.rollbig{display:flex;justify-content:center;align-items:center}.rollbig .tsep,.rollbig .rsep{opacity:.6;margin:0 -.04em}
+.rollbig .tseg{position:relative;display:inline-flex;border-radius:10px;transition:background .15s}.rollbig .tseg:hover{background:rgb(255 255 255 / .05)}
+.rollbig .troll{display:inline-flex}.rollbig .dg{display:inline-block;width:1ch;height:1em;overflow:hidden}
+.rollbig .dg i{display:flex;flex-direction:column;font-style:normal;transition:transform .6s cubic-bezier(.34,1.32,.64,1)}.rollbig .dg i b{display:block;height:1em;line-height:1em;font-weight:inherit;text-align:center}
+.rollbig .tnum{position:absolute;inset:0;width:100%;border:0;outline:0;background:transparent;color:transparent;caret-color:transparent;font:inherit;letter-spacing:inherit;text-align:center;padding:0;border-radius:10px;cursor:text}
+.rollbig .tnum[readonly]{cursor:default}.rollbig .tseg:has(.tnum[readonly]):hover{background:transparent}
+.rollbig .tseg:focus-within{background:rgb(255 255 255 / .08)}.rollbig .tseg:focus-within .troll{display:none}.rollbig .tnum:focus{position:static;color:inherit;caret-color:auto;width:calc(var(--n,2) * 1ch + .15ch)}
+@media (prefers-reduced-motion:reduce){.rollbig .dg i{transition:none}}
 .audrow{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}.audrow select{width:100%;min-width:0}
 .ttabs{align-self:stretch;display:flex}.ttabs button{flex:1;position:relative}.tpane{display:flex;flex-direction:column;gap:12px}
-.ctn{display:inline-grid;place-items:center;min-width:15px;height:15px;border-radius:8px;background:var(--t2);color:#17191E;font-size:9.5px;font-weight:700;margin-left:5px;padding:0 3px}
+#ttabs [data-tt="ct"]{position:relative}.ctn{position:absolute;top:-3px;right:-2px;display:inline-grid;place-items:center;min-width:15px;height:15px;border-radius:8px;background:var(--t2);color:#17191E;font-size:9.5px;font-weight:700;padding:0 3px;pointer-events:none}
 .ctl{display:flex;flex-direction:column;gap:6px}.ctl:empty::before{content:"Çalışan sayaç yok.";font-size:12px;color:var(--ink-3)}
 .ctr{position:relative;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;border:1px solid var(--stroke);background:var(--glass);overflow:hidden}
 .ctr b{flex:1;min-width:0;font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ctr .mono{font-size:15px;font-variant-numeric:tabular-nums}
@@ -1088,7 +1088,7 @@ body.frameless .app{padding-top:8px}
   <div class="seg sm ttabs" id="ttabs" role="group" aria-label="Zamanlayıcı"><button data-tt="focus" aria-pressed="true">Odak</button><button data-tt="watch" aria-pressed="false">Kronometre</button><button data-tt="ct" aria-pressed="false">Sayaçlar<span class="ctn" id="ctN" hidden></span></button><button data-tt="hist" aria-pressed="false">Geçmiş</button></div>
   <div class="tpane" data-tp="focus">
   <div class="tmodes" id="tmodes" role="group" aria-label="Tür"><button data-tm="focus">Odak</button><button data-tm="short">Mola</button></div>
-  <div class="big" id="tbig" title="Dakikaya ya da saniyeye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><span class="tseg"><span class="troll" id="rMM" aria-hidden="true"></span><input class="tnum" id="tMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"></span><span class="tsep">:</span><span class="tseg"><span class="troll" id="rSS" aria-hidden="true"></span><input class="tnum" id="tSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></span></div>
+  <div class="big rollbig" id="tbig" title="Dakikaya ya da saniyeye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><span class="tseg"><span class="troll" id="rMM" aria-hidden="true"></span><input class="tnum" id="tMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"></span><span class="tsep">:</span><span class="tseg"><span class="troll" id="rSS" aria-hidden="true"></span><input class="tnum" id="tSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></span></div>
   <div class="tcyc" id="tcyc"></div>
   <input class="field" id="tlabel" placeholder="Neye odaklanıyorsun? (isteğe bağlı)" maxlength="80">
   <div class="small" id="ttask" hidden></div>
@@ -1105,16 +1105,16 @@ body.frameless .app{padding-top:8px}
   </div>
   </div>
   <div class="tpane" data-tp="watch" hidden>
-    <h3>Kronometre</h3><div class="big" id="swBig">0:00</div>
+    <h3>Kronometre</h3><div class="big rollbig" id="swBig"><span class="troll" id="swR"></span></div>
     <input class="field" id="swLabel" placeholder="Ne üzerinde çalışıyorsun? (isteğe bağlı)" maxlength="80">
     <div class="small" id="swTask" hidden></div>
     <div class="row"><button class="btn primary" id="swGo" style="flex:1">Başlat</button><button class="btn" id="swSave">Bitir ve kaydet</button><button class="btn" id="swReset" title="Kaydetmeden sıfırla">Sıfırla</button></div>
     <div class="small">Bir görevin yanındaki <b>süre</b> ile o görev için tutarsın; bitirince süre göreve eklenir.</div>
   </div>
   <div class="tpane" data-tp="ct" hidden>
-    <h3>Sayaçlar</h3>
-    <form class="row" id="ctForm" autocomplete="off"><input class="field" id="ctName" placeholder="ör. Lightmap bake" maxlength="40" style="flex:1;min-width:0"><input class="field mono" id="ctDur" placeholder="40 dk" style="width:86px" aria-label="Süre ya da bitiş saati"><button class="btn" type="submit">Ekle</button></form>
-    <span class="small">Süreyi dakika olarak (40) ya da bitiş saati olarak (15:30) yaz. Bitince ses ve bildirim gelir.</span>
+    <h3 id="ctLab">Yeni sayaç</h3>
+    <div class="big rollbig" id="ctBig" title="Süreye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><span class="tseg"><span class="troll" id="cMMr" aria-hidden="true"></span><input class="tnum" id="cMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"></span><span class="tsep">:</span><span class="tseg"><span class="troll" id="cSSr" aria-hidden="true"></span><input class="tnum" id="cSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></span></div>
+    <form class="row" id="ctForm" autocomplete="off"><input class="field" id="ctName" placeholder="Sayaç adı · ör. Lightmap bake" maxlength="40" style="flex:1;min-width:0"><button class="btn primary" type="submit">Başlat</button></form>
     <div class="ctl" id="ctList"></div>
   </div>
   <div class="tpane" data-tp="hist" hidden><h3>Geçmiş</h3><div id="histBody"></div></div>
@@ -3125,7 +3125,7 @@ function swTask(id){const t=S.items.find(i=>i.id===id);if(!t||!api)return;
   if(SW.task&&SW.task!==id&&swSec()>=60)swFinish(true);else if(SW.task!==id){SW.acc=0}
   SW.task=id;SW.label=t.title;SW.proj=null;SW.start=Date.now();swSaveLS();drawTimer();presTrack();renderSwTask();toast("Süre tutuluyor: "+t.title,{label:"Durdur ve kaydet",fn:()=>swFinish(false)},true)}
 function renderSwTask(){if(S.view==="home")renderHome();else if(curP()){const sb=subOf(curP());if(sb==="tasks"||sb==="team")renderTasks();else if(sb==="hub"&&typeof renderHub==="function")renderHub()}if(drId)drawDrawer()}
-function swDraw(){const sec=swSec();$("swBig").textContent=swFmt(sec);$("swGo").textContent=SW.start?"Duraklat":sec?"Devam et":"Başlat";$("swSave").disabled=sec<1;
+function swDraw(){const sec=swSec();rollText($("swR"),swFmt(sec));$("swGo").textContent=SW.start?"Duraklat":sec?"Devam et":"Başlat";$("swSave").disabled=sec<1;
   const t=SW.task&&S.items.find(i=>i.id===SW.task);$("swTask").hidden=!SW.task;if(document.activeElement!==$("swLabel"))$("swLabel").value=SW.label||"";
   if(SW.task)$("swTask").innerHTML=`Görev: <b style="color:var(--ink)">${esc(t?t.title:"…")}</b>${t&&t.focus?" · şimdiye kadar "+fmtMin(t.focus):""} <button class="mini" id="swUnlink">bağı kaldır</button>`}
 $("swGo").onclick=swToggle;$("swSave").onclick=()=>swFinish(false);$("swReset").onclick=swReset;
@@ -3153,12 +3153,28 @@ function ctTick(){const now=Date.now();let ch=false;
   const keep=CT.filter(c=>!c.done||now-c.end<600000);if(keep.length!==CT.length){CT=keep;ch=true}
   if(ch){ctSave();ctDraw()}else if(!$("timerPop").hidden)ctDraw()}
 function ctDel(id){CT=CT.filter(c=>c.id!==id);ctSave();ctDraw();drawTimer()}
+/* sayaçlar: büyük sayı en yakın sayacı gösterir; tıklayıp yazınca yeni sayacın süresi (LS ctLast) */
+const CTE={show:0,st:0};const ctLast=()=>Math.max(5,LS.get("ctLast",2400));
+function ctBig(){const now=Date.now(),c=CT.find(x=>!x.done),a=document.activeElement,ed=a&&(a.id==="cMM"||a.id==="cSS");
+  const own=!c||ed||now<CTE.show,sec=own?ctLast():Math.max(0,Math.ceil((c.end-now)/1000));
+  $("ctLab").textContent=own?"Yeni sayaç":c.n+" · "+pad(new Date(c.end).getHours())+":"+pad(new Date(c.end).getMinutes())+"'te biter";
+  rollSet($("cMMr"),pad(Math.floor(sec/60)));rollSet($("cSSr"),pad(sec%60));if(!ed){$("cMM").value=pad(Math.floor(sec/60));$("cSS").value=pad(sec%60)}}
 function ctDraw(){const now=Date.now(),act=CT.filter(c=>!c.done);$("ctN").hidden=!CT.length;$("ctN").textContent=CT.length;$("ctDot").hidden=!act.length;
-  if($("timerPop").hidden)return;const L=$("ctList");
+  if($("timerPop").hidden)return;const L=$("ctList");ctBig();
   const h=CT.map(c=>{const left=(c.end-now)/1000,fr=Math.min(1,Math.max(0,(now-c.start)/Math.max(1,c.end-c.start)));const at=new Date(c.end);
     return `<div class="ctr${c.done?" done":""}" data-ct="${esc(c.id)}"><b title="${esc(c.n)}">${esc(c.n)}</b><span class="small">${pad(at.getHours())}:${pad(at.getMinutes())}</span><span class="mono">${c.done?"bitti":fmtLong(left)}</span><button class="mini" data-ctdel="${esc(c.id)}" aria-label="Sil">×</button><i style="width:${(fr*100).toFixed(1)}%"></i></div>`}).join("");
   if(L.innerHTML!==h)L.innerHTML=h}
-$("ctForm").addEventListener("submit",e=>{e.preventDefault();if(ctAdd($("ctName").value.trim(),$("ctDur").value)){$("ctName").value="";$("ctDur").value="";toast("Sayaç eklendi",null,true)}});
+function ctStart(){const sec=ctLast();if(ctAdd($("ctName").value.trim(),sec/60)){$("ctName").value="";CTE.show=0;CTE.st=Date.now();if(document.activeElement)document.activeElement.blur();ctDraw();toast("Sayaç başladı · "+fmtMin(Math.max(1,Math.round(sec/60))),null,true)}}
+function ctApplyNum(){const m=parseInt($("cMM").value,10),x=parseInt($("cSS").value,10);if(isNaN(m)&&isNaN(x))return;const sec=Math.min(1440*60,(isNaN(m)?0:m)*60+Math.min(59,isNaN(x)?0:x));if(sec>=5)LS.set("ctLast",sec)}
+$("ctForm").addEventListener("submit",e=>{e.preventDefault();ctApplyNum();ctStart()});
+for(const id of ["cMM","cSS"]){const el=$(id);
+  el.addEventListener("pointerdown",e=>{if(document.activeElement===el)return;e.preventDefault();const L=ctLast();$("cMM").value=pad(Math.floor(L/60));$("cSS").value=pad(L%60);el.focus();el.select();ctBig()});
+  el.addEventListener("focus",()=>el.select());
+  el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"");el.style.setProperty("--n",Math.max(2,el.value.length));if(id==="cMM"&&el.value.length>=3)$("cSS").focus()});
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();ctApplyNum();ctStart()}else if(e.key==="Escape"){e.stopPropagation();el.blur();ctBig()}else if(e.key===":"&&id==="cMM"){e.preventDefault();$("cSS").focus()}});
+  el.addEventListener("blur",()=>setTimeout(()=>{if(!["cMM","cSS"].includes((document.activeElement||{}).id)){ctApplyNum();if(Date.now()-CTE.st>400)CTE.show=Date.now()+2500;ctBig()}},0));
+  el.addEventListener("wheel",e=>{e.preventDefault();const up=e.deltaY<0;let sec=ctLast();sec+=id==="cMM"?(up?1:-1)*(e.shiftKey?5:1)*60:(up?1:-1)*(e.shiftKey?10:1);
+    LS.set("ctLast",Math.max(5,Math.min(1440*60,sec)));if(document.activeElement===el)el.blur();CTE.show=Date.now()+2500;ctBig()},{passive:false})}
 $("ctList").addEventListener("click",e=>{const d=e.target.closest("[data-ctdel]");if(d)ctDel(d.dataset.ctdel)});
 /* sayaç bildirimi: odakta olsan da gelir (kendi kurduğun hatırlatma) */
 async function notifyAlways(title,body){if(document.hasFocus()&&!document.hidden)return;
@@ -3375,6 +3391,10 @@ function rollSet(el,str){if(el.dataset.v===str)return;el.dataset.v=str;
   if(el.children.length!==str.length){el.innerHTML=[...str].map(()=>`<span class="dg"><i>${"0123456789".split("").map(d=>`<b>${d}</b>`).join("")}</i></span>`).join("");
     [...el.children].forEach((c,k)=>{const i=c.firstChild;i.style.transition="none";i.style.transform=`translateY(${-str[k]}em)`;void i.offsetHeight;i.style.transition=""});return}
   [...el.children].forEach((c,k)=>{c.firstChild.style.transform=`translateY(${-str[k]}em)`})}
+function rollText(el,str){if(el.dataset.v===str)return;const sig=str.replace(/\d/g,"0");
+  if(el.dataset.sig!==sig){el.dataset.sig=sig;el.innerHTML=[...str].map(ch=>/\d/.test(ch)?`<span class="dg"><i>${"0123456789".split("").map(d=>`<b>${d}</b>`).join("")}</i></span>`:`<span class="rsep">${ch}</span>`).join("");
+    el.dataset.v="";[...el.children].forEach((c,k)=>{if(!c.firstChild||c.className!=="dg")return;const i=c.firstChild;i.style.transition="none";i.style.transform=`translateY(${-str[k]}em)`;void i.offsetHeight;i.style.transition=""});el.dataset.v=str;return}
+  el.dataset.v=str;[...el.children].forEach((c,k)=>{if(c.className==="dg")c.firstChild.style.transform=`translateY(${-str[k]}em)`})}
 /* tür: Odak / Mola; her biri kendi süresini hatırlar */
 $("tmodes").addEventListener("click",e=>{const b=e.target.closest("[data-tm]");if(!b)return;const k=b.dataset.tm;
   if(TM.endAt||tLeft()<TM.dur){if(k!==brkKind())toast("Önce sayacı sıfırla",null,true);return}
