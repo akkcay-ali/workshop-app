@@ -80,7 +80,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Salt görüntü: ana pencere `#world`'ün kopyasını `ref-snap` olayıyla yollar (`refPush`, `syncCards` sonunda `refSched`); görseller Cache Storage `ws-ref`'e yazılır (aynı köken).
   Ref penceresi: kaydır/yakınlaştır, çift tık sığdır, saydamlık (LS `atolye:refop`), sabitle, "tıklamalar arkaya geçsin" (`setIgnoreCursorEvents`; geri Ctrl+Alt+R → `ref-pass`), görünüm LS `atolye:refv:<bid>`.
 - Hızlı görev (masaüstü): Ctrl+Alt+Boşluk (global-shortcut → `quick` olayı) → `quickOpen` (`#quick` penceresi) → `quick-add` → `quickAdd`: açık projeye (yoksa projesiz) bugünün görevi, ortak projede özel; `parseTask` (14:30, #etiket).
-  Yardımcı pencereler `__WIN` = mini/ref/quick (`__MINI` ile ana betik durur); izinler `capabilities/aux.json`.
+  Yardımcı pencereler `__WIN` = mini/ref/quick (`__MINI` ile ana betik durur); izinler `capabilities/helpers.json` (Windows'ta `aux` ayrılmış ad, kullanma).
 - Paylaş: yerel proje hemen taşınmaz (`shPre`); "Buluta taşı ve davet et" / "Yalnızca buluta taşı" (`shareMove`).
 - Ses cihazları ayarlarda (`drawAud`, LS `vMic`/`vOut`); çan ve ses kartları da `vOut`'a çalar. Yazı tipi sabit: Geist + Unbounded (seçenek kaldırıldı).
 - Yazı kartı `kind:"text"` (çerçevesiz başlık): `fs` px, genişlik içerikten (`max-content`, `w` ölçülüp saklanır); araç çubuğu "Yazı" / T, köşeden sürükle = boyut (`tresize`), seçiliyken +/−, sağ tık `textSizeMenu` (`TSIZES`), `convText` not ↔ yazı.
