@@ -148,12 +148,12 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .ibtn:hover{color:var(--ink);border-color:var(--stroke-2)}
 .ibtn svg{width:15px;height:15px}
 .ibtn[aria-expanded="true"]{background:var(--glass-3);color:var(--ink)}
-.npchip{display:flex;align-items:center;gap:9px;height:32px;padding:0 12px 0 4px;border-radius:11px;overflow:hidden;background:var(--glass);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 rgb(255 255 255 / .05),0 6px 18px -10px rgb(0 0 0 / .6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex:0 1 auto;color:var(--ink-2);font-size:12px;text-decoration:none;position:absolute;left:0;right:0;margin-inline:auto;width:max-content;max-width:min(460px,36vw);min-width:0;z-index:2;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.npchip{display:flex;align-items:center;gap:9px;height:32px;padding:0 14px;border-radius:11px;overflow:hidden;background:var(--glass);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 rgb(255 255 255 / .05),0 6px 18px -10px rgb(0 0 0 / .6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex:0 1 auto;color:var(--ink-2);font-size:12px;text-decoration:none;position:absolute;left:0;right:0;margin-inline:auto;width:max-content;max-width:min(460px,36vw);min-width:0;z-index:2;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
 .npchip .npart{position:relative;width:24px;height:24px;flex:0 0 auto;border-radius:7px;background:rgb(255 255 255 / .06) center/cover no-repeat;display:grid;place-items:center;overflow:hidden}
 .npchip .npart .npeq{position:absolute;inset:auto 0 0 0;height:100%;padding:0 6px 5px;justify-content:center;background:linear-gradient(transparent 30%,rgb(0 0 0 / .55))}.npchip .npart .npeq i{background:#fff}
 .npchip .nptm{font-family:var(--f-mono);font-size:11px;color:var(--muted);flex:0 0 auto;font-variant-numeric:tabular-nums}
 .npchip .npbar{position:absolute;left:0;bottom:0;height:2px;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 50%,transparent),var(--accent));border-radius:0 2px 2px 0;transition:width 1s linear}
-.npchip.idle{padding-left:10px}.npchip.idle .npart{display:none}
+.npchip .npart{display:none}
 .npchip:hover{border-color:var(--stroke-2);color:var(--ink)}.npchip.idle .npeq i{animation:none;transform:scaleY(.3);background:var(--ink-3,var(--muted))}.npchip.idle .nptag{color:var(--muted)}.npchip:active{transform:scale(.96)}.npchip.npin{animation:popIn .45s linear both}
 .npchip .nptag{font-family:var(--f-mono);font-size:11px;color:var(--accent);flex:0 0 auto}.npchip .nptx{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npchip .nptx b{color:var(--ink);font-weight:500}
 .npeq{display:flex;align-items:flex-end;gap:2px;height:11px;flex:0 0 auto}.npeq i{width:2px;height:100%;border-radius:2px;background:var(--accent);transform-origin:bottom;animation:npEq 1s ease-in-out infinite}
@@ -1031,7 +1031,7 @@ body.frameless .app{padding-top:8px}
 <div class="app">
   <div class="topbar">
     <div class="tabs" id="tabs" role="tablist" aria-label="Açık projeler"></div>
-    <a class="npchip" id="npChip" hidden target="_blank" rel="noopener"><span class="npart" id="npArt"><span class="npeq" aria-hidden="true"><i></i><i></i><i></i></span></span><span class="nptag">#np</span><span class="nptx" id="npTx"></span><span class="nptm" id="npTm"></span><i class="npbar" id="npBar"></i></a>
+    <a class="npchip" id="npChip" hidden target="_blank" rel="noopener"><span class="npart" id="npArt" hidden></span><span class="nptag">#np</span><span class="nptx" id="npTx"></span><span class="nptm" id="npTm"></span><i class="npbar" id="npBar"></i></a>
     <div class="right">
       <button class="ibtn" id="timerBtn" aria-expanded="false" aria-controls="timerPop" title="Odak zamanlayıcısı">
         <svg class="ring" viewBox="0 0 20 20"><circle class="bgc" cx="10" cy="10" r="8"/><circle class="fg" id="ringFg" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27"/></svg>
@@ -3442,7 +3442,7 @@ setInterval(npTick,1000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)spoNow(true)});
 function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
   const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!k;np.classList.toggle("idle",!n);
-  $("npArt").style.backgroundImage=n&&n.img?`url("${n.img}")`:"";if(!n){$("npTm").textContent="";$("npBar").style.width="0"}
+  if(!n){$("npTm").textContent="";$("npBar").style.width="0"}
   if(!n){if(k){$("npTx").textContent=SPO.err?"Spotify: "+SPO.err:"şu an çalan yok";np.title="Spotify bağlı · çalmaya başlayınca burada görünür";np.href="https://open.spotify.com/"}return}
   $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a+" · Spotify'da aç";np.href=n.id&&!/\s/.test(n.id)?"https://open.spotify.com/track/"+encodeURIComponent(n.id):"https://open.spotify.com/";
   np.classList.remove("npin");void np.offsetWidth;np.classList.add("npin")}
