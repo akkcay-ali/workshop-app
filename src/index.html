@@ -149,7 +149,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .ibtn svg{width:15px;height:15px}
 .ibtn[aria-expanded="true"]{background:var(--glass-3);color:var(--ink)}
 .npchip{display:flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 10px;border-radius:9px;background:transparent;border:1px dashed var(--stroke-2);flex:0 1 auto;color:var(--ink-2);font-size:12px;text-decoration:none;max-width:min(340px,32vw);min-width:0;cursor:pointer;transition:background .15s,color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
-.npchip:hover{background:var(--glass);color:var(--ink)}.npchip.idle .npeq i{animation:none;transform:scaleY(.3);background:var(--ink-3,var(--muted))}.npchip.idle .nptag{color:var(--muted)}.npchip:active{transform:scale(.96)}.npchip.pop{animation:popIn .45s linear both}
+.npchip:hover{background:var(--glass);color:var(--ink)}.npchip.idle .npeq i{animation:none;transform:scaleY(.3);background:var(--ink-3,var(--muted))}.npchip.idle .nptag{color:var(--muted)}.npchip:active{transform:scale(.96)}.npchip.npin{animation:popIn .45s linear both}
 .npchip .nptag{font-family:var(--f-mono);font-size:11px;color:var(--accent);flex:0 0 auto}.npchip .nptx{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npchip .nptx b{color:var(--ink);font-weight:500}
 .npeq{display:flex;align-items:flex-end;gap:2px;height:11px;flex:0 0 auto}.npeq i{width:2px;height:100%;border-radius:2px;background:var(--accent);transform-origin:bottom;animation:npEq 1s ease-in-out infinite}
 .npeq i:nth-child(2){animation-duration:.8s;animation-delay:-.3s}.npeq i:nth-child(3){animation-duration:1.15s;animation-delay:-.6s}
@@ -3432,7 +3432,7 @@ function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;
   const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!k;np.classList.toggle("idle",!n);
   if(!n){if(k){$("npTx").textContent=SPO.err?"Spotify: "+SPO.err:"şu an çalan yok";np.title="Spotify bağlı · çalmaya başlayınca burada görünür";np.href="https://open.spotify.com/"}return}
   $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a+" · Spotify'da aç";np.href=n.id&&!/\s/.test(n.id)?"https://open.spotify.com/track/"+encodeURIComponent(n.id):"https://open.spotify.com/";
-  np.classList.remove("pop");void np.offsetWidth;np.classList.add("pop")}
+  np.classList.remove("npin");void np.offsetWidth;np.classList.add("npin")}
 function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!!TA||!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
 $("spoBtn").onclick=()=>SPO.on()?spoOff(false):spoConnect();
 setTimeout(()=>{spoBoot();drawSpo();drawSpoNow();spoNow(true)},0);setInterval(spoNow,5000);
