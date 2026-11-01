@@ -154,6 +154,45 @@ fn initial_files() -> Vec<String> {
     workshop_args(&std::env::args().collect::<Vec<_>>())
 }
 
+/// Spotify bağlantısı (masaüstü): Spotify dönüşü http://127.0.0.1:43117/callback adresine gelir.
+/// Bir kez dinler (en çok 5 dk), tarayıcıya kısa bir sayfa döner, sorgu dizesini `spo-code` olayıyla arayüze yollar.
+/// Port doluysa (önceki deneme hâlâ dinliyorsa) hata döner; arayüz bunu yok sayar, o dinleyici yakalar.
+#[tauri::command]
+fn spo_listen(app: tauri::AppHandle) -> Result<(), String> {
+    use std::io::{Read, Write};
+    use tauri::Emitter;
+    let l = std::net::TcpListener::bind("127.0.0.1:43117").map_err(|e| e.to_string())?;
+    l.set_nonblocking(true).map_err(|e| e.to_string())?;
+    std::thread::spawn(move || {
+        let start = std::time::Instant::now();
+        while start.elapsed().as_secs() < 300 {
+            match l.accept() {
+                Ok((mut s, _)) => {
+                    let _ = s.set_nonblocking(false);
+                    let _ = s.set_read_timeout(Some(std::time::Duration::from_secs(5)));
+                    let mut buf = [0u8; 8192];
+                    let n = s.read(&mut buf).unwrap_or(0);
+                    let req = String::from_utf8_lossy(&buf[..n]).to_string();
+                    let path = req.lines().next().unwrap_or("").split_whitespace().nth(1).unwrap_or("").to_string();
+                    if !path.starts_with("/callback") {
+                        let _ = s.write_all(b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+                        continue;
+                    }
+                    let body = "<!doctype html><meta charset=utf-8><title>Workshop</title><body style=\"font-family:system-ui,sans-serif;background:#111216;color:#e8eaee;display:grid;place-items:center;height:100vh;margin:0\"><div style=\"text-align:center\"><b>Spotify bağlandı</b><p style=\"color:#9aa0ac\">Bu sekmeyi kapatıp Workshop'a dönebilirsin.</p></div></body>";
+                    let resp = format!("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", body.len(), body);
+                    let _ = s.write_all(resp.as_bytes());
+                    let q = path.splitn(2, '?').nth(1).unwrap_or("").to_string();
+                    let _ = app.emit("spo-code", q);
+                    break;
+                }
+                Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => std::thread::sleep(std::time::Duration::from_millis(150)),
+                Err(_) => break,
+            }
+        }
+    });
+    Ok(())
+}
+
 /// Ekran alıntısı: sistemin kendi alıntı aracını açar (Windows: Ekran Alıntısı, macOS: screencapture).
 /// Seçilen bölge panoya (clipboard) kopyalanır; arayüz `clip_seq`/`clip_image` ile alır.
 #[tauri::command]
@@ -373,7 +412,8 @@ pub fn run() {
             initial_files,
             snip_start,
             clip_seq,
-            clip_image
+            clip_image,
+            spo_listen
         ])
         .run(tauri::generate_context!());
     if let Err(e) = res {

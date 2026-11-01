@@ -3383,13 +3383,25 @@ $("histBody").addEventListener("pointerleave",()=>histTip(null));
 $("histBody").addEventListener("click",e=>{const d=e.target.closest(".hday");histTip(d||null)});
 /* --- Spotify: odakta çalan şarkılar geçmişe (PKCE, gizli anahtar yok; Client ID app_config.spotify_client_id) --- */
 const SPO={tok:LS.get("spo",null),now:null,nt:0,on(){return !!(this.tok&&this.tok.refresh)}};
-const spoRedirect=()=>location.origin+location.pathname.replace(/index\.html$/,"");
+/* masaüstünde dönüş uygulamanın yerel dinleyicisine (lib.rs spo_listen), web'de sayfanın kendisine */
+const SPO_LOOP="http://127.0.0.1:43117/callback";
+const spoRedirect=()=>TA?SPO_LOOP:location.origin+location.pathname.replace(/index\.html$/,"");
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 async function spoCid(){let c="";try{if(CL.sb){const {data}=await CL.sb.from("app_config").select("value").eq("key","spotify_client_id").maybeSingle();c=(data&&data.value)||""}}catch(_){}return c}
-async function spoConnect(){if(TA){toast("Spotify şimdilik yalnızca web sürümünde",null,true);return}const cid=await spoCid();if(!cid){toast("Spotify bağlantısı henüz ayarlanmadı",null,true);return}
+async function spoConnect(){const cid=await spoCid();if(!cid){toast("Spotify bağlantısı henüz ayarlanmadı",null,true);return}
   const v=b64u(crypto.getRandomValues(new Uint8Array(48))),st=b64u(crypto.getRandomValues(new Uint8Array(12))),ch=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));
+  const url="https://accounts.spotify.com/authorize?"+new URLSearchParams({client_id:cid,response_type:"code",redirect_uri:spoRedirect(),code_challenge_method:"S256",code_challenge:ch,state:st,scope:"user-read-recently-played user-read-currently-playing"});
+  if(TA){SPO.pk={v,st,cid};try{await tinv("spo_listen")}catch(_){/* önceki dinleyici hâlâ açık: o yakalar */}
+    try{await TA.opener.openUrl(url)}catch(e){toast("Tarayıcı açılamadı: "+(e.message||e),null,true);return}toast("Tarayıcıda Spotify iznini onayla, sonra buraya dön",null,true);return}
   try{sessionStorage.setItem("spoPk",JSON.stringify({v,st,cid}))}catch(_){}
-  location.href="https://accounts.spotify.com/authorize?"+new URLSearchParams({client_id:cid,response_type:"code",redirect_uri:spoRedirect(),code_challenge_method:"S256",code_challenge:ch,state:st,scope:"user-read-recently-played user-read-currently-playing"})}
+  location.href=url}
+/* masaüstü: tarayıcıdan dönen kod */
+async function spoDesk(q){const pk=SPO.pk;const u=new URLSearchParams(q||"");const code=u.get("code"),err=u.get("error");if(!pk||u.get("state")!==pk.st)return;SPO.pk=null;
+  if(err||!code){toast("Spotify bağlantısı iptal edildi",null,true);return}
+  try{spoSave(await spoToken({grant_type:"authorization_code",code,redirect_uri:SPO_LOOP,client_id:pk.cid,code_verifier:pk.v}),pk.cid);toast("Spotify bağlandı · odakta çalanlar Geçmiş'e yazılacak",null,true);spoNow(true);
+    try{const w=TA.window.getCurrentWindow();w.show();w.unminimize();w.setFocus()}catch(_){}}
+  catch(e){toast("Spotify bağlanamadı: "+e.message,null,true);errPush("spotify: "+e.message)}}
+if(TA&&TA.event)TA.event.listen("spo-code",e=>spoDesk(e.payload));
 async function spoToken(body){const r=await fetch("https://accounts.spotify.com/api/token",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error_description||j.error||String(r.status));return j}
 function spoSave(j,cid){SPO.tok={access:j.access_token,refresh:j.refresh_token||(SPO.tok&&SPO.tok.refresh),exp:Date.now()+((j.expires_in||3600)-60)*1000,cid};LS.set("spo",SPO.tok);drawSpo()}
@@ -3432,7 +3444,7 @@ function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;
   if(!n){if(k){$("npTx").textContent=SPO.err?"Spotify: "+SPO.err:"şu an çalan yok";np.title="Spotify bağlı · çalmaya başlayınca burada görünür";np.href="https://open.spotify.com/"}return}
   $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a+" · Spotify'da aç";np.href=n.id&&!/\s/.test(n.id)?"https://open.spotify.com/track/"+encodeURIComponent(n.id):"https://open.spotify.com/";
   np.classList.remove("npin");void np.offsetWidth;np.classList.add("npin")}
-function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!!TA||!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
+function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
 $("spoBtn").onclick=()=>SPO.on()?spoOff(false):spoConnect();
 setTimeout(()=>{spoBoot();drawSpo();drawSpoNow();spoNow(true)},0);setInterval(spoNow,5000);
 function drawTimer(){
