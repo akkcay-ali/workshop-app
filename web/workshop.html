@@ -105,7 +105,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:10px 14px}
 
 /* ---------- top bar ---------- */
-.topbar{display:flex;align-items:center;gap:10px;min-width:0}
+.topbar{display:flex;align-items:center;gap:10px;min-width:0;position:relative}
 .tabs{display:flex;gap:6px;overflow-x:auto;min-width:0;flex:0 1 auto;scrollbar-width:none;padding:2px}.topbar>.right{margin-left:auto}
 .tabs::-webkit-scrollbar{display:none}
 .tab{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-radius:10px;color:var(--ink-2);white-space:nowrap;font-size:13px;font-weight:500;flex:0 0 auto;
@@ -134,7 +134,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .ibtn:hover{color:var(--ink);border-color:var(--stroke-2)}
 .ibtn svg{width:15px;height:15px}
 .ibtn[aria-expanded="true"]{background:var(--glass-3);color:var(--ink)}
-.npchip{display:flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 10px;border-radius:9px;background:transparent;border:1px dashed var(--stroke-2);flex:0 1 auto;color:var(--ink-2);font-size:12px;text-decoration:none;max-width:min(340px,32vw);min-width:0;cursor:pointer;transition:background .15s,color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.npchip{display:flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 10px;border-radius:9px;background:transparent;border:1px dashed var(--stroke-2);flex:0 1 auto;color:var(--ink-2);font-size:12px;text-decoration:none;position:absolute;left:0;right:0;margin-inline:auto;width:max-content;max-width:min(420px,34vw);min-width:0;z-index:2;cursor:pointer;transition:background .15s,color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
 .npchip:hover{background:var(--glass);color:var(--ink)}.npchip.idle .npeq i{animation:none;transform:scaleY(.3);background:var(--ink-3,var(--muted))}.npchip.idle .nptag{color:var(--muted)}.npchip:active{transform:scale(.96)}.npchip.npin{animation:popIn .45s linear both}
 .npchip .nptag{font-family:var(--f-mono);font-size:11px;color:var(--accent);flex:0 0 auto}.npchip .nptx{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npchip .nptx b{color:var(--ink);font-weight:500}
 .npeq{display:flex;align-items:flex-end;gap:2px;height:11px;flex:0 0 auto}.npeq i{width:2px;height:100%;border-radius:2px;background:var(--accent);transform-origin:bottom;animation:npEq 1s ease-in-out infinite}
