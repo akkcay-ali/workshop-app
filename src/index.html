@@ -1113,6 +1113,7 @@ body.frameless .app{padding-top:8px}
   </div>
   <div class="tpane" data-tp="ct" hidden>
     <h3 id="ctLab">Yeni sayaç</h3>
+    <div class="tmodes" id="ctModes" role="group" aria-label="Sayaç türü"><button data-cm="dur">Süre</button><button data-cm="at">Bitiş saati</button></div>
     <div class="big rollbig" id="ctBig" title="Süreye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><span class="tseg"><span class="troll" id="cMMr" aria-hidden="true"></span><input class="tnum" id="cMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"></span><span class="tsep">:</span><span class="tseg"><span class="troll" id="cSSr" aria-hidden="true"></span><input class="tnum" id="cSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></span></div>
     <form class="row" id="ctForm" autocomplete="off"><input class="field" id="ctName" placeholder="Sayaç adı · ör. Lightmap bake" maxlength="40" style="flex:1;min-width:0"><button class="btn primary" type="submit">Başlat</button></form>
     <div class="ctl" id="ctList"></div>
@@ -3154,27 +3155,42 @@ function ctTick(){const now=Date.now();let ch=false;
   if(ch){ctSave();ctDraw()}else if(!$("timerPop").hidden)ctDraw()}
 function ctDel(id){CT=CT.filter(c=>c.id!==id);ctSave();ctDraw();drawTimer()}
 /* sayaçlar: büyük sayı en yakın sayacı gösterir; tıklayıp yazınca yeni sayacın süresi (LS ctLast) */
-const CTE={show:0,st:0};const ctLast=()=>Math.max(5,LS.get("ctLast",2400));
+/* iki tür: Süre (dk:sn, LS ctLast) ya da Bitiş saati (sa:dk, LS ctAt = günün dakikası; geçmişse ertesi gün) */
+const CTE={show:0,st:0,mode:LS.get("ctMode","dur")};const ctLast=()=>Math.max(5,LS.get("ctLast",2400));
+const ctAtDef=()=>{const d=new Date(Date.now()+3600e3);return (d.getHours()*60+Math.ceil(d.getMinutes()/5)*5)%1440};
+const ctAt=()=>{const v=LS.get("ctAt",null);return v==null?ctAtDef():((v%1440)+1440)%1440};
+const ctAtMs=m=>{const d=new Date();d.setHours(Math.floor(m/60),m%60,0,0);if(d.getTime()<=Date.now())d.setDate(d.getDate()+1);return d.getTime()};
+const ctPair=()=>{if(CTE.mode==="at"){const m=ctAt();return [Math.floor(m/60),m%60]}const s=ctLast();return [Math.floor(s/60),s%60]};
 function ctBig(){const now=Date.now(),c=CT.find(x=>!x.done),a=document.activeElement,ed=a&&(a.id==="cMM"||a.id==="cSS");
-  const own=!c||ed||now<CTE.show,sec=own?ctLast():Math.max(0,Math.ceil((c.end-now)/1000));
-  $("ctLab").textContent=own?"Yeni sayaç":c.n+" · "+pad(new Date(c.end).getHours())+":"+pad(new Date(c.end).getMinutes())+"'te biter";
-  rollSet($("cMMr"),pad(Math.floor(sec/60)));rollSet($("cSSr"),pad(sec%60));if(!ed){$("cMM").value=pad(Math.floor(sec/60));$("cSS").value=pad(sec%60)}}
+  const own=!c||ed||now<CTE.show;let A,B;
+  if(own){[A,B]=ctPair();$("ctLab").textContent=CTE.mode==="at"?"Bitiş saati · "+fmtMin(Math.max(1,Math.round((ctAtMs(ctAt())-now)/60000)))+" sonra":"Yeni sayaç"}
+  else{const sec=Math.max(0,Math.ceil((c.end-now)/1000)),hr=sec>=3600;A=hr?Math.floor(sec/3600):Math.floor(sec/60);B=hr?Math.floor(sec%3600/60):sec%60;
+    $("ctLab").textContent=c.n+" · "+pad(new Date(c.end).getHours())+":"+pad(new Date(c.end).getMinutes())+"'te biter"+(hr?" · sa:dk":"")}
+  document.querySelectorAll("#ctModes [data-cm]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.cm===CTE.mode));
+  $("cMM").setAttribute("aria-label",CTE.mode==="at"?"Saat":"Dakika");$("cSS").setAttribute("aria-label",CTE.mode==="at"?"Dakika":"Saniye");
+  rollSet($("cMMr"),pad(A));rollSet($("cSSr"),pad(B));if(!ed){$("cMM").value=pad(A);$("cSS").value=pad(B)}}
+$("ctModes").addEventListener("click",e=>{const b=e.target.closest("[data-cm]");if(!b)return;CTE.mode=b.dataset.cm;LS.set("ctMode",CTE.mode);if(CTE.mode==="at"&&LS.get("ctAt",null)==null)LS.set("ctAt",ctAtDef());CTE.show=Date.now()+2500;ctBig()});
 function ctDraw(){const now=Date.now(),act=CT.filter(c=>!c.done);$("ctN").hidden=!CT.length;$("ctN").textContent=CT.length;$("ctDot").hidden=!act.length;
   if($("timerPop").hidden)return;const L=$("ctList");ctBig();
   const h=CT.map(c=>{const left=(c.end-now)/1000,fr=Math.min(1,Math.max(0,(now-c.start)/Math.max(1,c.end-c.start)));const at=new Date(c.end);
     return `<div class="ctr${c.done?" done":""}" data-ct="${esc(c.id)}"><b title="${esc(c.n)}">${esc(c.n)}</b><span class="small">${pad(at.getHours())}:${pad(at.getMinutes())}</span><span class="mono">${c.done?"bitti":fmtLong(left)}</span><button class="mini" data-ctdel="${esc(c.id)}" aria-label="Sil">×</button><i style="width:${(fr*100).toFixed(1)}%"></i></div>`}).join("");
   if(L.innerHTML!==h)L.innerHTML=h}
-function ctStart(){const sec=ctLast();if(ctAdd($("ctName").value.trim(),sec/60)){$("ctName").value="";CTE.show=0;CTE.st=Date.now();if(document.activeElement)document.activeElement.blur();ctDraw();toast("Sayaç başladı · "+fmtMin(Math.max(1,Math.round(sec/60))),null,true)}}
-function ctApplyNum(){const m=parseInt($("cMM").value,10),x=parseInt($("cSS").value,10);if(isNaN(m)&&isNaN(x))return;const sec=Math.min(1440*60,(isNaN(m)?0:m)*60+Math.min(59,isNaN(x)?0:x));if(sec>=5)LS.set("ctLast",sec)}
+function ctStart(){const at=CTE.mode==="at",sec=ctLast(),m=ctAt();
+  if(ctAdd($("ctName").value.trim(),at?pad(Math.floor(m/60))+":"+pad(m%60):sec/60)){$("ctName").value="";CTE.show=0;CTE.st=Date.now();if(document.activeElement)document.activeElement.blur();ctDraw();
+    toast(at?"Sayaç "+pad(Math.floor(m/60))+":"+pad(m%60)+"'e kadar · "+fmtMin(Math.max(1,Math.round((ctAtMs(m)-Date.now())/60000))):"Sayaç başladı · "+fmtMin(Math.max(1,Math.round(sec/60))),null,true)}}
+function ctApplyNum(){const m=parseInt($("cMM").value,10),x=parseInt($("cSS").value,10);if(isNaN(m)&&isNaN(x))return;
+  if(CTE.mode==="at"){LS.set("ctAt",Math.min(23,isNaN(m)?0:m)*60+Math.min(59,isNaN(x)?0:x));return}
+  const sec=Math.min(1440*60,(isNaN(m)?0:m)*60+Math.min(59,isNaN(x)?0:x));if(sec>=5)LS.set("ctLast",sec)}
 $("ctForm").addEventListener("submit",e=>{e.preventDefault();ctApplyNum();ctStart()});
 for(const id of ["cMM","cSS"]){const el=$(id);
-  el.addEventListener("pointerdown",e=>{if(document.activeElement===el)return;e.preventDefault();const L=ctLast();$("cMM").value=pad(Math.floor(L/60));$("cSS").value=pad(L%60);el.focus();el.select();ctBig()});
+  el.addEventListener("pointerdown",e=>{if(document.activeElement===el)return;e.preventDefault();const ae=(document.activeElement||{}).id;if(ae!=="cMM"&&ae!=="cSS"){const [A,B]=ctPair();$("cMM").value=pad(A);$("cSS").value=pad(B)}el.focus();el.select();ctBig()});
   el.addEventListener("focus",()=>el.select());
   el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"");el.style.setProperty("--n",Math.max(2,el.value.length));if(id==="cMM"&&el.value.length>=3)$("cSS").focus()});
   el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();ctApplyNum();ctStart()}else if(e.key==="Escape"){e.stopPropagation();el.blur();ctBig()}else if(e.key===":"&&id==="cMM"){e.preventDefault();$("cSS").focus()}});
   el.addEventListener("blur",()=>setTimeout(()=>{if(!["cMM","cSS"].includes((document.activeElement||{}).id)){ctApplyNum();if(Date.now()-CTE.st>400)CTE.show=Date.now()+2500;ctBig()}},0));
-  el.addEventListener("wheel",e=>{e.preventDefault();const up=e.deltaY<0;let sec=ctLast();sec+=id==="cMM"?(up?1:-1)*(e.shiftKey?5:1)*60:(up?1:-1)*(e.shiftKey?10:1);
-    LS.set("ctLast",Math.max(5,Math.min(1440*60,sec)));if(document.activeElement===el)el.blur();CTE.show=Date.now()+2500;ctBig()},{passive:false})}
+  el.addEventListener("wheel",e=>{e.preventDefault();const up=e.deltaY<0,dir=up?1:-1;
+    if(CTE.mode==="at"){LS.set("ctAt",((ctAt()+(id==="cMM"?dir*60:dir*(e.shiftKey?15:5)))%1440+1440)%1440)}
+    else{let sec=ctLast();sec+=id==="cMM"?dir*(e.shiftKey?5:1)*60:dir*(e.shiftKey?10:1);LS.set("ctLast",Math.max(5,Math.min(1440*60,sec)))}if(document.activeElement===el)el.blur();CTE.show=Date.now()+2500;ctBig()},{passive:false})}
 $("ctList").addEventListener("click",e=>{const d=e.target.closest("[data-ctdel]");if(d)ctDel(d.dataset.ctdel)});
 /* sayaç bildirimi: odakta olsan da gelir (kendi kurduğun hatırlatma) */
 async function notifyAlways(title,body){if(document.hasFocus()&&!document.hidden)return;
