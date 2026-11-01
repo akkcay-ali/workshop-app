@@ -76,6 +76,8 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Odak ekleri: günlük hedef (`fGoal`, LS `fgoal`, `#tgoal` tekerlek/tık) · "aklıma geldi" (`PARK`, LS `park`; odaktayken hızlı ekleme `quickAdd` → `parkAdd`, listesi `#tpark`, odak bitince hatırlatma) ·
   ortam sesi (`AMB`, LS `amb`/`ambv`: yağmur/derin/kafe Web Audio ile üretilir, yalnızca odak sürerken; `ambSync` drawTimer'da) · mola önerileri (`BTIPS`, `BK`, `#brkCard`, OPT `btips`; mini sayaçta kısa hâli) ·
   Geçmiş sekmesi (`drawHist`, son 7 gün: özet, hedef serisi, gün kutuları + `histTip`, saat dağılımı, projeler; `type:"focus"` öğelerinden).
+  Spotify (yalnızca web, `SPO`): ayarlar `#spoSec` "Bağlan" → PKCE (`spoConnect`, dönüşte `spoBoot`; Client ID `app_config.spotify_client_id`, yönlendirme = sayfa adresi `spoRedirect`),
+  belirteç LS `spo` (yenileme `spoFetch`). Odak bitince `spoAttach`: son çalınanlar + şu an çalan → focus öğesinde `music:[{id,n,a,img,at}]` (4 dk sonra bir kez daha). Odakta `#tspo` şu an çalan; Geçmiş'te ipucu + "Odakta dinlediklerin".
   Odakta: presence `f` (bitiş zamanı ya da 1 = kronometre) → `.hp.fx`; odaktayken `teamNotify` yalnızca acil (bahsetme, özel mesaj).
 - Üstte referans (masaüstü, PureRef yerine): pano çubuğu "Üstte aç" → `refOpen` → `WebviewWindow("ref", index.html#ref)` (her zaman üstte, çerçevesiz, saydam).
   Salt görüntü: ana pencere `#world`'ün kopyasını `ref-snap` olayıyla yollar (`refPush`, `syncCards` sonunda `refSched`); görseller Cache Storage `ws-ref`'e yazılır (aynı köken).

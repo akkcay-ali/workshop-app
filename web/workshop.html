@@ -964,7 +964,9 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .brkcard .bkx{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px}.brkcard .bktip{font-size:14px;line-height:1.45;color:var(--ink)}.brkcard .row .btn{flex:1}
 .hst{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}.hst div{padding:8px;border-radius:10px;background:rgb(255 255 255 / .04);border:1px solid var(--stroke)}.hst b{display:block;font-size:15px;font-variant-numeric:tabular-nums}.hst span{font-size:11px;color:var(--muted)}
 .hh{font-size:10.5px;letter-spacing:.06em;color:var(--muted);margin:12px 0 6px;font-family:var(--mono,inherit)}
-#histBody{position:relative}.hdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.hday{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:default}
+#histBody{position:relative}.tspo{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tspo img{width:18px;height:18px;border-radius:4px}
+.htip .hmu{display:block;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hmus{display:flex;flex-direction:column;gap:6px}.hmus div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;font-size:12.5px}
+.hmus img,.hmus .ph{width:28px;height:28px;border-radius:5px;background:rgb(255 255 255 / .06)}.hmus b{font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hmus em{font-style:normal;color:var(--muted);font-size:11.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hmus span{color:var(--muted);font-variant-numeric:tabular-nums}.hdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.hday{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:default}
 .hday i{width:100%;aspect-ratio:1;border-radius:8px;background:rgb(255 255 255 / .05);display:grid;place-items:center;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}.hday:hover i{transform:scale(1.08)}
 .hday i b{font-size:10.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}.hday span{font-size:10.5px;color:var(--muted)}.hday.tdy span{color:var(--ink);font-weight:600}
 .hday i.l1{background:color-mix(in srgb,var(--accent) 28%,transparent)}.hday i.l2{background:color-mix(in srgb,var(--accent) 50%,transparent)}.hday i.l3{background:color-mix(in srgb,var(--accent) 75%,transparent)}.hday i.l4{background:var(--accent)}.hday i.l3 b,.hday i.l4 b{color:#16171B}
@@ -1080,6 +1082,7 @@ body.frameless .app{padding-top:8px}
   <div class="small" id="ttask" hidden></div>
   <div class="row"><button class="btn primary" id="tgo" style="flex:1">Başlat</button><button class="btn" id="treset">Sıfırla</button></div>
   <div class="tgoal" id="tgoal" title="Günlük hedef · tekerlekle ya da tıklayarak değiştir (Shift ile azalt)"><div class="gbar"><i id="tgoalF"></i></div><span class="small" id="tstat"></span></div>
+  <div class="small tspo" id="tspo" hidden></div>
   <div class="tpark" id="tpark" hidden></div>
   <div class="tamb"><span class="small">Ortam sesi</span><div class="seg sm" id="ambSeg" role="group" aria-label="Ortam sesi"><button data-amb="off">Kapalı</button><button data-amb="rain">Yağmur</button><button data-amb="brown">Derin</button><button data-amb="cafe">Kafe</button></div>
     <input type="range" id="ambV" min="0" max="100" aria-label="Ortam sesi düzeyi" title="Ses düzeyi"></div>
@@ -1163,6 +1166,8 @@ body.frameless .app{padding-top:8px}
     <label class="audrow"><span>Mikrofon</span><select class="field sm" id="audMic"></select></label>
     <label class="audrow" id="audOutRow"><span>Hoparlör / kulaklık</span><select class="field sm" id="audOut"></select></label>
     <button class="btn sm" id="audPerm" hidden>Cihaz adlarını göster</button></div>
+  <div class="cfgsec" id="spoSec"><span class="small">Spotify · odakta çalan şarkılar Geçmiş'e yazılır</span>
+    <div class="row" style="align-items:center"><span class="small" id="spoTxt" style="flex:1"></span><button class="btn sm" id="spoBtn">Bağlan</button></div></div>
   <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
@@ -3092,7 +3097,7 @@ function finish(silent){
   if(mins>5&&OPT("pomo")){const long=false,bs=bDur(),bm=fmtMin(Math.max(1,Math.round(bs/60)));tSetSec(bs,"break","short");BK.next();tStart();
     notify("Odak bitti",lbl.replace(" odak bitti","")+" · "+bm+" "+(long?"uzun ":"")+"mola"+(OPT("btips")?" · "+BK.tip().s:" başladı"));toast(lbl+" · "+bm+" "+(long?"uzun ":"")+"mola",{label:"Molayı atla",fn:()=>finish(false)})}
   else{notify("Odak bitti",lbl);toast(lbl,mins>5?{label:"Mola ver",fn:()=>{tSetSec(bDur("short"),"break","short");BK.next();tStart()}}:null,true)}
-  if(rid)askNote(rid,mins);
+  if(rid)askNote(rid,mins);if(rid&&SPO.on())spoAttach(rid,Date.now()-mins*6e4,Date.now());
 }
 let lastTitle="",lastProg="";
 /* ---------- kronometre: ileri sayar; göreve bağlıysa bitince süre göreve yazılır (task.focus, dakika) ---------- */
@@ -3344,6 +3349,11 @@ function drawHist(){const el=$("histBody");if(!el)return;const fs=S.items.filter
   const pm=new Map(),l7=ymd(days[0]);for(const f of fs){if((f.date||"")<l7)continue;const k=f.project&&f.project!=="legacy"?f.project:"";pm.set(k,(pm.get(k)||0)+f.mins)}
   const pl=[...pm].sort((a,b)=>b[1]-a[1]).slice(0,6),pmx=Math.max(1,...pl.map(x=>x[1]));
   h+=`<div class="hh">PROJELER</div>`+(pl.length?`<div class="hpr">${pl.map(([k,m])=>`<div><b>${esc(projName(k))}</b><span>${fmtMin(m)}</span><em style="width:${m/pmx*100}%"></em></div>`).join("")}</div>`:`<span class="small">Son 7 günde kayıtlı odak yok.</span>`);
+  /* odakta dinlediklerin (Spotify bağlıysa) */
+  const tr=new Map(),ar=new Map();for(const f of fs){if((f.date||"")<l7)continue;for(const m of f.music||[]){const k=m.id||m.n;const x=tr.get(k)||{m,c:0};x.c++;tr.set(k,x);for(const a of (m.a||"").split(", ").filter(Boolean))ar.set(a,(ar.get(a)||0)+1)}}
+  if(tr.size){const top=[...tr.values()].sort((a,b)=>b.c-a.c).slice(0,5),ta=[...ar].sort((a,b)=>b[1]-a[1])[0];
+    h+=`<div class="hh">ODAKTA DİNLEDİKLERİN${ta?` · EN ÇOK ${esc(ta[0].toLocaleUpperCase("tr"))}`:""}</div><div class="hmus">${top.map(({m,c})=>`<div>${m.img?`<img src="${esc(m.img)}" alt="" loading="lazy">`:`<i class="ph"></i>`}<span style="color:inherit;min-width:0"><b>${esc(m.n)}</b><em>${esc(m.a)}</em></span><span>${c}×</span></div>`).join("")}</div>`}
+  else if(SPO.on())h+=`<div class="hh">ODAKTA DİNLEDİKLERİN</div><span class="small">Odak bitince o sırada çalanlar buraya yazılır.</span>`;
   el.innerHTML=h;HIST.list=list}
 const projName=k=>k?((S.items.find(i=>i.type==="project"&&i.id===k)||{}).name||"Proje"):"Projesiz";
 const HIST={list:new Map()};
@@ -3352,11 +3362,48 @@ function histTip(day){const t=$("hTip");if(!t)return;if(!day){t.hidden=true;retu
   t.innerHTML=`<div class="hth"><b>${d.toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"long"})}</b><span>${tot?fmtMin(tot):""}</span></div>`+(arr.length?arr.map(f=>{
     const tk=f.task&&S.items.find(i=>i.id===f.task);const name=tk?tk.title:f.note||(f.project&&f.project!=="legacy"?projName(f.project):"Odak");
     const at=f.created?new Date(f.created-f.mins*6e4):null;
-    return `<div class="hti"><span class="mono">${at?pad(at.getHours())+":"+pad(at.getMinutes()):"--:--"}</span><span class="n">${esc(name)}${tk&&f.note?`<em>${esc(f.note)}</em>`:""}${!tk&&f.project&&f.project!=="legacy"&&f.note?`<em>${esc(projName(f.project))}</em>`:""}</span><span>${fmtMin(f.mins)}</span></div>`}).join(""):`<span class="small">Bu gün odak yok.</span>`);
+    return `<div class="hti"><span class="mono">${at?pad(at.getHours())+":"+pad(at.getMinutes()):"--:--"}</span><span class="n">${esc(name)}${tk&&f.note?`<em>${esc(f.note)}</em>`:""}${!tk&&f.project&&f.project!=="legacy"&&f.note?`<em>${esc(projName(f.project))}</em>`:""}${(f.music||[]).length?`<span class="hmu">♪ ${esc(f.music.slice(0,2).map(m=>m.n+" — "+m.a).join(" · "))}${f.music.length>2?` +${f.music.length-2}`:""}</span>`:""}</span><span>${fmtMin(f.mins)}</span></div>`}).join(""):`<span class="small">Bu gün odak yok.</span>`);
   t.hidden=false;const box=$("histBody").getBoundingClientRect(),r=day.getBoundingClientRect();t.style.top=(r.bottom-box.top+6)+"px"}
 $("histBody").addEventListener("pointerover",e=>{const d=e.target.closest(".hday");if(d)histTip(d)});
 $("histBody").addEventListener("pointerleave",()=>histTip(null));
 $("histBody").addEventListener("click",e=>{const d=e.target.closest(".hday");histTip(d||null)});
+/* --- Spotify: odakta çalan şarkılar geçmişe (PKCE, gizli anahtar yok; Client ID app_config.spotify_client_id) --- */
+const SPO={tok:LS.get("spo",null),now:null,nt:0,on(){return !!(this.tok&&this.tok.refresh)}};
+const spoRedirect=()=>location.origin+location.pathname.replace(/index\.html$/,"");
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+async function spoCid(){let c="";try{if(CL.sb){const {data}=await CL.sb.from("app_config").select("value").eq("key","spotify_client_id").maybeSingle();c=(data&&data.value)||""}}catch(_){}return c}
+async function spoConnect(){if(TA){toast("Spotify şimdilik yalnızca web sürümünde",null,true);return}const cid=await spoCid();if(!cid){toast("Spotify bağlantısı henüz ayarlanmadı",null,true);return}
+  const v=b64u(crypto.getRandomValues(new Uint8Array(48))),st=b64u(crypto.getRandomValues(new Uint8Array(12))),ch=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));
+  try{sessionStorage.setItem("spoPk",JSON.stringify({v,st,cid}))}catch(_){}
+  location.href="https://accounts.spotify.com/authorize?"+new URLSearchParams({client_id:cid,response_type:"code",redirect_uri:spoRedirect(),code_challenge_method:"S256",code_challenge:ch,state:st,scope:"user-read-recently-played user-read-currently-playing"})}
+async function spoToken(body){const r=await fetch("https://accounts.spotify.com/api/token",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error_description||j.error||String(r.status));return j}
+function spoSave(j,cid){SPO.tok={access:j.access_token,refresh:j.refresh_token||(SPO.tok&&SPO.tok.refresh),exp:Date.now()+((j.expires_in||3600)-60)*1000,cid};LS.set("spo",SPO.tok);drawSpo()}
+function spoOff(expired){SPO.tok=null;SPO.now=null;LS.set("spo",null);drawSpo();toast(expired?"Spotify bağlantısının süresi doldu, yeniden bağlan":"Spotify bağlantısı kesildi",null,true)}
+async function spoBoot(){let pk=null;try{pk=JSON.parse(sessionStorage.getItem("spoPk")||"null")}catch(_){}if(!pk)return;
+  const u=new URL(location.href),code=u.searchParams.get("code"),st=u.searchParams.get("state"),err=u.searchParams.get("error");if((!code&&!err)||st!==pk.st)return;
+  try{sessionStorage.removeItem("spoPk")}catch(_){}["code","state","error"].forEach(k=>u.searchParams.delete(k));history.replaceState(null,"",u.toString());
+  if(err){toast("Spotify bağlantısı iptal edildi",null,true);return}
+  try{spoSave(await spoToken({grant_type:"authorization_code",code,redirect_uri:spoRedirect(),client_id:pk.cid,code_verifier:pk.v}),pk.cid);toast("Spotify bağlandı · odakta çalanlar Geçmiş'e yazılacak",null,true)}
+  catch(e){toast("Spotify bağlanamadı: "+e.message,null,true);errPush("spotify: "+e.message)}}
+async function spoFetch(path){if(!SPO.on())return null;
+  if(Date.now()>SPO.tok.exp){try{spoSave(await spoToken({grant_type:"refresh_token",refresh_token:SPO.tok.refresh,client_id:SPO.tok.cid}),SPO.tok.cid)}catch(e){if(/invalid_grant|revoked/i.test(e.message))spoOff(true);return null}}
+  try{const r=await fetch("https://api.spotify.com/v1"+path,{headers:{authorization:"Bearer "+SPO.tok.access}});if(r.status===204)return {};if(r.status===401){SPO.tok.exp=0;return null}if(!r.ok)return null;return await r.json()}catch(_){return null}}
+const spoTrack=t=>t&&t.name?{id:t.id||t.name,n:t.name,a:(t.artists||[]).map(x=>x.name).join(", "),img:(((t.album||{}).images||[]).slice(-1)[0]||{}).url||""}:null;
+/* odak bitince o aralıkta çalanlar; Spotify'ın "son çalınanlar" listesi birkaç dakika gecikebildiği için 4 dk sonra bir kez daha bakılır */
+async function spoAttach(rid,s,e,again){const id=await Promise.resolve(rid);if(!id||!SPO.on())return;const got=[];
+  const j=await spoFetch("/me/player/recently-played?limit=50&after="+Math.floor(s-60000));
+  for(const it of (j&&j.items)||[]){const at=Date.parse(it.played_at);if(at>=s&&at<=e+90000){const t=spoTrack(it.track);if(t)got.push(Object.assign(t,{at}))}}
+  if(!again){const c=await spoFetch("/me/player/currently-playing");if(c&&c.item){const t=spoTrack(c.item);if(t)got.push(Object.assign(t,{at:e}))}}
+  const f=S.items.find(i=>i.id===id);if(f){const prev=f.music||[];const add=got.filter(x=>!prev.some(p=>p.id===x.id&&Math.abs(p.at-x.at)<6*60000)).filter((x,i,a)=>a.findIndex(y=>y.id===x.id&&Math.abs(y.at-x.at)<6*60000)===i);
+    if(add.length)run(api.update(id,{music:[...prev,...add].sort((a,b)=>a.at-b.at).slice(0,60)}))}
+  if(!again)setTimeout(()=>spoAttach(id,s,e,true),240000)}
+/* odak sürerken sayaçta şu an çalan (pencere açıksa, 20 sn'de bir) */
+async function spoNow(){if(!SPO.on()||!focusing()||$("timerPop").hidden||Date.now()-SPO.nt<20000)return;SPO.nt=Date.now();const c=await spoFetch("/me/player/currently-playing");SPO.now=c&&c.item&&c.is_playing?spoTrack(c.item):null;drawSpoNow()}
+function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`}
+function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!!TA||!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
+$("spoBtn").onclick=()=>SPO.on()?spoOff(false):spoConnect();
+setTimeout(()=>{spoBoot();drawSpo()},0);setInterval(spoNow,5000);
 function drawTimer(){
   const left=tLeft(),run_=!!TM.endAt,brk=TM.mode==="break";
   $("timerBtn").classList.toggle("brk",brk);const bk=brkKind();
@@ -3373,7 +3420,7 @@ function drawTimer(){
   $("tgo").textContent=run_?"Duraklat":(left<TM.dur?"Devam et":"Başlat");
   const fs=focusStats(),gl=fGoal();$("tstat").textContent=`Bugün ${fs.n}/${gl} odak · ${fmtMin(fs.m)}`+(fs.n>=gl?" · hedef tamam":"");
   $("tgoalF").style.width=Math.min(100,fs.n/gl*100)+"%";$("tgoal").classList.toggle("done",fs.n>=gl);
-  ambSync();brkDraw();
+  ambSync();brkDraw();drawSpoNow();
   /* odak çalışmıyorsa ve kronometre çalışıyorsa düğmede kronometre görünür */
   const swOn=!run_&&!!SW.start;$("timerBtn").classList.toggle("sw",swOn);
   if(swOn){const sec=swSec();$("tpill").textContent=swFmt(sec);$("tpill").classList.remove("idle");$("timerBtn").classList.add("running");$("ringFg").setAttribute("stroke-dashoffset",(50.27*(1-(sec%60)/60)).toFixed(2));
