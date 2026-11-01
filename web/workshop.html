@@ -3584,7 +3584,7 @@ function drawUiScale(){const on=!!window.__UIK;$("uiSec").hidden=!on;if(on)$("ui
 $("uiScale").addEventListener("click",e=>{const b=e.target.closest("[data-uik]");if(!b)return;const k=+b.dataset.uik;LS.set("uiScale",k);window.__UIK=k;
   const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute("content",`width=device-width,initial-scale=${k},minimum-scale=${k},maximum-scale=${k},user-scalable=no,viewport-fit=cover`);drawUiScale();
   setTimeout(()=>{if(curP()&&boardVisible())applyView()},120)});
-function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
