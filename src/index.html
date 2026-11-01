@@ -188,6 +188,10 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .pop h3{margin:0;font-size:11px;font-family:var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
 .big{font-family:var(--f-mono);font-size:54px;font-weight:400;letter-spacing:-.02em;line-height:1;text-align:center;font-variant-numeric:tabular-nums;padding:6px 0}
 .presets{display:flex;gap:6px;flex-wrap:wrap}
+.tmodes{display:flex;justify-content:center;gap:4px}.tmodes button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:5px 10px;border-radius:99px;cursor:pointer;transition:background .15s,color .15s}
+.tmodes button:hover{color:var(--ink)}.tmodes button[aria-pressed="true"]{background:var(--glass-2,rgb(255 255 255 / .08));color:var(--ink)}.tmodes.lock button:not([aria-pressed="true"]){opacity:.45;cursor:default}
+#tbig{display:flex;justify-content:center;align-items:center}#tbig .tnum{width:2.2ch;border:0;outline:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:center;padding:0;border-radius:10px;cursor:text;transition:background .15s}
+#tbig .tnum#tMM{width:calc(var(--mmw,2) * 1ch + .2ch)}#tbig .tnum:hover:not([readonly]){background:rgb(255 255 255 / .05)}#tbig .tnum:focus{background:rgb(255 255 255 / .08)}#tbig .tnum[readonly]{cursor:default}#tbig .tsep{opacity:.6;margin:0 -.04em}
 .audrow{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}.audrow select{width:100%;min-width:0}
 .ttabs{align-self:stretch;display:flex}.ttabs button{flex:1;position:relative}.tpane{display:flex;flex-direction:column;gap:12px}
 .ctn{display:inline-grid;place-items:center;min-width:15px;height:15px;border-radius:8px;background:var(--t2);color:#17191E;font-size:9.5px;font-weight:700;margin-left:5px;padding:0 3px}
@@ -964,6 +968,13 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .brkcard .bkx{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px}.brkcard .bktip{font-size:14px;line-height:1.45;color:var(--ink)}.brkcard .row .btn{flex:1}
 .hst{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}.hst div{padding:8px;border-radius:10px;background:rgb(255 255 255 / .04);border:1px solid var(--stroke)}.hst b{display:block;font-size:15px;font-variant-numeric:tabular-nums}.hst span{font-size:11px;color:var(--muted)}
 .hh{font-size:10.5px;letter-spacing:.06em;color:var(--muted);margin:12px 0 6px;font-family:var(--mono,inherit)}
+#histBody{position:relative}.hdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.hday{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:default}
+.hday i{width:100%;aspect-ratio:1;border-radius:8px;background:rgb(255 255 255 / .05);display:grid;place-items:center;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}.hday:hover i{transform:scale(1.08)}
+.hday i b{font-size:10.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}.hday span{font-size:10.5px;color:var(--muted)}.hday.tdy span{color:var(--ink);font-weight:600}
+.hday i.l1{background:color-mix(in srgb,var(--accent) 28%,transparent)}.hday i.l2{background:color-mix(in srgb,var(--accent) 50%,transparent)}.hday i.l3{background:color-mix(in srgb,var(--accent) 75%,transparent)}.hday i.l4{background:var(--accent)}.hday i.l3 b,.hday i.l4 b{color:#16171B}
+.htip{position:absolute;left:0;right:0;z-index:3;padding:10px 12px;border-radius:12px;background:var(--panel-solid,rgb(24 25 29 / .97));border:1px solid var(--stroke-2);box-shadow:0 14px 30px -12px rgb(0 0 0 / .6);display:flex;flex-direction:column;gap:6px;animation:popIn .3s linear both;pointer-events:none}
+.htip .hth{display:flex;gap:8px;font-size:12.5px}.htip .hth b{flex:1}.htip .hth span{color:var(--muted)}
+.htip .hti{display:grid;grid-template-columns:auto 1fr auto;gap:8px;font-size:12.5px;align-items:baseline}.htip .hti .mono{color:var(--muted);font-size:11px}.htip .hti .n{min-width:0;overflow:hidden;text-overflow:ellipsis}.htip .hti em{display:block;font-style:normal;color:var(--muted);font-size:11.5px}.htip .hti>span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
 .hmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px;justify-content:start}.hmap i{width:14px;height:14px;border-radius:3px;background:rgb(255 255 255 / .05)}
 .hmap i.l1{background:color-mix(in srgb,var(--accent) 30%,transparent)}.hmap i.l2{background:color-mix(in srgb,var(--accent) 55%,transparent)}.hmap i.l3{background:color-mix(in srgb,var(--accent) 80%,transparent)}.hmap i.l4{background:var(--accent)}.hmap i.tdy{outline:1px solid var(--ink);outline-offset:1px}.hmap i.fut{visibility:hidden}
 .hhr{display:flex;align-items:flex-end;gap:2px;height:46px}.hhr i{flex:1;background:color-mix(in srgb,var(--accent) 70%,transparent);border-radius:2px 2px 0 0;min-height:1px}.hhl{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px}
@@ -1066,13 +1077,9 @@ body.frameless .app{padding-top:8px}
 <div class="pop" id="timerPop" hidden role="dialog" aria-label="Zamanlayıcı">
   <div class="seg sm ttabs" id="ttabs" role="group" aria-label="Zamanlayıcı"><button data-tt="focus" aria-pressed="true">Odak</button><button data-tt="watch" aria-pressed="false">Kronometre</button><button data-tt="ct" aria-pressed="false">Sayaçlar<span class="ctn" id="ctN" hidden></span></button><button data-tt="hist" aria-pressed="false">Geçmiş</button></div>
   <div class="tpane" data-tp="focus">
-  <h3 id="th3">Odak</h3>
-  <div class="big" id="tbig" title="Fare tekerleğiyle süreyi değiştir · Shift ile 5 dk">25:00</div>
-  <div class="tcyc" id="tcyc" title="Her 4 odakta bir uzun mola (15 dk)"></div>
-  <div class="presets" id="presets">
-    <button class="chip" data-min="15">15</button><button class="chip" data-min="25">25</button><button class="chip" data-min="50">50</button><button class="chip" data-min="90">90</button><button class="chip" data-min="5" data-brk>5 mola</button>
-  </div>
-  <div class="row"><input class="field mono" id="tmin" type="number" min="1" max="240" placeholder="dk" style="width:76px" aria-label="Dakika"><button class="btn" id="tsetBtn">Ayarla</button></div>
+  <div class="tmodes" id="tmodes" role="group" aria-label="Tür"><button data-tm="focus">Odak</button><button data-tm="short">Kısa mola</button><button data-tm="long">Uzun mola</button></div>
+  <div class="big" id="tbig" title="Dakikaya ya da saniyeye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><input class="tnum" id="tMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"><span class="tsep">:</span><input class="tnum" id="tSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></div>
+  <div class="tcyc" id="tcyc"></div>
   <input class="field" id="tlabel" placeholder="Neye odaklanıyorsun? (isteğe bağlı)" maxlength="80">
   <div class="small" id="ttask" hidden></div>
   <div class="row"><button class="btn primary" id="tgo" style="flex:1">Başlat</button><button class="btn" id="treset">Sıfırla</button></div>
@@ -1081,7 +1088,7 @@ body.frameless .app{padding-top:8px}
   <div class="tamb"><span class="small">Ortam sesi</span><div class="seg sm" id="ambSeg" role="group" aria-label="Ortam sesi"><button data-amb="off">Kapalı</button><button data-amb="rain">Yağmur</button><button data-amb="brown">Derin</button><button data-amb="cafe">Kafe</button></div>
     <input type="range" id="ambV" min="0" max="100" aria-label="Ortam sesi düzeyi" title="Ses düzeyi"></div>
   <div class="topts" id="topts">
-    <button class="opt" data-opt="pomo" title="Odak bitince mola, mola bitince yeni odak kendiliğinden başlar. Her 4 odakta bir 15 dk uzun mola.">Otomatik mola</button>
+    <button class="opt" data-opt="pomo" title="Odak bitince mola, mola bitince yeni odak kendiliğinden başlar. Her 4 odakta bir uzun mola. Süreleri Kısa mola / Uzun mola sekmesinde ayarla.">Otomatik mola</button>
     <button class="opt" data-opt="fnotify" title="Workshop arka plandayken süre dolunca sistem bildirimi gösterir">Bildirim</button>
     <button class="opt" data-opt="quiet" title="Odak sürerken uygulama içi bilgi mesajlarını gizler (hatalar ve geri al yine görünür)">Sessiz odak</button>
     <button class="opt" data-opt="btips" title="Mola başlayınca köşede kısa bir öneri gösterir: uzağa bak, esne, su iç">Mola önerileri</button>
@@ -3020,7 +3027,7 @@ function creditTask(id,mins,date,proj){const t=id&&S.items.find(i=>i.id===id);if
   return run(api.add({type:"focus",task:t?id:null,project:pr,date:date||TODAY,mins,created:Date.now()})).then(r=>r&&r.id)}
 function flushFocus(){if(!api||!S.loaded||!TM.pend||!TM.pend.length)return;const p=TM.pend;TM.pend=[];tSave();p.forEach(([id,m,d,pr])=>creditTask(id,m,d,pr))}
 function focusTask(id){const t=S.items.find(i=>i.id===id);if(!t)return;TM.task=id;TM.label=t.title;$("tlabel").value=t.title;
-  if(TM.mode==="break"||TM.dur<600)tSet(TM.fdur>=600?TM.fdur/60:25,"focus");TM.endAt=null;TM.left=TM.dur;TM.proj=null;tStart();toast("Odak başladı: "+t.title+" · "+Math.round(TM.dur/60)+" dk",null,true);renderAll()}
+  if(TM.mode==="break")tSetSec(TM.fdur||1500,"focus");TM.endAt=null;TM.left=TM.dur;TM.proj=null;tStart();toast("Odak başladı: "+t.title+" · "+Math.round(TM.dur/60)+" dk",null,true);renderAll()}
 let actx=null;
 const tLeft=()=>TM.endAt?Math.max(0,Math.ceil((TM.endAt-Date.now())/1000)):TM.left;
 const fmt=s=>pad(Math.floor(s/60))+":"+pad(s%60);
@@ -3042,8 +3049,13 @@ function tStart(){ensureAudio();if(tLeft()<=0)TM.left=TM.dur;
 function tPause(){TM.left=tLeft();TM.endAt=null;tSave();drawTimer();presTrack()}
 function tReset(){if(!TM.endAt&&TM.left===TM.dur)TM.cycle=0;/* ikinci sıfırla seansları da sıfırlar */
   TM.endAt=null;TM.left=TM.dur;TM.proj=null;tSave();drawTimer()}
-function tSet(min,mode){min=Math.max(1,Math.min(240,Math.round(min)));TM.mode=mode||"focus";if(TM.mode==="focus")TM.fdur=min*60;
-  TM.dur=min*60;TM.left=TM.dur;TM.endAt=null;tSave();drawTimer()}
+/* süreler saniye: odak TM.fdur, kısa mola LS sbrk, uzun mola LS lbrk */
+const bDur=k=>Math.max(5,LS.get(k==="long"?"lbrk":"sbrk",k==="long"?900:300));
+function tSetSec(sec,mode,bk){sec=Math.max(5,Math.min(14400,Math.round(sec)));TM.mode=mode||"focus";TM.bk=TM.mode==="break"?(bk||TM.bk||"short"):null;
+  if(TM.mode==="focus")TM.fdur=sec;else LS.set(TM.bk==="long"?"lbrk":"sbrk",sec);
+  TM.dur=sec;TM.left=TM.dur;TM.endAt=null;tSave();drawTimer()}
+function tSet(min,mode,bk){tSetSec(min*60,mode,bk)}
+const brkKind=()=>TM.mode==="break"?(TM.bk||(TM.dur>=900?"long":"short")):"focus";
 /* ekip bildirimleri (bahsetme, atama, onay, özel mesaj, alıntı): pencere arkadayken sistem bildirimi; zil menüsünden kapatılır */
 async function teamNotify(title,body,urgent){if(LS.get("tnotify",true)===false||(document.hasFocus()&&!document.hidden))return;if(!urgent&&inFocus())return;
   try{if(TA&&TA.notification){const N=TA.notification;let g=await N.isPermissionGranted();if(!g)g=(await N.requestPermission())==="granted";if(g)N.sendNotification({title,body});return}
@@ -3064,9 +3076,9 @@ function finish(silent){
   const mins=Math.round(TM.dur/60),brk=TM.mode==="break";TM.endAt=null;TM.left=TM.dur;setTimeout(presTrack,50);
   const ding=()=>{chime();const b=$("timerBtn");b.classList.remove("ding");void b.offsetWidth;b.classList.add("ding")};
   if(brk){drawTimer();if(silent)return;ding();
-    if(OPT("pomo")){tSet(Math.round(TM.fdur/60),"focus");tStart();notify("Mola bitti","Yeni odak başladı · "+fmtMin(Math.round(TM.fdur/60)));
+    if(OPT("pomo")){tSetSec(TM.fdur,"focus");tStart();notify("Mola bitti","Yeni odak başladı · "+fmtMin(Math.round(TM.fdur/60)));
       toast("Mola bitti · yeni odak başladı",{label:"Duraklat",fn:tPause})}
-    else{notify("Mola bitti","Odaklanmaya hazır mısın?");toast("Mola bitti",{label:"Odak başlat",fn:()=>{tSet(Math.round(TM.fdur/60),"focus");tStart()}})}
+    else{notify("Mola bitti","Odaklanmaya hazır mısın?");toast("Mola bitti",{label:"Odak başlat",fn:()=>{tSetSec(TM.fdur,"focus");tStart()}})}
     return}
   const ftk=TM.task,fpr=TM.proj;TM.task=null;TM.proj=null;
   if(TM.cday!==TODAY){TM.cday=TODAY;TM.cycle=0}if(mins>5)TM.cycle++;tSave();
@@ -3077,9 +3089,9 @@ function finish(silent){
   if(silent)return;
   ding();const lbl=(TM.label?TM.label+" · ":"")+fmtMin(mins)+" odak bitti";
   if(PARK.length)setTimeout(()=>toast(`Odakta ${PARK.length} not aldın`,{label:"Gör",fn:()=>{if($("timerPop").hidden)$("timerBtn").click();setTTab("focus")}},true),2600);
-  if(mins>5&&OPT("pomo")){const long=TM.cycle%4===0,bm=long?15:5;tSet(bm,"break");BK.next();tStart();
-    notify("Odak bitti",lbl.replace(" odak bitti","")+" · "+bm+" dk "+(long?"uzun ":"")+"mola"+(OPT("btips")?" · "+BK.tip().s:" başladı"));toast(lbl+" · "+bm+" dk "+(long?"uzun ":"")+"mola",{label:"Molayı atla",fn:()=>finish(false)})}
-  else{notify("Odak bitti",lbl);toast(lbl,mins>5?{label:"5 dk mola",fn:()=>{tSet(5,"break");BK.next();tStart()}}:null,true)}
+  if(mins>5&&OPT("pomo")){const long=TM.cycle%4===0,bs=bDur(long?"long":"short"),bm=fmtMin(Math.max(1,Math.round(bs/60)));tSetSec(bs,"break",long?"long":"short");BK.next();tStart();
+    notify("Odak bitti",lbl.replace(" odak bitti","")+" · "+bm+" "+(long?"uzun ":"")+"mola"+(OPT("btips")?" · "+BK.tip().s:" başladı"));toast(lbl+" · "+bm+" "+(long?"uzun ":"")+"mola",{label:"Molayı atla",fn:()=>finish(false)})}
+  else{notify("Odak bitti",lbl);toast(lbl,mins>5?{label:"Mola ver",fn:()=>{tSetSec(bDur("short"),"break","short");BK.next();tStart()}}:null,true)}
   if(rid)askNote(rid,mins);
 }
 let lastTitle="",lastProg="";
@@ -3248,7 +3260,7 @@ const BK={i:LS.get("btip",0),key:"",hid:"",tip(){const t=BTIPS[this.i%BTIPS.leng
 function brkDraw(){const on=TM.mode==="break"&&!!TM.endAt&&OPT("btips");const c=$("brkCard");
   if(!on){if(!c.hidden)animHide(c);return}
   const id=TM.dur+":"+Math.round(TM.endAt/1000-TM.dur);if(BK.hid===id){if(!c.hidden)animHide(c);return}BK.key=id;
-  const t=BK.tip();$("bkT").textContent=(TM.dur>=900?"Uzun mola":"Mola")+" · "+fmt(tLeft());if($("bkTip").dataset.i!==String(BK.i)){$("bkTip").dataset.i=BK.i;$("bkTip").innerHTML=`<b>${esc(t.s)}</b><br>${esc(t.l)}`}
+  const t=BK.tip();$("bkT").textContent=(brkKind()==="long"?"Uzun mola":"Mola")+" · "+fmt(tLeft());if($("bkTip").dataset.i!==String(BK.i)){$("bkTip").dataset.i=BK.i;$("bkTip").innerHTML=`<b>${esc(t.s)}</b><br>${esc(t.l)}`}
   if(c.hidden)animShow(c)}
 $("bkX").onclick=()=>{BK.hid=BK.key;animHide($("brkCard"))};$("bkNext").onclick=()=>{BK.next();brkDraw();miniPush()};$("bkSkip").onclick=()=>finish(false);
 /* --- ortam sesi: dosya yok, Web Audio ile üretilir; yalnızca odak sürerken çalar, molada yavaşça kısılır --- */
@@ -3283,37 +3295,51 @@ $("ambV").addEventListener("input",e=>{AMB.vol=+e.target.value;LS.set("ambv",AMB
 ambDraw();setTimeout(drawPark,0);
 /* --- geçmiş: hafta özeti, 12 haftalık ısı haritası, saat dağılımı, projeler --- */
 function drawHist(){const el=$("histBody");if(!el)return;const fs=S.items.filter(i=>i.type==="focus"&&!i.deleted&&i.mins>0);
-  const byDay=new Map(),nDay=new Map();for(const f of fs){const d=f.date||"";byDay.set(d,(byDay.get(d)||0)+f.mins);if(f.mins>5)nDay.set(d,(nDay.get(d)||0)+1)}
-  const today=parse(TODAY),mon=monday(today),gl=fGoal();let wk=0,lw=0;
-  for(let k=0;k<7;k++){wk+=byDay.get(ymd(addDays(mon,k)))||0;lw+=byDay.get(ymd(addDays(mon,k-7)))||0}
-  const dIn=Math.round((today-mon)/864e5)+1;let streak=0;{let d=today;if((nDay.get(ymd(d))||0)<gl)d=addDays(d,-1);while((nDay.get(ymd(d))||0)>=gl){streak++;d=addDays(d,-1)}}
+  const byDay=new Map(),nDay=new Map(),list=new Map();for(const f of fs){const d=f.date||"";byDay.set(d,(byDay.get(d)||0)+f.mins);if(f.mins>5)nDay.set(d,(nDay.get(d)||0)+1);(list.get(d)||list.set(d,[]).get(d)).push(f)}
+  const today=parse(TODAY),gl=fGoal(),days=[...Array(7)].map((_,k)=>addDays(today,k-6));let wk=0,lw=0;
+  for(let k=0;k<7;k++){wk+=byDay.get(ymd(addDays(today,-k)))||0;lw+=byDay.get(ymd(addDays(today,-k-7)))||0}
+  let streak=0;{let d=today;if((nDay.get(ymd(d))||0)<gl)d=addDays(d,-1);while((nDay.get(ymd(d))||0)>=gl){streak++;d=addDays(d,-1)}}
   const diff=lw?Math.round((wk-lw)/lw*100):null;
-  let h=`<div class="hst"><div><b>${fmtMin(wk)}</b><span>bu hafta${diff!=null?` · ${diff>=0?"+":""}${diff}%`:""}</span></div><div><b>${fmtMin(Math.round(wk/dIn))}</b><span>günlük ort.</span></div><div><b>${streak} gün</b><span>hedef serisi</span></div></div>`;
-  /* ısı haritası: sütun = hafta (pazartesi başlar), satır = gün */
-  const start=addDays(mon,-77),mx=Math.max(60,...[...byDay.values()]);let cells="";
-  for(let k=0;k<84;k++){const d=addDays(start,k),ds=ymd(d),m=byDay.get(ds)||0,lv=m?Math.min(4,1+Math.floor(m/mx*3.999)):0;
-    cells+=`<i class="${lv?"l"+lv:""}${ds===TODAY?" tdy":""}${d>today?" fut":""}" title="${d.toLocaleDateString("tr-TR",{day:"numeric",month:"short",weekday:"short"})} · ${m?fmtMin(m):"odak yok"}"></i>`}
-  h+=`<div class="hh">SON 12 HAFTA</div><div class="hmap">${cells}</div>`;
-  /* saat dağılımı (son 30 gün): her odak bitiş anından geriye yayılır */
-  const hr=new Array(24).fill(0),lim=Date.now()-30*864e5;
+  let h=`<div class="hst"><div><b>${fmtMin(wk)}</b><span>son 7 gün${diff!=null?` · ${diff>=0?"+":""}${diff}%`:""}</span></div><div><b>${fmtMin(Math.round(wk/7))}</b><span>günlük ort.</span></div><div><b>${streak} gün</b><span>hedef serisi</span></div></div>`;
+  /* son 7 gün: üstüne gelince o gün neye çalıştığın */
+  const mx=Math.max(60,...days.map(d=>byDay.get(ymd(d))||0));
+  h+=`<div class="hh">SON 7 GÜN</div><div class="hdays">${days.map(d=>{const ds=ymd(d),m=byDay.get(ds)||0,lv=m?Math.min(4,1+Math.floor(m/mx*3.999)):0;
+    return `<div class="hday${ds===TODAY?" tdy":""}" data-hd="${ds}"><i class="${lv?"l"+lv:""}"><b>${m?(m>=60?Math.floor(m/60)+"s"+(m%60?pad(m%60):""):m+"dk"):""}</b></i><span>${d.toLocaleDateString("tr-TR",{weekday:"short"})}</span></div>`}).join("")}</div><div class="htip" id="hTip" hidden></div>`;
+  /* saat dağılımı (son 7 gün): her odak bitiş anından geriye yayılır */
+  const hr=new Array(24).fill(0),lim=days[0].getTime();
   for(const f of fs){if(!f.created||f.created<lim)continue;let e=f.created,s0=e-f.mins*6e4;while(s0<e){const d=new Date(s0),nx=Math.min(e,new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours()+1).getTime());hr[d.getHours()]+=(nx-s0)/6e4;s0=nx}}
-  const hm=Math.max(1,...hr);h+=`<div class="hh">HANGİ SAATLERDE · SON 30 GÜN</div><div class="hhr">${hr.map((v,i)=>`<i style="height:${v/hm*100}%" title="${pad(i)}:00 · ${fmtMin(Math.round(v))}"></i>`).join("")}</div><div class="hhl"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>`;
+  const hm=Math.max(1,...hr);h+=`<div class="hh">HANGİ SAATLERDE</div><div class="hhr">${hr.map((v,i)=>`<i style="height:${v/hm*100}%" title="${pad(i)}:00 · ${fmtMin(Math.round(v))}"></i>`).join("")}</div><div class="hhl"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>`;
   /* projeler (son 7 gün) */
-  const pm=new Map(),l7=ymd(addDays(today,-6));for(const f of fs){if((f.date||"")<l7)continue;const k=f.project&&f.project!=="legacy"?f.project:"";pm.set(k,(pm.get(k)||0)+f.mins)}
+  const pm=new Map(),l7=ymd(days[0]);for(const f of fs){if((f.date||"")<l7)continue;const k=f.project&&f.project!=="legacy"?f.project:"";pm.set(k,(pm.get(k)||0)+f.mins)}
   const pl=[...pm].sort((a,b)=>b[1]-a[1]).slice(0,6),pmx=Math.max(1,...pl.map(x=>x[1]));
-  h+=`<div class="hh">PROJELER · SON 7 GÜN</div>`+(pl.length?`<div class="hpr">${pl.map(([k,m])=>`<div><b>${esc(k?((S.items.find(i=>i.type==="project"&&i.id===k)||{}).name||"Proje"):"Projesiz")}</b><span>${fmtMin(m)}</span><em style="width:${m/pmx*100}%"></em></div>`).join("")}</div>`:`<span class="small">Bu hafta kayıtlı odak yok.</span>`);
-  el.innerHTML=h}
+  h+=`<div class="hh">PROJELER</div>`+(pl.length?`<div class="hpr">${pl.map(([k,m])=>`<div><b>${esc(projName(k))}</b><span>${fmtMin(m)}</span><em style="width:${m/pmx*100}%"></em></div>`).join("")}</div>`:`<span class="small">Son 7 günde kayıtlı odak yok.</span>`);
+  el.innerHTML=h;HIST.list=list}
+const projName=k=>k?((S.items.find(i=>i.type==="project"&&i.id===k)||{}).name||"Proje"):"Projesiz";
+const HIST={list:new Map()};
+function histTip(day){const t=$("hTip");if(!t)return;if(!day){t.hidden=true;return}const ds=day.dataset.hd,arr=(HIST.list.get(ds)||[]).slice().sort((a,b)=>(a.created||0)-(b.created||0));
+  const d=parse(ds),tot=arr.reduce((a,f)=>a+f.mins,0);
+  t.innerHTML=`<div class="hth"><b>${d.toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"long"})}</b><span>${tot?fmtMin(tot):""}</span></div>`+(arr.length?arr.map(f=>{
+    const tk=f.task&&S.items.find(i=>i.id===f.task);const name=tk?tk.title:f.note||(f.project&&f.project!=="legacy"?projName(f.project):"Odak");
+    const at=f.created?new Date(f.created-f.mins*6e4):null;
+    return `<div class="hti"><span class="mono">${at?pad(at.getHours())+":"+pad(at.getMinutes()):"--:--"}</span><span class="n">${esc(name)}${tk&&f.note?`<em>${esc(f.note)}</em>`:""}${!tk&&f.project&&f.project!=="legacy"&&f.note?`<em>${esc(projName(f.project))}</em>`:""}</span><span>${fmtMin(f.mins)}</span></div>`}).join(""):`<span class="small">Bu gün odak yok.</span>`);
+  t.hidden=false;const box=$("histBody").getBoundingClientRect(),r=day.getBoundingClientRect();t.style.top=(r.bottom-box.top+6)+"px"}
+$("histBody").addEventListener("pointerover",e=>{const d=e.target.closest(".hday");if(d)histTip(d)});
+$("histBody").addEventListener("pointerleave",()=>histTip(null));
+$("histBody").addEventListener("click",e=>{const d=e.target.closest(".hday");histTip(d||null)});
 function drawTimer(){
   const left=tLeft(),run_=!!TM.endAt,brk=TM.mode==="break";
-  $("timerBtn").classList.toggle("brk",brk);$("th3").textContent=brk?(TM.dur>=900?"Uzun mola":"Mola"):"Odak";
+  $("timerBtn").classList.toggle("brk",brk);const bk=brkKind();
+  document.querySelectorAll("#tmodes [data-tm]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.tm===bk));$("tmodes").classList.toggle("lock",run_||left<TM.dur);
+  $("tcyc").title=`Her 4 odakta bir uzun mola (${fmtMin(Math.round(bDur("long")/60))})`;
   if(TM.cday!==TODAY&&TM.cycle){TM.cycle=0;TM.cday=TODAY}
   const cy=TM.cycle%4,full=TM.cycle>0&&cy===0;$("tcyc").innerHTML=OPT("pomo")?[0,1,2,3].map(k=>`<i class="${full||k<cy?"on":""}"></i>`).join(""):"";
   document.querySelectorAll("#timerPop [data-opt]").forEach(b=>b.setAttribute("aria-pressed",OPT(b.dataset.opt)));
   $("tpill").textContent=fmt(left);$("tpill").classList.toggle("idle",!run_&&left===TM.dur);
   $("timerBtn").classList.toggle("running",run_);
   const frac=TM.dur?1-left/TM.dur:0;$("ringFg").setAttribute("stroke-dashoffset",(50.27*(1-frac)).toFixed(2));winStatus(left,run_,frac);
-  $("tbig").textContent=fmt(left);$("tgo").textContent=run_?"Duraklat":(left<TM.dur?"Devam et":"Başlat");
-  document.querySelectorAll("#presets [data-min]").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.min*60===TM.dur&&(c.dataset.brk!=null)===brk));
+  {const mm=Math.floor(left/60),ss=left%60,a=document.activeElement;const M=$("tMM"),Sx=$("tSS");
+   if(a!==M)M.value=pad(mm);if(a!==Sx)Sx.value=pad(ss);$("tbig").style.setProperty("--mmw",Math.max(2,String(a===M?M.value:pad(mm)).length));M.readOnly=Sx.readOnly=run_}
+  $("tgo").textContent=run_?"Duraklat":(left<TM.dur?"Devam et":"Başlat");
   const fs=focusStats(),gl=fGoal();$("tstat").textContent=`Bugün ${fs.n}/${gl} odak · ${fmtMin(fs.m)}`+(fs.n>=gl?" · hedef tamam":"");
   $("tgoalF").style.width=Math.min(100,fs.n/gl*100)+"%";$("tgoal").classList.toggle("done",fs.n>=gl);
   ambSync();brkDraw();
@@ -3331,16 +3357,28 @@ $("tlabel").value=TM.label||"";
 $("tlabel").addEventListener("input",e=>{TM.label=e.target.value;if(TM.task){TM.task=null;drawTimer()}tSave()});
 $("ttask").addEventListener("click",e=>{if(e.target.closest("#tunlink")){TM.task=null;tSave();drawTimer();renderAll()}});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-focus]");if(b&&api)focusTask(b.dataset.focus);const sh=e.target.closest("[data-share]");if(sh)shareProject(sh.dataset.share);if(e.target.closest("[data-acct]"))openAcct()});
-$("presets").addEventListener("click",e=>{const c=e.target.closest("[data-min]");if(c)tSet(+c.dataset.min,c.dataset.brk!=null?"break":"focus")});
+/* tür: Odak / Kısa mola / Uzun mola; her biri kendi süresini hatırlar */
+$("tmodes").addEventListener("click",e=>{const b=e.target.closest("[data-tm]");if(!b)return;const k=b.dataset.tm;
+  if(TM.endAt||tLeft()<TM.dur){if(k!==brkKind())toast("Önce sayacı sıfırla",null,true);return}
+  if(k==="focus")tSetSec(TM.fdur||1500,"focus");else tSetSec(bDur(k),"break",k)});
+/* büyük sayı: dakikaya ya da saniyeye tıklayıp yaz; Enter uygular ve başlatır */
+function tApplyNum(start){const m=parseInt($("tMM").value,10),x=parseInt($("tSS").value,10);if(isNaN(m)&&isNaN(x)){drawTimer();return}
+  const sec=Math.min(14400,(isNaN(m)?0:m)*60+Math.min(59,isNaN(x)?0:x));if(sec<5){drawTimer();return}
+  if(sec!==TM.dur||tLeft()!==TM.dur)tSetSec(sec,TM.mode,TM.bk);if(start&&!TM.endAt)tStart()}
+for(const id of ["tMM","tSS"]){const el=$(id);
+  el.addEventListener("focus",()=>{if(!el.readOnly)setTimeout(()=>el.select(),0)});
+  el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"");if(id==="tMM")$("tbig").style.setProperty("--mmw",Math.max(2,el.value.length));if(id==="tMM"&&el.value.length>=3)$("tSS").focus()});
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();tApplyNum(true);el.blur()}else if(e.key==="Escape"){e.stopPropagation();el.blur();drawTimer()}
+    else if(e.key===":"&&id==="tMM"){e.preventDefault();$("tSS").focus()}});
+  el.addEventListener("blur",()=>setTimeout(()=>{if(!["tMM","tSS"].includes((document.activeElement||{}).id))tApplyNum(false)},0));
+  el.addEventListener("wheel",e=>{if(TM.endAt)return;e.preventDefault();const up=e.deltaY<0;let sec=TM.dur;
+    if(id==="tMM")sec+=(up?1:-1)*(e.shiftKey?5:1)*60;else sec+=(up?1:-1)*(e.shiftKey?10:1);if(document.activeElement===el)el.blur();tSetSec(Math.max(5,sec),TM.mode,TM.bk)},{passive:false})}
 $("topts").addEventListener("click",e=>{const b=e.target.closest("[data-opt]");if(!b)return;const k=b.dataset.opt,v=!OPT(k);LS.set("t_"+k,v);
   if(k==="fnotify"&&v&&!TA&&"Notification"in window&&Notification.permission==="default"){try{Notification.requestPermission()}catch(_){}}
-  drawTimer();toast({pomo:v?"Otomatik mola açık · her 4 odakta bir 15 dk uzun mola":"Otomatik mola kapalı",fnotify:v?"Arka plandayken sistem bildirimi gösterilecek":"Sistem bildirimi kapalı",quiet:v?"Odak sırasında bilgi mesajları gizlenecek":"Sessiz odak kapalı",btips:v?"Molada kısa öneriler gösterilecek":"Mola önerileri kapalı"}[k],null,true)});
-$("tsetBtn").onclick=()=>{const v=+$("tmin").value;if(v>0){tSet(v);$("tmin").value=""}};
-$("tmin").addEventListener("keydown",e=>{if(e.key==="Enter")$("tsetBtn").click()});
+  drawTimer();toast({pomo:v?"Otomatik mola açık · her 4 odakta bir uzun mola":"Otomatik mola kapalı",fnotify:v?"Arka plandayken sistem bildirimi gösterilecek":"Sistem bildirimi kapalı",quiet:v?"Odak sırasında bilgi mesajları gizlenecek":"Sessiz odak kapalı",btips:v?"Molada kısa öneriler gösterilecek":"Mola önerileri kapalı"}[k],null,true)});
 $("tgo").onclick=()=>TM.endAt?tPause():tStart();
 $("treset").onclick=tReset;
 /* fare tekerleği: büyük sayının, dakika kutularının üstünde kaydırınca değer değişir (Shift ile 5'er) */
-$("tbig").addEventListener("wheel",e=>{if(TM.endAt)return;e.preventDefault();const st=e.shiftKey?5:1,d=e.deltaY<0?st:-st;const cur=Math.round(TM.dur/60);tSet(Math.max(1,Math.min(240,cur+d)),TM.mode)},{passive:false});
 document.addEventListener("wheel",e=>{const el=e.target.closest&&e.target.closest('#timerPop input[type=number],#ctDur,#drEst,#tmin');if(!el)return;e.preventDefault();
   const st=(e.shiftKey?5:1)*(el.id==="drEst"?.5:1),d=e.deltaY<0?st:-st;const v=parseFloat(String(el.value||el.placeholder).replace(",","."))||0;
   if(el.id==="ctDur"&&/:/.test(el.value)){const m=/^(\d{1,2}):(\d{2})$/.exec(el.value);if(m){let t=(+m[1]*60+ +m[2]+d*5+1440)%1440;el.value=pad(Math.floor(t/60))+":"+pad(t%60)}return}
