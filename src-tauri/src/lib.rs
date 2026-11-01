@@ -280,12 +280,22 @@ pub fn run() {
         // Ctrl+Alt+W: uygulama arkadayken bile ekran alıntısını panoya ekle
         {
             use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
+            // Ctrl+Alt+Boşluk: hızlı görev kutusu · Ctrl+Alt+R: referans penceresinde "tıklamalar arkaya geçsin"i kapat
             let snip = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyW);
+            let quick = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::Space);
+            let refp = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyR);
             builder = builder.plugin(
                 tauri_plugin_global_shortcut::Builder::new()
                     .with_handler(move |app, sc, ev| {
-                        if sc == &snip && ev.state() == ShortcutState::Pressed {
+                        if ev.state() != ShortcutState::Pressed {
+                            return;
+                        }
+                        if sc == &snip {
                             let _ = app.emit("snip", ());
+                        } else if sc == &quick {
+                            let _ = app.emit("quick", ());
+                        } else if sc == &refp {
+                            let _ = app.emit("ref-pass", ());
                         }
                     })
                     .build(),
@@ -340,9 +350,11 @@ pub fn run() {
             #[cfg(desktop)]
             {
                 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
-                let _ = _app
-                    .global_shortcut()
-                    .register(Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyW));
+                for code in [Code::KeyW, Code::Space, Code::KeyR] {
+                    let _ = _app
+                        .global_shortcut()
+                        .register(Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), code));
+                }
             }
             Ok(())
         })

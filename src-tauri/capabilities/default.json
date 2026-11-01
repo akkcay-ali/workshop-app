@@ -4,7 +4,9 @@
   "description": "Ana pencerenin izinleri (tüm platformlar)",
   "windows": [
     "main",
-    "mini"
+    "mini",
+    "ref",
+    "quick"
   ],
   "permissions": [
     "core:default",

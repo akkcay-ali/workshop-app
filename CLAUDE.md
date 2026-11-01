@@ -71,6 +71,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Zamanlayıcı (`#timerPop`, sekmeler `setTTab`, LS `ttab`): Odak (Pomodoro, `TM`) · Kronometre (`SW`, LS `sw`; `swTask` görevde "süre", `swFinish` → `creditTask` → `task.focus` dk; görevde `est` tahmini dk, `timeBadge`) · Sayaçlar (`CT`, LS `ctimers`, `ctAdd` "40" dk ya da "15:30" saat; bitince `chime`+`notifyAlways`). Büyük sayı ve dakika kutuları fare tekerleğiyle değişir.
   Mini sayaç (masaüstü): `miniOpen` → `WebviewWindow("mini", index.html#mini)`, her zaman üstte; sayfa `html.mini` + `#miniRoot`, ana betik `__MINI` ile durur; durum olayı `mini-state`, komut `mini-cmd`; küçültünce/gizleyince otomatik (LS `t_mini`). Tray ipucu `trayTip`. İzinler `capabilities/desktop.json`, pencere listesi `default.json` (`mini`).
   Odakta: presence `f` (bitiş zamanı ya da 1 = kronometre) → `.hp.fx`; odaktayken `teamNotify` yalnızca acil (bahsetme, özel mesaj).
+- Üstte referans (masaüstü, PureRef yerine): pano çubuğu "Üstte aç" → `refOpen` → `WebviewWindow("ref", index.html#ref)` (her zaman üstte, çerçevesiz, saydam).
+  Salt görüntü: ana pencere `#world`'ün kopyasını `ref-snap` olayıyla yollar (`refPush`, `syncCards` sonunda `refSched`); görseller Cache Storage `ws-ref`'e yazılır (aynı köken).
+  Ref penceresi: kaydır/yakınlaştır, çift tık sığdır, saydamlık (LS `atolye:refop`), sabitle, "tıklamalar arkaya geçsin" (`setIgnoreCursorEvents`; geri Ctrl+Alt+R → `ref-pass`), görünüm LS `atolye:refv:<bid>`.
+- Hızlı görev (masaüstü): Ctrl+Alt+Boşluk (global-shortcut → `quick` olayı) → `quickOpen` (`#quick` penceresi) → `quick-add` → `quickAdd`: açık projeye (yoksa projesiz) bugünün görevi, ortak projede özel; `parseTask` (14:30, #etiket).
+  Yardımcı pencereler `__WIN` = mini/ref/quick (`__MINI` ile ana betik durur); izinler `capabilities/aux.json`.
 - Paylaş: yerel proje hemen taşınmaz (`shPre`); "Buluta taşı ve davet et" / "Yalnızca buluta taşı" (`shareMove`).
 - Ses cihazları ayarlarda (`drawAud`, LS `vMic`/`vOut`); çan ve ses kartları da `vOut`'a çalar. Yazı tipi sabit: Geist + Unbounded (seçenek kaldırıldı).
 - Yazı kartı `kind:"text"` (çerçevesiz başlık): `fs` px, genişlik içerikten (`max-content`, `w` ölçülüp saklanır); araç çubuğu "Yazı" / T, köşeden sürükle = boyut (`tresize`), seçiliyken +/−, sağ tık `textSizeMenu` (`TSIZES`), `convText` not ↔ yazı.
