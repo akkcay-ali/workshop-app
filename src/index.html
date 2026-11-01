@@ -3410,8 +3410,10 @@ async function spoBoot(){let pk=null;try{pk=JSON.parse(sessionStorage.getItem("s
   try{spoSave(await spoToken({grant_type:"authorization_code",code,redirect_uri:spoRedirect(),client_id:pk.cid,code_verifier:pk.v}),pk.cid);toast("Spotify bağlandı · odakta çalanlar Geçmiş'e yazılacak",null,true)}
   catch(e){toast("Spotify bağlanamadı: "+e.message,null,true);errPush("spotify: "+e.message)}}
 async function spoFetch(path){if(!SPO.on())return null;
-  if(Date.now()>SPO.tok.exp){try{spoSave(await spoToken({grant_type:"refresh_token",refresh_token:SPO.tok.refresh,client_id:SPO.tok.cid}),SPO.tok.cid)}catch(e){if(/invalid_grant|revoked/i.test(e.message))spoOff(true);return null}}
-  try{const r=await fetch("https://api.spotify.com/v1"+path,{headers:{authorization:"Bearer "+SPO.tok.access}});if(r.status===204)return {};if(r.status===401){SPO.tok.exp=0;return null}if(!r.ok)return null;return await r.json()}catch(_){return null}}
+  if(Date.now()>SPO.tok.exp){try{spoSave(await spoToken({grant_type:"refresh_token",refresh_token:SPO.tok.refresh,client_id:SPO.tok.cid}),SPO.tok.cid)}catch(e){SPO.err="yenileme: "+e.message;errPush("spotify "+SPO.err);if(/invalid_grant|revoked/i.test(e.message))spoOff(true);else drawSpoNow();return null}}
+  try{const r=await fetch("https://api.spotify.com/v1"+path,{headers:{authorization:"Bearer "+SPO.tok.access}});if(r.status===204){SPO.err="";return {}}if(r.status===401)SPO.tok.exp=0;
+    if(!r.ok){const t=await r.text().catch(()=>"");let m="";try{m=(JSON.parse(t).error||{}).message||""}catch(_){m=t.slice(0,80)}SPO.err=r.status+(m?" · "+m:"");errPush("spotify "+path.split("?")[0]+": "+SPO.err);return null}
+    SPO.err="";return await r.json()}catch(e){SPO.err="bağlantı: "+(e.message||e);errPush("spotify: "+SPO.err);return null}}
 const spoTrack=t=>t&&t.name?{id:t.id||t.name,n:t.name,a:(t.artists||[]).map(x=>x.name).join(", "),img:(((t.album||{}).images||[]).slice(-1)[0]||{}).url||""}:null;
 /* odak bitince o aralıkta çalanlar; Spotify'ın "son çalınanlar" listesi birkaç dakika gecikebildiği için 4 dk sonra bir kez daha bakılır */
 async function spoAttach(rid,s,e,again){const id=await Promise.resolve(rid);if(!id||!SPO.on())return;const got=[];
@@ -3427,8 +3429,8 @@ async function spoNow(force){if(!SPO.on()||document.hidden||(!force&&Date.now()-
   const c=await spoFetch("/me/player/currently-playing");SPO.now=c&&c.item&&c.is_playing?spoTrack(c.item):null;drawSpoNow()}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)spoNow(true)});
 function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
-  const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle":"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!k;np.classList.toggle("idle",!n);
-  if(!n){if(k){$("npTx").textContent="şu an çalan yok";np.title="Spotify bağlı · çalmaya başlayınca burada görünür";np.href="https://open.spotify.com/"}return}
+  const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!k;np.classList.toggle("idle",!n);
+  if(!n){if(k){$("npTx").textContent=SPO.err?"Spotify: "+SPO.err:"şu an çalan yok";np.title="Spotify bağlı · çalmaya başlayınca burada görünür";np.href="https://open.spotify.com/"}return}
   $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a+" · Spotify'da aç";np.href=n.id&&!/\s/.test(n.id)?"https://open.spotify.com/track/"+encodeURIComponent(n.id):"https://open.spotify.com/";
   np.classList.remove("pop");void np.offsetWidth;np.classList.add("pop")}
 function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!!TA||!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
