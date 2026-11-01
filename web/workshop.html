@@ -176,8 +176,14 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .presets{display:flex;gap:6px;flex-wrap:wrap}
 .tmodes{display:flex;justify-content:center;gap:4px}.tmodes button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:5px 10px;border-radius:99px;cursor:pointer;transition:background .15s,color .15s}
 .tmodes button:hover{color:var(--ink)}.tmodes button[aria-pressed="true"]{background:var(--glass-2,rgb(255 255 255 / .08));color:var(--ink)}.tmodes.lock button:not([aria-pressed="true"]){opacity:.45;cursor:default}
-#tbig{display:flex;justify-content:center;align-items:center}#tbig .tnum{width:2.2ch;border:0;outline:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:center;padding:0;border-radius:10px;cursor:text;transition:background .15s}
-#tbig .tnum#tMM{width:calc(var(--mmw,2) * 1ch + .2ch)}#tbig .tnum:hover:not([readonly]){background:rgb(255 255 255 / .05)}#tbig .tnum:focus{background:rgb(255 255 255 / .08)}#tbig .tnum[readonly]{cursor:default}#tbig .tsep{opacity:.6;margin:0 -.04em}
+#tbig{display:flex;justify-content:center;align-items:center}#tbig .tsep{opacity:.6;margin:0 -.04em}
+#tbig .tseg{position:relative;display:inline-flex;border-radius:10px;transition:background .15s}#tbig .tseg:hover{background:rgb(255 255 255 / .05)}
+#tbig .troll{display:inline-flex}#tbig .dg{display:inline-block;width:1ch;height:1em;overflow:hidden}
+#tbig .dg i{display:flex;flex-direction:column;font-style:normal;transition:transform .6s cubic-bezier(.34,1.32,.64,1)}#tbig .dg i b{display:block;height:1em;line-height:1em;font-weight:inherit;text-align:center}
+#tbig .tnum{position:absolute;inset:0;width:100%;border:0;outline:0;background:transparent;color:transparent;caret-color:transparent;font:inherit;letter-spacing:inherit;text-align:center;padding:0;border-radius:10px;cursor:text}
+#tbig .tnum[readonly]{cursor:default}#tbig .tseg:has(.tnum[readonly]):hover{background:transparent}
+#tbig .tseg:focus-within{background:rgb(255 255 255 / .08)}#tbig .tseg:focus-within .troll{display:none}#tbig .tnum:focus{position:static;color:inherit;caret-color:auto;width:calc(var(--n,2) * 1ch + .15ch)}
+@media (prefers-reduced-motion:reduce){#tbig .dg i{transition:none}}
 .audrow{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}.audrow select{width:100%;min-width:0}
 .ttabs{align-self:stretch;display:flex}.ttabs button{flex:1;position:relative}.tpane{display:flex;flex-direction:column;gap:12px}
 .ctn{display:inline-grid;place-items:center;min-width:15px;height:15px;border-radius:8px;background:var(--t2);color:#17191E;font-size:9.5px;font-weight:700;margin-left:5px;padding:0 3px}
@@ -916,6 +922,10 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .npi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--glass-2);color:var(--ink-2)}.npi svg{width:18px;height:18px}
 .npi.cloud{color:var(--ink)}.npi.shared{color:var(--t5)}.npmsg{display:block;padding:4px 18px 16px}
 .acform{display:flex;flex-direction:column;gap:8px}
+.acme{display:flex;align-items:center;gap:12px;padding:4px 0 2px}.acbig{width:42px;height:42px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:17px;color:#16171B;background:linear-gradient(135deg,#C9D6FF,#9FB7FF)}
+.acid{display:flex;flex-direction:column;min-width:0}.acid b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.acid span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acst{display:flex;gap:6px;flex-wrap:wrap}.acst span{font-size:11.5px;padding:4px 9px;border-radius:99px;background:rgb(255 255 255 / .05);border:1px solid var(--stroke);color:var(--ink-2)}.acst span b{color:var(--ink);font-weight:600}
+.acbtns .btn{flex:1}
 .shbtn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:9px;border:1px solid var(--stroke);background:var(--glass);color:var(--ink-2);font-size:12px;margin-left:10px;transition:all .15s}
 .shbtn svg{width:14px;height:14px}.shbtn:hover{color:var(--ink);border-color:var(--stroke-2)}.shbtn.on{color:var(--t5);border-color:color-mix(in srgb,var(--t5) 40%,transparent)}
 .pcl{display:inline-flex;vertical-align:-2px;margin-left:7px;color:var(--t5)}.pcl svg{width:14px;height:14px}
@@ -1063,8 +1073,8 @@ body.frameless .app{padding-top:8px}
 <div class="pop" id="timerPop" hidden role="dialog" aria-label="Zamanlayıcı">
   <div class="seg sm ttabs" id="ttabs" role="group" aria-label="Zamanlayıcı"><button data-tt="focus" aria-pressed="true">Odak</button><button data-tt="watch" aria-pressed="false">Kronometre</button><button data-tt="ct" aria-pressed="false">Sayaçlar<span class="ctn" id="ctN" hidden></span></button><button data-tt="hist" aria-pressed="false">Geçmiş</button></div>
   <div class="tpane" data-tp="focus">
-  <div class="tmodes" id="tmodes" role="group" aria-label="Tür"><button data-tm="focus">Odak</button><button data-tm="short">Kısa mola</button><button data-tm="long">Uzun mola</button></div>
-  <div class="big" id="tbig" title="Dakikaya ya da saniyeye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><input class="tnum" id="tMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"><span class="tsep">:</span><input class="tnum" id="tSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></div>
+  <div class="tmodes" id="tmodes" role="group" aria-label="Tür"><button data-tm="focus">Odak</button><button data-tm="short">Mola</button></div>
+  <div class="big" id="tbig" title="Dakikaya ya da saniyeye tıklayıp yaz · Enter başlatır · tekerlekle de değişir"><span class="tseg"><span class="troll" id="rMM" aria-hidden="true"></span><input class="tnum" id="tMM" inputmode="numeric" maxlength="3" aria-label="Dakika" autocomplete="off"></span><span class="tsep">:</span><span class="tseg"><span class="troll" id="rSS" aria-hidden="true"></span><input class="tnum" id="tSS" inputmode="numeric" maxlength="2" aria-label="Saniye" autocomplete="off"></span></div>
   <div class="tcyc" id="tcyc"></div>
   <input class="field" id="tlabel" placeholder="Neye odaklanıyorsun? (isteğe bağlı)" maxlength="80">
   <div class="small" id="ttask" hidden></div>
@@ -1074,7 +1084,7 @@ body.frameless .app{padding-top:8px}
   <div class="tamb"><span class="small">Ortam sesi</span><div class="seg sm" id="ambSeg" role="group" aria-label="Ortam sesi"><button data-amb="off">Kapalı</button><button data-amb="rain">Yağmur</button><button data-amb="brown">Derin</button><button data-amb="cafe">Kafe</button></div>
     <input type="range" id="ambV" min="0" max="100" aria-label="Ortam sesi düzeyi" title="Ses düzeyi"></div>
   <div class="topts" id="topts">
-    <button class="opt" data-opt="pomo" title="Odak bitince mola, mola bitince yeni odak kendiliğinden başlar. Her 4 odakta bir uzun mola. Süreleri Kısa mola / Uzun mola sekmesinde ayarla.">Otomatik mola</button>
+    <button class="opt" data-opt="pomo" title="Odak bitince mola, mola bitince yeni odak kendiliğinden başlar. Mola süresini "Mola"yı seçip ayarla.">Otomatik mola</button>
     <button class="opt" data-opt="fnotify" title="Workshop arka plandayken süre dolunca sistem bildirimi gösterir">Bildirim</button>
     <button class="opt" data-opt="quiet" title="Odak sürerken uygulama içi bilgi mesajlarını gizler (hatalar ve geri al yine görünür)">Sessiz odak</button>
     <button class="opt" data-opt="btips" title="Mola başlayınca köşede kısa bir öneri gösterir: uzağa bak, esne, su iç">Mola önerileri</button>
@@ -1129,8 +1139,11 @@ body.frameless .app{padding-top:8px}
   <div id="acctSec">
     <div id="acctOut" class="acform"><input class="field" id="acEmail" type="email" placeholder="e-posta" autocomplete="email"><input class="field" id="acPass" type="password" placeholder="şifre (en az 6 karakter)" autocomplete="current-password">
       <div class="row"><button class="btn primary" id="acIn" style="flex:1">Giriş yap</button><button class="btn" id="acUp" style="flex:1">Hesap oluştur</button></div><span class="small" id="acMsg"></span></div>
-    <div id="acctIn" class="acform" hidden><div class="libpath mono" id="acWho"></div>
-      <label class="small" for="acName">Görünen ad · ekip seni böyle görür</label><input class="field" id="acName" maxlength="40" placeholder="ör. Ali"><button class="btn" id="acBug" hidden>Hata bildir</button><button class="btn" id="acOut">Çıkış yap</button></div></div>
+    <div id="acctIn" class="acform" hidden>
+      <div class="acme"><span class="acbig" id="acBig"></span><div class="acid"><b id="acNm"></b><span id="acWho"></span></div></div>
+      <div class="acst" id="acSt"></div>
+      <label class="small" for="acName">Görünen ad · ekip seni böyle görür</label><input class="field" id="acName" maxlength="40" placeholder="ör. Ali">
+      <div class="row acbtns"><button class="btn" id="acBug" hidden>Hata bildir</button><button class="btn" id="acOut">Çıkış yap</button></div></div></div>
 </div>
 
 <div class="pop" id="cfgPop" hidden role="dialog" aria-label="Ayarlar">
@@ -3036,12 +3049,12 @@ function tPause(){TM.left=tLeft();TM.endAt=null;tSave();drawTimer();presTrack()}
 function tReset(){if(!TM.endAt&&TM.left===TM.dur)TM.cycle=0;/* ikinci sıfırla seansları da sıfırlar */
   TM.endAt=null;TM.left=TM.dur;TM.proj=null;tSave();drawTimer()}
 /* süreler saniye: odak TM.fdur, kısa mola LS sbrk, uzun mola LS lbrk */
-const bDur=k=>Math.max(5,LS.get(k==="long"?"lbrk":"sbrk",k==="long"?900:300));
+const bDur=()=>Math.max(5,LS.get("sbrk",300));
 function tSetSec(sec,mode,bk){sec=Math.max(5,Math.min(14400,Math.round(sec)));TM.mode=mode||"focus";TM.bk=TM.mode==="break"?(bk||TM.bk||"short"):null;
-  if(TM.mode==="focus")TM.fdur=sec;else LS.set(TM.bk==="long"?"lbrk":"sbrk",sec);
+  if(TM.mode==="focus")TM.fdur=sec;else LS.set("sbrk",sec);
   TM.dur=sec;TM.left=TM.dur;TM.endAt=null;tSave();drawTimer()}
 function tSet(min,mode,bk){tSetSec(min*60,mode,bk)}
-const brkKind=()=>TM.mode==="break"?(TM.bk||(TM.dur>=900?"long":"short")):"focus";
+const brkKind=()=>TM.mode==="break"?"short":"focus";
 /* ekip bildirimleri (bahsetme, atama, onay, özel mesaj, alıntı): pencere arkadayken sistem bildirimi; zil menüsünden kapatılır */
 async function teamNotify(title,body,urgent){if(LS.get("tnotify",true)===false||(document.hasFocus()&&!document.hidden))return;if(!urgent&&inFocus())return;
   try{if(TA&&TA.notification){const N=TA.notification;let g=await N.isPermissionGranted();if(!g)g=(await N.requestPermission())==="granted";if(g)N.sendNotification({title,body});return}
@@ -3075,7 +3088,7 @@ function finish(silent){
   if(silent)return;
   ding();const lbl=(TM.label?TM.label+" · ":"")+fmtMin(mins)+" odak bitti";
   if(PARK.length)setTimeout(()=>toast(`Odakta ${PARK.length} not aldın`,{label:"Gör",fn:()=>{if($("timerPop").hidden)$("timerBtn").click();setTTab("focus")}},true),2600);
-  if(mins>5&&OPT("pomo")){const long=TM.cycle%4===0,bs=bDur(long?"long":"short"),bm=fmtMin(Math.max(1,Math.round(bs/60)));tSetSec(bs,"break",long?"long":"short");BK.next();tStart();
+  if(mins>5&&OPT("pomo")){const long=false,bs=bDur(),bm=fmtMin(Math.max(1,Math.round(bs/60)));tSetSec(bs,"break","short");BK.next();tStart();
     notify("Odak bitti",lbl.replace(" odak bitti","")+" · "+bm+" "+(long?"uzun ":"")+"mola"+(OPT("btips")?" · "+BK.tip().s:" başladı"));toast(lbl+" · "+bm+" "+(long?"uzun ":"")+"mola",{label:"Molayı atla",fn:()=>finish(false)})}
   else{notify("Odak bitti",lbl);toast(lbl,mins>5?{label:"Mola ver",fn:()=>{tSetSec(bDur("short"),"break","short");BK.next();tStart()}}:null,true)}
   if(rid)askNote(rid,mins);
@@ -3246,7 +3259,7 @@ const BK={i:LS.get("btip",0),key:"",hid:"",tip(){const t=BTIPS[this.i%BTIPS.leng
 function brkDraw(){const on=TM.mode==="break"&&!!TM.endAt&&OPT("btips");const c=$("brkCard");
   if(!on){if(!c.hidden)animHide(c);return}
   const id=TM.dur+":"+Math.round(TM.endAt/1000-TM.dur);if(BK.hid===id){if(!c.hidden)animHide(c);return}BK.key=id;
-  const t=BK.tip();$("bkT").textContent=(brkKind()==="long"?"Uzun mola":"Mola")+" · "+fmt(tLeft());if($("bkTip").dataset.i!==String(BK.i)){$("bkTip").dataset.i=BK.i;$("bkTip").innerHTML=`<b>${esc(t.s)}</b><br>${esc(t.l)}`}
+  const t=BK.tip();$("bkT").textContent="Mola"+" · "+fmt(tLeft());if($("bkTip").dataset.i!==String(BK.i)){$("bkTip").dataset.i=BK.i;$("bkTip").innerHTML=`<b>${esc(t.s)}</b><br>${esc(t.l)}`}
   if(c.hidden)animShow(c)}
 $("bkX").onclick=()=>{BK.hid=BK.key;animHide($("brkCard"))};$("bkNext").onclick=()=>{BK.next();brkDraw();miniPush()};$("bkSkip").onclick=()=>finish(false);
 /* --- ortam sesi: dosya yok, Web Audio ile üretilir; yalnızca odak sürerken çalar, molada yavaşça kısılır --- */
@@ -3316,7 +3329,7 @@ function drawTimer(){
   const left=tLeft(),run_=!!TM.endAt,brk=TM.mode==="break";
   $("timerBtn").classList.toggle("brk",brk);const bk=brkKind();
   document.querySelectorAll("#tmodes [data-tm]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.tm===bk));$("tmodes").classList.toggle("lock",run_||left<TM.dur);
-  $("tcyc").title=`Her 4 odakta bir uzun mola (${fmtMin(Math.round(bDur("long")/60))})`;
+  $("tcyc").title="Bugünkü odak turu";
   if(TM.cday!==TODAY&&TM.cycle){TM.cycle=0;TM.cday=TODAY}
   const cy=TM.cycle%4,full=TM.cycle>0&&cy===0;$("tcyc").innerHTML=OPT("pomo")?[0,1,2,3].map(k=>`<i class="${full||k<cy?"on":""}"></i>`).join(""):"";
   document.querySelectorAll("#timerPop [data-opt]").forEach(b=>b.setAttribute("aria-pressed",OPT(b.dataset.opt)));
@@ -3324,7 +3337,7 @@ function drawTimer(){
   $("timerBtn").classList.toggle("running",run_);
   const frac=TM.dur?1-left/TM.dur:0;$("ringFg").setAttribute("stroke-dashoffset",(50.27*(1-frac)).toFixed(2));winStatus(left,run_,frac);
   {const mm=Math.floor(left/60),ss=left%60,a=document.activeElement;const M=$("tMM"),Sx=$("tSS");
-   if(a!==M)M.value=pad(mm);if(a!==Sx)Sx.value=pad(ss);$("tbig").style.setProperty("--mmw",Math.max(2,String(a===M?M.value:pad(mm)).length));M.readOnly=Sx.readOnly=run_}
+   if(a!==M)M.value=pad(mm);if(a!==Sx)Sx.value=pad(ss);rollSet($("rMM"),pad(mm));rollSet($("rSS"),pad(ss));M.readOnly=Sx.readOnly=run_}
   $("tgo").textContent=run_?"Duraklat":(left<TM.dur?"Devam et":"Başlat");
   const fs=focusStats(),gl=fGoal();$("tstat").textContent=`Bugün ${fs.n}/${gl} odak · ${fmtMin(fs.m)}`+(fs.n>=gl?" · hedef tamam":"");
   $("tgoalF").style.width=Math.min(100,fs.n/gl*100)+"%";$("tgoal").classList.toggle("done",fs.n>=gl);
@@ -3343,7 +3356,12 @@ $("tlabel").value=TM.label||"";
 $("tlabel").addEventListener("input",e=>{TM.label=e.target.value;if(TM.task){TM.task=null;drawTimer()}tSave()});
 $("ttask").addEventListener("click",e=>{if(e.target.closest("#tunlink")){TM.task=null;tSave();drawTimer();renderAll()}});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-focus]");if(b&&api)focusTask(b.dataset.focus);const sh=e.target.closest("[data-share]");if(sh)shareProject(sh.dataset.share);if(e.target.closest("[data-acct]"))openAcct()});
-/* tür: Odak / Kısa mola / Uzun mola; her biri kendi süresini hatırlar */
+/* rakamlar yuvarlanarak değişir: her hane 0–9 şeridi, yalnızca transform */
+function rollSet(el,str){if(el.dataset.v===str)return;el.dataset.v=str;
+  if(el.children.length!==str.length){el.innerHTML=[...str].map(()=>`<span class="dg"><i>${"0123456789".split("").map(d=>`<b>${d}</b>`).join("")}</i></span>`).join("");
+    [...el.children].forEach((c,k)=>{const i=c.firstChild;i.style.transition="none";i.style.transform=`translateY(${-str[k]}em)`;void i.offsetHeight;i.style.transition=""});return}
+  [...el.children].forEach((c,k)=>{c.firstChild.style.transform=`translateY(${-str[k]}em)`})}
+/* tür: Odak / Mola; her biri kendi süresini hatırlar */
 $("tmodes").addEventListener("click",e=>{const b=e.target.closest("[data-tm]");if(!b)return;const k=b.dataset.tm;
   if(TM.endAt||tLeft()<TM.dur){if(k!==brkKind())toast("Önce sayacı sıfırla",null,true);return}
   if(k==="focus")tSetSec(TM.fdur||1500,"focus");else tSetSec(bDur(k),"break",k)});
@@ -3354,7 +3372,7 @@ function tApplyNum(start){const m=parseInt($("tMM").value,10),x=parseInt($("tSS"
 for(const id of ["tMM","tSS"]){const el=$(id);
   el.addEventListener("pointerdown",e=>{if(el.readOnly||document.activeElement===el)return;e.preventDefault();el.focus();el.select()});
   el.addEventListener("focus",()=>{if(!el.readOnly)el.select()});
-  el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"");if(id==="tMM")$("tbig").style.setProperty("--mmw",Math.max(2,el.value.length));if(id==="tMM"&&el.value.length>=3)$("tSS").focus()});
+  el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"");el.style.setProperty("--n",Math.max(2,el.value.length));if(id==="tMM"&&el.value.length>=3)$("tSS").focus()});
   el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();tApplyNum(true);el.blur()}else if(e.key==="Escape"){e.stopPropagation();el.blur();drawTimer()}
     else if(e.key===":"&&id==="tMM"){e.preventDefault();$("tSS").focus()}});
   el.addEventListener("blur",()=>setTimeout(()=>{if(!["tMM","tSS"].includes((document.activeElement||{}).id))tApplyNum(false)},0));
@@ -3362,7 +3380,7 @@ for(const id of ["tMM","tSS"]){const el=$(id);
     if(id==="tMM")sec+=(up?1:-1)*(e.shiftKey?5:1)*60;else sec+=(up?1:-1)*(e.shiftKey?10:1);if(document.activeElement===el)el.blur();tSetSec(Math.max(5,sec),TM.mode,TM.bk)},{passive:false})}
 $("topts").addEventListener("click",e=>{const b=e.target.closest("[data-opt]");if(!b)return;const k=b.dataset.opt,v=!OPT(k);LS.set("t_"+k,v);
   if(k==="fnotify"&&v&&!TA&&"Notification"in window&&Notification.permission==="default"){try{Notification.requestPermission()}catch(_){}}
-  drawTimer();toast({pomo:v?"Otomatik mola açık · her 4 odakta bir uzun mola":"Otomatik mola kapalı",fnotify:v?"Arka plandayken sistem bildirimi gösterilecek":"Sistem bildirimi kapalı",quiet:v?"Odak sırasında bilgi mesajları gizlenecek":"Sessiz odak kapalı",btips:v?"Molada kısa öneriler gösterilecek":"Mola önerileri kapalı"}[k],null,true)});
+  drawTimer();toast({pomo:v?"Otomatik mola açık":"Otomatik mola kapalı",fnotify:v?"Arka plandayken sistem bildirimi gösterilecek":"Sistem bildirimi kapalı",quiet:v?"Odak sırasında bilgi mesajları gizlenecek":"Sessiz odak kapalı",btips:v?"Molada kısa öneriler gösterilecek":"Mola önerileri kapalı"}[k],null,true)});
 $("tgo").onclick=()=>TM.endAt?tPause():tStart();
 $("treset").onclick=tReset;
 /* fare tekerleği: büyük sayının, dakika kutularının üstünde kaydırınca değer değişir (Shift ile 5'er) */
@@ -3434,7 +3452,10 @@ $("sk").addEventListener("pointerdown",e=>{if(e.target===$("sk"))closeSearch()})
 /* popovers */
 function hidePop(id){animHide($(id))}
 function closePops(){["timerPop","cfgPop","acctPop","bellPop"].forEach(hidePop);["timerBtn","cfgBtn","acctBtn","bellBtn"].forEach(id=>$(id).setAttribute("aria-expanded","false"))}
-function togglePop(pop,btn){const el=$(pop);const open=el.hidden||el.classList.contains("closing");closePops();if(open){animShow(el);$(btn).setAttribute("aria-expanded","true")}}
+/* açılır pencere düğmenin altına hizalanır ve düğmeden büyür */
+function anchorPop(el,btn){const b=$(btn);if(!b)return;const r=b.getBoundingClientRect();if(!r.width)return;const w=el.offsetWidth||320,cx=r.left+r.width/2;
+  const left=Math.max(12,Math.min(innerWidth-w-12,cx-w/2));el.style.left=left+"px";el.style.right="auto";el.style.top=(r.bottom+8)+"px";el.style.transformOrigin=`${Math.round(cx-left)}px -8px`}
+function togglePop(pop,btn){const el=$(pop);const open=el.hidden||el.classList.contains("closing");closePops();if(open){animShow(el);anchorPop(el,btn);$(btn).setAttribute("aria-expanded","true")}}
 $("timerBtn").onclick=e=>{e.stopPropagation();togglePop("timerPop","timerBtn")};
 document.addEventListener("pointerdown",e=>{if(!e.target.closest(".pop,#timerBtn,#cfgBtn"))closePops()});
 $("acctBtn").onclick=e=>{e.stopPropagation();drawAcct();togglePop("acctPop","acctBtn")};
@@ -3826,7 +3847,7 @@ function lsApi(){const save=()=>LS.set("wloose",S.items.filter(i=>!CL.items.has(
 
 /* --- hata bildirimi: yalnızca geliştirici hesabı (public.is_dev), başka kimse görmez --- */
 const BUG={shot:null};
-async function devCheck(){CL.dev=false;try{const {data}=await CL.sb.rpc("is_dev");CL.dev=data===true}catch(_){}$("acBug").hidden=!CL.dev;
+async function devCheck(){CL.dev=false;try{const {data}=await CL.sb.rpc("is_dev");CL.dev=data===true}catch(_){}$("acBug").hidden=!CL.dev;drawAcct();
   /* eski dosyalar bir kez kendiliğinden R2'ye taşınır (sorunsuz bitince bir daha çalışmaz) */
   if(CL.dev&&!LS.get("r2mig",0))setTimeout(async()=>{const ok=await migrateR2(true);if(ok)LS.set("r2mig",1)},8000)}
 function bugCtx(){const tabs=[...document.querySelectorAll('[aria-selected="true"],.tab.on,.seg .on')].map(e=>e.textContent.trim()).filter(Boolean).slice(0,6);
@@ -4086,7 +4107,9 @@ function drawAcct(){const btn=$("acctBtn");btn.hidden=!cloudAvail();if(btn.hidde
   $("acctOut").hidden=!!CL.me;$("acctIn").hidden=!CL.me;btn.classList.toggle("in",!!CL.me);
   $("acAv").hidden=!CL.me;$("acAv").textContent=CL.me?(CL.email[0]||"?").toUpperCase():"";btn.title=CL.me?"Hesap · "+CL.email:"Hesap · giriş yap";
   if(CL.me&&document.activeElement!==$("acName"))$("acName").value=(CL.prof.get(CL.me)||{}).name||"";
-  if(CL.me){const n=CL.pids.size,sh=[...CL.pids].filter(isShared).length;$("acWho").textContent=CL.email+(n?` · ${n} bulut projesi${sh?`, ${sh} ortak`:""}`:"")}}
+  if(CL.me){const n=CL.pids.size,sh=[...CL.pids].filter(isShared).length,nm=(CL.prof.get(CL.me)||{}).name||"";
+    $("acNm").textContent=nm||CL.email.split("@")[0];$("acWho").textContent=CL.email;$("acWho").title=CL.email;$("acBig").textContent=((nm||CL.email)[0]||"?").toLocaleUpperCase("tr");
+    $("acSt").innerHTML=`<span><b>${n}</b> bulut projesi</span>`+(sh?`<span><b>${sh}</b> ortak</span>`:"")+(CL.dev?`<span>geliştirici</span>`:"")}}
 const AUTH_TR=m=>/database error saving new user|signup_not_allowed/i.test(m)?"Bu e-posta davetli değil. Hesap açabilmek için bir projeye davet edilmen gerekiyor.":/invalid login/i.test(m)?"E-posta ya da şifre hatalı":/not confirmed/i.test(m)?"E-postanı henüz onaylamadın: gelen kutundaki bağlantıya tıkla":/already registered|already been registered/i.test(m)?"Bu e-postayla zaten hesap var, giriş yap":/at least 6|weak/i.test(m)?"Şifre en az 6 karakter olmalı":/rate limit/i.test(m)?"Çok fazla deneme, biraz bekle":/fetch|network/i.test(m)?"Bağlantı yok":m;
 async function acct(kind){const email=$("acEmail").value.trim(),password=$("acPass").value;const msg=$("acMsg");
   if(!email||!password){msg.textContent="E-posta ve şifre gerekli";return}msg.textContent=kind==="up"?"Hesap oluşturuluyor…":"Giriş yapılıyor…";
@@ -4273,6 +4296,7 @@ document.addEventListener("focusin",e=>{if(e.target.id==="briefIn")S.editing=tru
 document.addEventListener("focusout",e=>{if(e.target.id==="briefIn"){S.editing=false;const pid=curP();clearTimeout(briefT);saveBrief(pid,e.target.value);setTimeout(rerender,0)}});
 document.addEventListener("input",e=>{if(e.target.id==="briefIn"){fitBrief();const pid=curP(),v=e.target.value;clearTimeout(briefT);briefT=setTimeout(()=>saveBrief(pid,v),900)}});
 function saveBrief(pid,v){const p=proj(pid);if(!p||(p.brief||"")===v)return;run(api.update(pid,{brief:v,briefBy:CL.me,briefAt:Date.now()}))}
+$("acName").addEventListener("input",e=>{const v=e.target.value.trim();$("acNm").textContent=v||CL.email.split("@")[0];$("acBig").textContent=((v||CL.email)[0]||"?").toLocaleUpperCase("tr")});
 $("acName").addEventListener("change",saveMyName);$("acName").addEventListener("keydown",e=>{if(e.key==="Enter")e.target.blur()});
 
 /* =====================================================================

@@ -54,6 +54,7 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Dosyalar Cloudflare R2'de (kova `workshop`): edge function `r2` (secrets `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`)
   imzalı adres verir (`sign` toplu GET / PUT), `del`, `copy`, `purge` (proje sahibi), `migrate` (geliştirici). Yetki `public.r2_can(paths)` = assets RLS ile aynı kural.
   İstemcide `ST` (up/get/del/copy/purge): R2 olmazsa Supabase `assets`'e düşer; okumada R2'de yoksa Supabase'ten (eski sürümler, taşınmamış dosyalar). R2 CORS: Pages + tauri kökenleri.
+- Hesap paneli: avatar + ad + e-posta (`acBig`/`acNm`/`acWho`), proje sayıları `acSt`.
 - Hata bildirimi (yalnızca geliştirici, `private.devs` → `public.is_dev()`): hesap paneli "Hata bildir" → `#bug` (`openBug`, `sendBug`, bağlam `bugCtx` + son hatalar `ERRS`),
   tablo `public.bug_reports` (status open/fixed/wontfix, `reply`), görseller kova `bugs`. Aynı pencerede "Eski dosyaları R2'ye taşı" (`migrateR2`, `dev_asset_names`).
 - Yedek: bulut projesi menüsünde "Yedek indir (.workshop)" (`cloudBackup`, `zipItems` + `blobOf`, sürüm görselleri dahil `assetIdsOf`).
@@ -70,11 +71,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
   Özel şablon: pano sağ tık › "Şablon olarak kaydet" → öğe `type:"tpl"` (`project`, `name`, `cards`: çerçeve+not), projedeki herkes görür; `log_activity` `tpl`'yi atlar.
 - Zamanlayıcı (`#timerPop`, sekmeler `setTTab`, LS `ttab`): Odak (Pomodoro, `TM`) · Kronometre (`SW`, LS `sw`; `swTask` görevde "süre", `swFinish` → `creditTask` → `task.focus` dk; görevde `est` tahmini dk, `timeBadge`) · Sayaçlar (`CT`, LS `ctimers`, `ctAdd` "40" dk ya da "15:30" saat; bitince `chime`+`notifyAlways`). Büyük sayı ve dakika kutuları fare tekerleğiyle değişir.
   Mini sayaç (masaüstü): `miniOpen` → `WebviewWindow("mini", index.html#mini)`, her zaman üstte; sayfa `html.mini` + `#miniRoot`, ana betik `__MINI` ile durur; durum olayı `mini-state`, komut `mini-cmd`; küçültünce/gizleyince otomatik (LS `t_mini`). Tray ipucu `trayTip`. İzinler `capabilities/desktop.json`, pencere listesi `default.json` (`mini`).
-  Odak sekmesi: tür `#tmodes` Odak / Kısa mola / Uzun mola (her biri kendi süresi: `TM.fdur`, LS `sbrk`/`lbrk`, `bDur`, `TM.bk`, `brkKind`); büyük sayı iki giriş `#tMM`/`#tSS`
-  (tıkla-yaz, Enter uygular ve başlatır, tekerlek dk/sn; `tApplyNum`, `tSetSec`). Hazır dakika düğmeleri ve "dk/Ayarla" kaldırıldı. Geçmiş son 7 gün; güne gelince o gün nelere odaklanıldığı (`histTip`).
+  Odak sekmesi: tür `#tmodes` Odak / Mola (tek mola, otomatik molalar da bu süre; `TM.fdur`, LS `sbrk`, `bDur`, `brkKind`); büyük sayı `#tMM`/`#tSS` girişleri yuvarlanan rakamların
+  (`rollSet`, `.troll .dg`) üstünde saydam; tıkla-yaz, Enter uygular ve başlatır, tekerlek dk/sn (`tApplyNum`, `tSetSec`). Açılır pencereler düğmenin altına hizalanır (`anchorPop`). Hazır dakika düğmeleri ve "dk/Ayarla" kaldırıldı. Geçmiş son 7 gün; güne gelince o gün nelere odaklanıldığı (`histTip`).
   Odak ekleri: günlük hedef (`fGoal`, LS `fgoal`, `#tgoal` tekerlek/tık) · "aklıma geldi" (`PARK`, LS `park`; odaktayken hızlı ekleme `quickAdd` → `parkAdd`, listesi `#tpark`, odak bitince hatırlatma) ·
   ortam sesi (`AMB`, LS `amb`/`ambv`: yağmur/derin/kafe Web Audio ile üretilir, yalnızca odak sürerken; `ambSync` drawTimer'da) · mola önerileri (`BTIPS`, `BK`, `#brkCard`, OPT `btips`; mini sayaçta kısa hâli) ·
-  Geçmiş sekmesi (`drawHist`: hafta özeti, hedef serisi, 12 haftalık ısı haritası, saat dağılımı, projeler; `type:"focus"` öğelerinden).
+  Geçmiş sekmesi (`drawHist`, son 7 gün: özet, hedef serisi, gün kutuları + `histTip`, saat dağılımı, projeler; `type:"focus"` öğelerinden).
   Odakta: presence `f` (bitiş zamanı ya da 1 = kronometre) → `.hp.fx`; odaktayken `teamNotify` yalnızca acil (bahsetme, özel mesaj).
 - Üstte referans (masaüstü, PureRef yerine): pano çubuğu "Üstte aç" → `refOpen` → `WebviewWindow("ref", index.html#ref)` (her zaman üstte, çerçevesiz, saydam).
   Salt görüntü: ana pencere `#world`'ün kopyasını `ref-snap` olayıyla yollar (`refPush`, `syncCards` sonunda `refSched`); görseller Cache Storage `ws-ref`'e yazılır (aynı köken).
