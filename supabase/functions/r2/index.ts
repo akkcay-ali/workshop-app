@@ -46,15 +46,6 @@ Deno.serve(async (req) => {
   };
 
   try {
-    if (op === "ping") {
-      const a = await r2.fetch(BASE + "_ping", { method: "PUT", body: "ok" });
-      const b = await r2.fetch(BASE + "_ping");
-      const t = await b.text();
-      await del("_ping");
-      const g = await fetch(await sign("_ping2", "PUT", 60, "text/plain"), { method: "PUT", body: "x", headers: { "content-type": "text/plain" } });
-      await del("_ping2");
-      return out({ put: a.status, get: b.status, body: t, presigned_put: g.status });
-    }
     if (op === "sign") {
       const paths: string[] = body.paths ?? [];
       if (!(await can(paths))) return out({ error: "forbidden" }, 403);

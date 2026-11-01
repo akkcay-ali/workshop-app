@@ -3627,7 +3627,9 @@ function lsApi(){const save=()=>LS.set("wloose",S.items.filter(i=>!CL.items.has(
 
 /* --- hata bildirimi: yalnızca geliştirici hesabı (public.is_dev), başka kimse görmez --- */
 const BUG={shot:null};
-async function devCheck(){CL.dev=false;try{const {data}=await CL.sb.rpc("is_dev");CL.dev=data===true}catch(_){}$("acBug").hidden=!CL.dev}
+async function devCheck(){CL.dev=false;try{const {data}=await CL.sb.rpc("is_dev");CL.dev=data===true}catch(_){}$("acBug").hidden=!CL.dev;
+  /* eski dosyalar bir kez kendiliğinden R2'ye taşınır (sorunsuz bitince bir daha çalışmaz) */
+  if(CL.dev&&!LS.get("r2mig",0))setTimeout(async()=>{const ok=await migrateR2(true);if(ok)LS.set("r2mig",1)},8000)}
 function bugCtx(){const tabs=[...document.querySelectorAll('[aria-selected="true"],.tab.on,.seg .on')].map(e=>e.textContent.trim()).filter(Boolean).slice(0,6);
   return {surum:$("verTxt")?$("verTxt").textContent:"",ortam:TA?"masaüstü":NOKBD?"dokunmatik":"web",mod:S.mode,ua:navigator.userAgent,ekran:innerWidth+"x"+innerHeight+" @"+devicePixelRatio,
     proje:curP()?((S.items.find(i=>i.type==="project"&&i.id===curP())||{}).name||curP()):"ana sayfa",bulut:curP()?isCloud(curP()):false,sekmeler:tabs,hatalar:ERRS.slice()}}
@@ -3643,11 +3645,12 @@ async function sendBug(){const body=$("bugTxt").value.trim();if(!body){$("bugTxt
     const {error}=await CL.sb.from("bug_reports").insert({body,ctx,shot});if(error)throw error;
     $("bugTxt").value="";bugSetShot(null);$("bugMsg").textContent="Gönderildi, teşekkürler.";drawBugs()}
   catch(e){$("bugMsg").textContent="Gönderilemedi: "+(e.message||e)}finally{$("bugSend").disabled=false}}
-async function migrateR2(){const m=$("bugMigMsg");$("bugMig").disabled=true;let after="",n=0,bad=0;
+async function migrateR2(quiet){const m=$("bugMigMsg");$("bugMig").disabled=true;let after="",n=0,bad=0,ok=false;
   try{for(;;){const {data,error}=await CL.sb.rpc("dev_asset_names",{after});if(error)throw error;if(!data||!data.length)break;
       const r=await ST.call({op:"migrate",names:data});for(const v of Object.values(r.res||{}))if(/hata|yok/.test(v))bad++;n+=data.length;after=data[data.length-1];
       m.textContent=n+" dosya denetlendi…"}
-    m.textContent=`${n} dosya R2'de`+(bad?` · ${bad} sorunlu`:"")}catch(e){m.textContent="Olmadı: "+(e.message||e)}finally{$("bugMig").disabled=false}}
+    m.textContent=`${n} dosya R2'de`+(bad?` · ${bad} sorunlu`:"");ok=!bad;if(quiet&&n)toast(`Eski dosyalar R2'ye taşındı · ${n}`+(bad?`, ${bad} sorunlu`:""),null,true)}
+  catch(e){m.textContent="Olmadı: "+(e.message||e);errPush("r2 taşıma: "+(e.message||e))}finally{$("bugMig").disabled=false}return ok}
 $("acBug").onclick=()=>{animHide($("acctPop"));openBug()};
 $("bugClose").onclick=()=>animHide($("bug"));$("bug").addEventListener("click",e=>{if(e.target===$("bug"))animHide($("bug"))});
 $("bugSend").onclick=sendBug;$("bugShotX").onclick=()=>bugSetShot(null);$("bugMig").onclick=migrateR2;
