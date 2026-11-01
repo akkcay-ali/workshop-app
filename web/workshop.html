@@ -134,6 +134,14 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .ibtn:hover{color:var(--ink);border-color:var(--stroke-2)}
 .ibtn svg{width:15px;height:15px}
 .ibtn[aria-expanded="true"]{background:var(--glass-3);color:var(--ink)}
+.npchip{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 10px;border-radius:10px;background:var(--glass);border:1px solid var(--stroke);color:var(--ink-2);font-size:12px;text-decoration:none;max-width:min(340px,32vw);min-width:0;cursor:pointer;transition:background .15s,color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.npchip:hover{background:var(--glass-2,var(--glass));color:var(--ink)}.npchip:active{transform:scale(.96)}.npchip.pop{animation:popIn .45s linear both}
+.npchip .nptag{font-family:var(--f-mono);font-size:11px;color:var(--accent);flex:0 0 auto}.npchip .nptx{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npchip .nptx b{color:var(--ink);font-weight:500}
+.npeq{display:flex;align-items:flex-end;gap:2px;height:11px;flex:0 0 auto}.npeq i{width:2px;height:100%;border-radius:2px;background:var(--accent);transform-origin:bottom;animation:npEq 1s ease-in-out infinite}
+.npeq i:nth-child(2){animation-duration:.8s;animation-delay:-.3s}.npeq i:nth-child(3){animation-duration:1.15s;animation-delay:-.6s}
+@keyframes npEq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.npeq i{animation:none;transform:scaleY(.7)}}
+@media (max-width:900px){.npchip{display:none}}
 .tpill{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .tpill.idle{color:var(--ink-2)}
 .ring{width:16px;height:16px;transform:rotate(-90deg)}
@@ -1005,6 +1013,7 @@ body.frameless .app{padding-top:8px}
   <div class="topbar">
     <div class="tabs" id="tabs" role="tablist" aria-label="Açık projeler"></div>
     <div class="right">
+      <a class="npchip" id="npChip" hidden target="_blank" rel="noopener"><span class="npeq" aria-hidden="true"><i></i><i></i><i></i></span><span class="nptag">#np</span><span class="nptx" id="npTx"></span></a>
       <button class="ibtn" id="timerBtn" aria-expanded="false" aria-controls="timerPop" title="Odak zamanlayıcısı">
         <svg class="ring" viewBox="0 0 20 20"><circle class="bgc" cx="10" cy="10" r="8"/><circle class="fg" id="ringFg" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27"/></svg>
         <span class="tpill idle" id="tpill">25:00</span><span class="ctdot" id="ctDot" hidden></span>
@@ -3379,7 +3388,7 @@ async function spoConnect(){if(TA){toast("Spotify şimdilik yalnızca web sürü
 async function spoToken(body){const r=await fetch("https://accounts.spotify.com/api/token",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams(body)});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error_description||j.error||String(r.status));return j}
 function spoSave(j,cid){SPO.tok={access:j.access_token,refresh:j.refresh_token||(SPO.tok&&SPO.tok.refresh),exp:Date.now()+((j.expires_in||3600)-60)*1000,cid};LS.set("spo",SPO.tok);drawSpo()}
-function spoOff(expired){SPO.tok=null;SPO.now=null;LS.set("spo",null);drawSpo();toast(expired?"Spotify bağlantısının süresi doldu, yeniden bağlan":"Spotify bağlantısı kesildi",null,true)}
+function spoOff(expired){SPO.tok=null;SPO.now=null;LS.set("spo",null);drawSpo();drawSpoNow();toast(expired?"Spotify bağlantısının süresi doldu, yeniden bağlan":"Spotify bağlantısı kesildi",null,true)}
 async function spoBoot(){let pk=null;try{pk=JSON.parse(sessionStorage.getItem("spoPk")||"null")}catch(_){}if(!pk)return;
   const u=new URL(location.href),code=u.searchParams.get("code"),st=u.searchParams.get("state"),err=u.searchParams.get("error");if((!code&&!err)||st!==pk.st)return;
   try{sessionStorage.removeItem("spoPk")}catch(_){}["code","state","error"].forEach(k=>u.searchParams.delete(k));history.replaceState(null,"",u.toString());
@@ -3399,8 +3408,14 @@ async function spoAttach(rid,s,e,again){const id=await Promise.resolve(rid);if(!
     if(add.length)run(api.update(id,{music:[...prev,...add].sort((a,b)=>a.at-b.at).slice(0,60)}))}
   if(!again)setTimeout(()=>spoAttach(id,s,e,true),240000)}
 /* odak sürerken sayaçta şu an çalan (pencere açıksa, 20 sn'de bir) */
-async function spoNow(){if(!SPO.on()||!focusing()||$("timerPop").hidden||Date.now()-SPO.nt<20000)return;SPO.nt=Date.now();const c=await spoFetch("/me/player/currently-playing");SPO.now=c&&c.item&&c.is_playing?spoTrack(c.item):null;drawSpoNow()}
-function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`}
+/* şu an çalan: üst çubukta #np (sayfa görünürken 15 sn'de bir) ve odakta sayaç penceresinde */
+async function spoNow(force){if(!SPO.on()||document.hidden||(!force&&Date.now()-SPO.nt<15000)){if(!SPO.on()&&SPO.now){SPO.now=null;drawSpoNow()}return}SPO.nt=Date.now();
+  const c=await spoFetch("/me/player/currently-playing");SPO.now=c&&c.item&&c.is_playing?spoTrack(c.item):null;drawSpoNow()}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)spoNow(true)});
+function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
+  const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!n;if(!n)return;
+  $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a+" · Spotify'da aç";np.href=n.id&&!/\s/.test(n.id)?"https://open.spotify.com/track/"+encodeURIComponent(n.id):"https://open.spotify.com/";
+  np.classList.remove("pop");void np.offsetWidth;np.classList.add("pop")}
 function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!!TA||!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
 $("spoBtn").onclick=()=>SPO.on()?spoOff(false):spoConnect();
 setTimeout(()=>{spoBoot();drawSpo()},0);setInterval(spoNow,5000);
