@@ -901,7 +901,8 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vchl .m{font-size:12.5px;line-height:1.4;word-break:break-word;display:flex;align-items:flex-start;gap:8px;margin-top:4px}.vchl .m.cont{margin-top:-3px}.vchl>:first-child{margin-top:auto}.vchl .mav{flex:0 0 24px;width:24px}.vchl .mav .av{width:24px;height:24px;font-size:11px}.vchl .mb{flex:1;min-width:0;padding-top:3px}.vchl .m time{font-size:10.5px;color:var(--muted);padding-top:4px;flex:0 0 auto;opacity:0;transition:opacity .15s}.vchl .m:hover time,.vchl .m:not(.cont) time{opacity:1}.vchl .e{font-size:11.5px;color:var(--muted)}
 .vchat form{display:flex;gap:6px}
 .vchat{position:relative}
-.vchh{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}.vchh b{font-weight:600}.vchh .vhx{width:26px;height:26px}
+.vchh{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}.vchh b{font-weight:600}.vchh .sp{flex:1}.vwin #vChPop{display:none}.vwin #vChWin svg{transform:rotate(180deg)}
+html.chwin,html.chwin body{height:100%;margin:0;overflow:hidden;background:var(--bg,#16171B)}.vhub.vwin{position:fixed;inset:0;top:0;bottom:0;height:auto;width:auto;border-radius:0;border:0;box-shadow:none;animation:none}.vwin .vchat,.vwin .vchat.sized{flex:1;max-height:none;border-top:0;padding-top:0;min-height:0}.vwin .vgh{display:none}.vchh .vhx{width:26px;height:26px}
 .vhub.vdock{right:calc(min(var(--vhw,390px),100vw - 24px) + 22px);width:min(var(--vdw,400px),calc(100vw - var(--vhw,390px) - 60px))}
 .vdock .vchat,.vdock .vchat.sized{flex:1;max-height:none;border-top:0;padding-top:0;min-height:0}.vdock .vgh{display:none}.vdock #vChPop svg{transform:scaleX(-1)}
 @media (max-width:760px){#vChPop{display:none}}.vchat.sized{flex:0 0 var(--vchh);max-height:calc(100% - 120px)}
@@ -934,7 +935,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vctl{display:flex;align-items:center;gap:8px;border-top:1px solid var(--stroke);padding-top:12px;position:relative}
 .vnsb{position:relative}.vnsb svg{width:16px;height:16px}.vnsb.strong{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--stroke-2))}.vnsb.open{background:var(--glass-2,var(--glass))}
 .vnsb.nsoff{color:var(--muted)}.vnsb.nsoff::after{content:"";position:absolute;width:20px;height:1.5px;background:currentColor;transform:rotate(-45deg);border-radius:2px}
-.vnsd{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.vnsd{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent)}.vnsd.half{background:none;box-shadow:inset 0 0 0 1.5px var(--accent)}
 .vnspop{position:absolute;left:0;bottom:calc(100% + 8px);z-index:3;width:min(270px,100%);padding:10px;border-radius:12px;background:var(--panel-solid,rgb(24 25 29 / .97));border:1px solid var(--stroke-2);box-shadow:0 16px 36px -14px rgb(0 0 0 / .6);display:flex;flex-direction:column;gap:4px;animation:popIn .35s linear both;transform-origin:20% 100%}
 .vnspop b{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.04em;padding:0 6px 4px}
 .vnspop button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:8px 10px;border-radius:9px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
@@ -1269,11 +1270,11 @@ body.frameless .app{padding-top:8px}
     <div class="tphead">SON BİLDİRİMLER</div><div id="bugList" class="buglist"></div>
     <div class="row" style="margin-top:6px"><button class="btn" id="bugMig">Eski dosyaları R2'ye taşı</button><span class="small" id="bugMigMsg"></span></div></div></div></div>
 <div class="sk" id="tpk" hidden role="dialog" aria-label="Yeni pano"><div class="skbox tpbox"><div class="kbhead"><h2 id="tpT">Yeni pano</h2><button class="btn" id="tpClose">Vazgeç <kbd>Esc</kbd></button></div><div id="tpBody"></div></div></div>
-<aside class="vhub vdock" id="vchDock" hidden aria-label="Sohbet"></aside>
+<aside class="vhub vdock" id="vchDock" hidden aria-label="Sohbet"><i class="vgrip vgw" id="vdGrip" title="Sürükle: sohbeti genişlet · çift tık: varsayılan"></i></aside>
 <aside class="vhub" id="voicePop" hidden aria-label="Ses ve yayın"><i class="vgrip vgw" id="vhGrip" title="Sürükle: paneli genişlet · çift tık: varsayılan"></i><div class="vhh"><b>Ses ve yayın</b><span class="sp"></span><button class="vhx" id="vhClose" title="Paneli gizle" aria-label="Paneli gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
   <div class="vhprev" id="vhPrev" hidden><video id="vhV" autoplay playsinline muted></video><div class="vhpb"><span class="dot"></span><span id="vhPl"></span><span class="sp"></span><button class="btn sm" data-vhbig>Büyük izle</button></div></div>
   <div class="vhbody" id="voiceBody"></div>
-  <div class="vchat" id="vChat" hidden><i class="vgrip vgh" id="vchGrip" title="Sürükle: sohbeti büyüt · çift tık: varsayılan"></i><div class="vchh"><button class="vhx" id="vChPop" type="button" title="Sohbeti yanda aç" aria-label="Sohbeti yanda aç"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M6.5 2.5v11"/><path d="M4.3 6.5 3.3 8l1 1.5"/></svg></button><b id="vChT"></b></div><div class="vchl" id="vChL"></div><div class="vchup" id="vChUp" hidden></div><form id="vChF" autocomplete="off"><button class="vclip" type="button" id="vChAtt" title="Dosya ekle · ekler 7 gün sonra silinir" aria-label="Dosya ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2 7.6 8 12.8a3.3 3.3 0 0 1-4.7-4.7l5.6-5.6a2.2 2.2 0 0 1 3.1 3.1L6.5 11.1a1.1 1.1 0 0 1-1.6-1.6L9.8 4.6"/></svg></button><input type="file" id="vChFile" multiple hidden><input class="field" id="vChIn" maxlength="2000" placeholder="Odaya yaz…"><button class="btn sm" type="submit">Gönder</button></form></div></aside>
+  <div class="vchat" id="vChat" hidden><i class="vgrip vgh" id="vchGrip" title="Sürükle: sohbeti büyüt · çift tık: varsayılan"></i><div class="vchh"><button class="vhx" id="vChPop" type="button" title="Sohbeti yanda aç" aria-label="Sohbeti yanda aç"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M6.5 2.5v11"/><path d="M4.3 6.5 3.3 8l1 1.5"/></svg></button><b id="vChT"></b><span class="sp"></span><button class="vhx" id="vChWin" type="button" title="Ayrı pencerede aç · başka ekrana taşıyabilirsin" aria-label="Ayrı pencerede aç"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/><path d="M12 9.5v3a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"/></svg></button></div><div class="vchl" id="vChL"></div><div class="vchup" id="vChUp" hidden></div><form id="vChF" autocomplete="off"><button class="vclip" type="button" id="vChAtt" title="Dosya ekle · ekler 7 gün sonra silinir" aria-label="Dosya ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2 7.6 8 12.8a3.3 3.3 0 0 1-4.7-4.7l5.6-5.6a2.2 2.2 0 0 1 3.1 3.1L6.5 11.1a1.1 1.1 0 0 1-1.6-1.6L9.8 4.6"/></svg></button><input type="file" id="vChFile" multiple hidden><input class="field" id="vChIn" maxlength="2000" placeholder="Odaya yaz…"><button class="btn sm" type="submit">Gönder</button></form></div></aside>
 <div class="folbar" id="folBar" hidden><span class="dot"></span><span id="folT"></span><button class="btn sm" id="folStop">Bırak</button></div>
 <div class="pop" id="bellPop" hidden role="dialog" aria-label="Bildirimler"><div class="bellh"><h3>Bildirimler</h3><button class="mini" id="bellSys" title="Pencere arkadayken sistem bildirimi göster"></button><button class="mini" id="bellAll">tümünü okundu say</button></div><div class="bell" id="bellList"></div></div>
 <div class="sk" id="npk" hidden role="dialog" aria-label="Yeni proje"><div class="skbox npbox"><div class="kbhead"><h2>Yeni proje</h2><button class="btn" id="npClose">Vazgeç <kbd>Esc</kbd></button></div>
@@ -1327,7 +1328,8 @@ const MONTHS=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağust
 const MSH=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
 const DAYS=["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
 const DSH=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
-const $=id=>document.getElementById(id);
+/* sohbet ayrı pencereye taşınınca (CHW) öğeleri orada da bul */
+let CHW=null;const $=id=>document.getElementById(id)||(CHW&&!CHW.closed?CHW.document.getElementById(id):null);
 const pad=n=>String(n).padStart(2,"0");
 const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
@@ -4774,7 +4776,7 @@ async function sendChat(){const i=$("chatIn");const v=i.value.trim();const pid=c
   const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawChat(pid)}
 function onMsg(p){const m=p.new;if(!m||!m.id||!CL.pids.has(m.project_id))return;const l=CL.msgs.get(m.project_id);if(l&&l.some(x=>x.id===m.id))return;
   if(l)l.push(m);else{CL.msgs.set(m.project_id,[m])}
-  if(m.room){const pid=m.project_id,seeing=hubPid()===pid&&!$("voicePop").hidden&&vtSel(pid)===m.room;
+  if(m.room){const pid=m.project_id,seeing=hubPid()===pid&&(!!CHW&&!CHW.closed||!$("voicePop").hidden)&&vtSel(pid)===m.room;
     if(seeing)drawVChat();else{drawVoice();if(m.sender!==CL.me)toast(pname(m.sender)+" · #"+roomName(pid,"text",m.room)+": "+(m.att?"dosya · ":"")+m.text.slice(0,80),{label:"Aç",fn:()=>{setVtSel(pid,m.room);vhOpen(true)}})}
     if(m.sender!==CL.me&&pname(CL.me)&&m.text.includes("@"+pname(CL.me)))teamNotify(pname(m.sender)+" · #"+roomName(pid,"text",m.room),m.text.slice(0,140),true);return}
   if(hubPid()===m.project_id&&!m.recipient)drawVChat();else drawVoice();
@@ -4796,21 +4798,25 @@ function rawMic(id,ns){const a={echoCancellation:true,noiseSuppression:ns,autoGa
   return navigator.mediaDevices.getUserMedia({audio:a,video:false}).catch(e=>{if(id&&(e.name==="OverconstrainedError"||e.name==="NotFoundError")){LS.set("vMic","");return rawMic("",ns)}throw e})}
 /* güçlü gürültü engelleme (LS vNs): mikrofon → RNNoise (AudioWorklet, 48 kHz) → gönderilen iz. Tarayıcınınki kapatılır, üst üste binmesin */
 const RNN={wasm:null};
-async function rnnWrap(raw){const ctx=new AudioContext({sampleRate:48000});
+async function rnnWrap(raw,dry=0){const ctx=new AudioContext({sampleRate:48000});
   try{if(!RNN.wasm){const s=atob($("rnnB").textContent.trim()),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);RNN.wasm=u.buffer}
     const url=URL.createObjectURL(new Blob([$("rnnW").textContent],{type:"text/javascript"}));await ctx.audioWorklet.addModule(url);URL.revokeObjectURL(url);
     const node=new AudioWorkletNode(ctx,"@sapphi-red/web-noise-suppressor/rnnoise",{channelCount:1,channelCountMode:"explicit",outputChannelCount:[1],processorOptions:{maxChannels:1,wasmBinary:RNN.wasm}});
-    const dst=ctx.createMediaStreamDestination();ctx.createMediaStreamSource(raw).connect(node).connect(dst);if(ctx.state!=="running")await ctx.resume().catch(()=>{});
+    const dst=ctx.createMediaStreamDestination(),src=ctx.createMediaStreamSource(raw);
+    /* RNNoise · Normal: temizlenmiş sese ham sesin bir kısmı eklenir (RNNoise ~10 ms gecikir, ham yol da o kadar geciktirilir), daha doğal ve hafif */
+    if(dry>0){const wet=ctx.createGain(),dg=ctx.createGain(),dl=ctx.createDelay(0.05);wet.gain.value=1-dry;dg.gain.value=dry;dl.delayTime.value=0.01;src.connect(node).connect(wet).connect(dst);src.connect(dl).connect(dg).connect(dst)}
+    else src.connect(node).connect(dst);if(ctx.state!=="running")await ctx.resume().catch(()=>{});
     const rt=raw.getAudioTracks()[0],t=dst.stream.getAudioTracks()[0],stop=t.stop.bind(t);
     t.stop=()=>{stop();raw.getTracks().forEach(x=>x.stop());try{node.port.postMessage("destroy")}catch(_){}ctx.close().catch(()=>{})};
     t.getSettings=()=>rt.getSettings();Object.defineProperty(t,"label",{value:rt.label});dst.stream.rnn=true;return dst.stream}
   catch(e){ctx.close().catch(()=>{});throw e}}
 /* üç durum (LS vNsM): off = hiç engelleme, normal = tarayıcının, strong = RNNoise. Eski LS vNs (true = güçlü) okunur */
-const nsMode=()=>{const m=LS.get("vNsM","");return m==="off"||m==="normal"||m==="strong"?m:(LS.get("vNs",false)?"strong":"normal")};
-const NS_TX={off:"Gürültü engelleme kapalı",normal:"Normal gürültü engelleme",strong:"Güçlü gürültü engelleme açık"};
-async function micStream(id){const mode=nsMode();const raw=await rawMic(id,mode==="normal");if(mode!=="strong")return raw;
-  try{return await rnnWrap(raw)}catch(e){raw.getTracks().forEach(t=>t.stop());toast("Güçlü gürültü engelleme bu cihazda açılamadı · normal mod",null,true);return rawMic(id,true)}}
-function setNs(mode){if(mode===true)mode="strong";else if(mode===false)mode="normal";LS.set("vNsM",mode);LS.set("vNs",mode==="strong");drawVoice();
+/* dört durum: off, normal (tarayıcı), rnn (RNNoise · Normal: %30 ham ses karışır), strong (RNNoise · Güçlü) */
+const nsMode=()=>{const m=LS.get("vNsM","");return ["off","normal","rnn","strong"].includes(m)?m:(LS.get("vNs",false)?"strong":"normal")};
+const NS_TX={off:"Gürültü engelleme kapalı",normal:"Normal gürültü engelleme",rnn:"RNNoise · Normal açık",strong:"RNNoise · Güçlü açık"};
+async function micStream(id){const mode=nsMode();const raw=await rawMic(id,mode==="normal");if(mode!=="strong"&&mode!=="rnn")return raw;
+  try{return await rnnWrap(raw,mode==="rnn"?0.3:0)}catch(e){raw.getTracks().forEach(t=>t.stop());toast("Güçlü gürültü engelleme bu cihazda açılamadı · normal mod",null,true);return rawMic(id,true)}}
+function setNs(mode){if(mode===true)mode="strong";else if(mode===false)mode="normal";LS.set("vNsM",mode);LS.set("vNs",mode==="strong"||mode==="rnn");drawVoice();
   if(V.stream)setMic(LS.get("vMic",""),NS_TX[mode]);else toast(NS_TX[mode]+" · odaya girince devreye girer",null,true)}
 async function setMic(id,msg){if(!V.stream)return;let ns;try{ns=await micStream(id)}catch(e){toast("Mikrofon değiştirilemedi: "+((e&&e.message)||e),null,true);return}
   LS.set("vMic",id);const nt=ns.getAudioTracks()[0];nt.enabled=!V.muted;
@@ -5003,9 +5009,12 @@ stage.addEventListener("wheel",()=>{if(V.follow)followStop("Takip bırakıldı")
 function chatDock(out){LS.set("vchOut",!!out);const C=$("vChat"),D=$("vchDock");
   if(out){if(C.parentNode!==D)D.append(C)}else{if(C.parentNode!==$("voicePop"))$("voicePop").append(C);if(!D.hidden)animHide(D)}
   $("vChPop").title=$("vChPop").ariaLabel=out?"Sohbeti panele geri al":"Sohbeti yanda aç";const L=$("vChL");delete L.dataset.k;drawVChat()}
-function drawVChat(){const box=$("vChat");const pid=hubPid();const on=!!pid&&!$("voicePop").hidden&&!$("voicePop").classList.contains("closing")&&!!LS.get("vhub",false);box.hidden=!on;
-  const D=$("vchDock"),out=!!LS.get("vchOut",false)&&innerWidth>760;if(out&&box.parentNode!==D)D.append(box);if(!out&&box.parentNode===D)$("voicePop").append(box);
-  if(out&&on){if(D.hidden)animShow(D)}else if(!D.hidden)animHide(D);if(!on)return;
+function drawVChat(){const box=$("vChat");const pid=hubPid();const win=!!CHW&&!CHW.closed;
+  const on=!!pid&&(win||!$("voicePop").hidden&&!$("voicePop").classList.contains("closing")&&!!LS.get("vhub",false));box.hidden=!on&&!win;
+  const D=$("vchDock"),out=!win&&!!LS.get("vchOut",false)&&innerWidth>760;if(!win){if(out&&box.parentNode!==D)D.append(box);if(!out&&box.parentNode===D)$("voicePop").append(box)}
+  if(out&&on){if(D.hidden)animShow(D)}else if(!D.hidden)animHide(D);
+  if(win&&!pid){$("vChT").textContent="Sohbet";$("vChL").innerHTML=`<span class="e">Ortak bir projeyi açınca sohbet burada görünür.</span>`;delete $("vChL").dataset.k;return}
+  if(!on)return;
   const sel=vtSel(pid);$("vChT").textContent="#"+roomName(pid,"text",sel);$("vChIn").placeholder="#"+roomName(pid,"text",sel)+" odasına yaz…";
   if(!CL.msgs.has(pid)){loadMsgs(pid);$("vChL").innerHTML=`<span class="e">yükleniyor…</span>`;return}
   const l=(CL.msgs.get(pid)||[]).filter(m=>msgRoom(m)===sel).slice(-40);const mx=l.reduce((a,m)=>Math.max(a,m.id),0);if(mx&&mx>LS.get(vtSeenK(pid,sel),0)){LS.set(vtSeenK(pid,sel),mx);queueMicrotask(()=>{const b=document.querySelector(`[data-vtext="${sel}"] .vub`);if(b)b.remove()})}const L=$("vChL");const atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<30;
@@ -5057,6 +5066,21 @@ async function chatUpload(files){const pid=hubPid();if(!pid||!CL.sb||!CL.me)retu
     finally{UPS.delete(k);drawUps()}}
   if(ok)toast((ok>1?ok+" dosya":"Dosya")+" yüklendi · sohbet ekleri 7 gün sonra otomatik silinir",null,true)}
 $("vChPop").onclick=()=>chatDock(!LS.get("vchOut",false));
+/* ayrı pencere: canlı sohbet öğesi açılır pencereye taşınır (aynı köken), stiller kopyalanır; pencere kapanınca geri gelir */
+function chatWinBack(){const C=$("vChat");const w=CHW;CHW=null;if(C){(LS.get("vchOut",false)&&innerWidth>760?$("vchDock"):$("voicePop")).append(document.adoptNode(C));delete $("vChL").dataset.k}
+  $("vChWin").title="Ayrı pencerede aç · başka ekrana taşıyabilirsin";try{if(w&&!w.closed)w.close()}catch(_){}drawVChat()}
+function chatWin(){if(CHW&&!CHW.closed){chatWinBack();return}
+  let w=null;try{w=window.open("","workshopChat","popup=yes,width=440,height=720")}catch(_){}
+  if(!w){toast("Pencere açılamadı · tarayıcı açılır pencereleri engelliyor olabilir",null,true);return}
+  const d=w.document;d.open();d.write(`<!doctype html><html><head><meta charset="utf-8"><base href="${esc(location.href)}"><title>Sohbet · Workshop</title></head><body></body></html>`);d.close();
+  const H=document.documentElement;d.documentElement.className=H.className+" chwin";for(const a of H.attributes)if(a.name!=="class"&&a.name!=="style")d.documentElement.setAttribute(a.name,a.value);d.documentElement.style.cssText=H.style.cssText;
+  document.querySelectorAll('style,link[rel="stylesheet"]').forEach(n=>d.head.append(d.importNode(n,true)));
+  const A=d.createElement("aside");A.className="vhub vwin";d.body.append(A);CHW=w;
+  A.append(d.adoptNode($("vChat")));$("vChWin").title="Pencereyi kapat, sohbeti panele geri al";delete $("vChL").dataset.k;
+  if(!$("vchDock").hidden)animHide($("vchDock"));
+  w.addEventListener("pagehide",()=>{if(CHW===w)setTimeout(chatWinBack,0)});addEventListener("pagehide",()=>{try{w.close()}catch(_){}});
+  drawVChat();setTimeout(()=>{const L=$("vChL");if(L)L.scrollTop=L.scrollHeight;const i=$("vChIn");if(i)i.focus()},50)}
+$("vChWin").onclick=chatWin;
 $("vChAtt").onclick=()=>{toast("Ekli dosyalar 7 gün sonra otomatik silinir · görseller küçültülür, sınır 200 MB",null,true);$("vChFile").click()};
 $("vChFile").onchange=e=>{const fs=[...e.target.files];e.target.value="";if(fs.length)chatUpload(fs)};
 (()=>{const L=$("vChat");L.addEventListener("dragover",e=>{if(![...(e.dataTransfer?.types||[])].includes("Files"))return;e.preventDefault();e.stopPropagation();$("vChL").classList.add("drop")});
@@ -5074,6 +5098,9 @@ $("vChFile").onchange=e=>{const fs=[...e.target.files];e.target.value="";if(fs.l
   let H=0,W=0;
   drag($("vchGrip"),{start:e=>{const b=$("voiceBody"),rs=b.querySelectorAll(".vtr,.vradd"),last=rs[rs.length-1],cr=C.getBoundingClientRect();const lb=last?Math.min(last.getBoundingClientRect().bottom+b.scrollTop,b.getBoundingClientRect().top+b.scrollHeight):b.getBoundingClientRect().top+40;return {y:e.clientY,h:cr.height,max:Math.max(160,cr.bottom-lb-14)}},go:(e,st)=>{H=Math.round(Math.max(160,Math.min(st.max,st.h+(st.y-e.clientY))));setH(H)}},()=>{if(H)LS.set("vchH",H)});
   drag($("vhGrip"),{start:e=>({x:e.clientX,w:P.getBoundingClientRect().width}),go:(e,st)=>{W=Math.round(Math.max(330,Math.min(innerWidth*.7,st.w+(st.x-e.clientX))));setW(W)}},()=>{if(W)LS.set("vhW",W)});
+  const setDW=w=>{if(w)DE.style.setProperty("--vdw",w+"px");else DE.style.removeProperty("--vdw")};setDW(LS.get("vdW",0));let DW=0;
+  drag($("vdGrip"),{start:e=>({x:e.clientX,w:$("vchDock").getBoundingClientRect().width}),go:(e,st)=>{DW=Math.round(Math.max(300,Math.min(innerWidth-P.getBoundingClientRect().width-80,st.w+(st.x-e.clientX))));setDW(DW)}},()=>{if(DW)LS.set("vdW",DW)});
+  $("vdGrip").addEventListener("dblclick",()=>{LS.set("vdW",0);setDW(0)});
   $("vchGrip").addEventListener("dblclick",()=>{LS.set("vchH",0);setH(0)});$("vhGrip").addEventListener("dblclick",()=>{LS.set("vhW",0);setW(0)})})();
 $("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=hubPid();if(!v||!pid)return;i.value="";const sel=vtSel(pid);
   const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:null,text:v,room:sel==="main"?null:sel}).select("id,project_id,sender,recipient,text,at,room,att").single();
@@ -5139,11 +5166,12 @@ const tfRow=()=>{const on=TF.on,run=!!TM.endAt;
   ${on?`<button class="btn sm${run?"":" primary"}" data-vtfgo>${run?"Duraklat":"Başlat"}</button>`:""}<div class="seg sm" role="group" aria-label="Ekip odağı"><button data-vtf="0" aria-pressed="${!on}">Kapalı</button><button data-vtf="1" aria-pressed="${on}">Açık</button></div></div>`};
 /* gürültü engelleme: küçük düğme, basınca seçici (Normal = tarayıcı, Güçlü = RNNoise) */
 const NS_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1.8 8h1.6l1.3-3.2 2 7 2-9.6 1.8 7.4 1.2-1.6h2.5"/></svg>';
-const nsBtn=()=>{const m=nsMode();return `<button class="vbtn vnsb${m==="strong"?" strong":m==="off"?" nsoff":""}${S.nsOpen?" open":""}" data-vnsm title="Gürültü engelleme · ${{off:"Kapalı",normal:"Normal",strong:"Güçlü"}[m]}" aria-label="Gürültü engelleme" aria-expanded="${!!S.nsOpen}">${NS_IC}${m==="strong"?'<i class="vnsd"></i>':""}</button>`};
+const nsBtn=()=>{const m=nsMode();return `<button class="vbtn vnsb${m==="strong"||m==="rnn"?" strong":m==="off"?" nsoff":""}${S.nsOpen?" open":""}" data-vnsm title="Gürültü engelleme · ${{off:"Kapalı",normal:"Normal",rnn:"RNNoise · Normal",strong:"RNNoise · Güçlü"}[m]}" aria-label="Gürültü engelleme" aria-expanded="${!!S.nsOpen}">${NS_IC}${m==="strong"?'<i class="vnsd"></i>':m==="rnn"?'<i class="vnsd half"></i>':""}</button>`};
 const nsPop=()=>{if(!S.nsOpen)return "";const m=nsMode();return `<div class="vnspop" role="menu"><b>Gürültü engelleme</b>
   <button data-vns="off" aria-pressed="${m==="off"}"><span>Kapalı</span><em>Mikrofon olduğu gibi gider (stüdyo mikrofonu, müzik)</em></button>
-  <button data-vns="normal" aria-pressed="${m==="normal"}"><span>Normal</span><em>Fan, uğultu gibi sabit sesler</em></button>
-  <button data-vns="strong" aria-pressed="${m==="strong"}"><span>Güçlü · RNNoise</span><em>Klavye, tıklama ve arka plan da kesilir</em></button></div>`};
+  <button data-vns="normal" aria-pressed="${m==="normal"}"><span>Normal</span><em>Tarayıcının kendi filtresi · fan, uğultu gibi sabit sesler</em></button>
+  <button data-vns="rnn" aria-pressed="${m==="rnn"}"><span>RNNoise · Normal</span><em>Arka planı azaltır, ses daha doğal kalır</em></button>
+  <button data-vns="strong" aria-pressed="${m==="strong"}"><span>RNNoise · Güçlü</span><em>Klavye, tıklama ve arka plan tamamen kesilir</em></button></div>`};
 const nsRow=()=>{const on=!!LS.get("vNs",false);return `<div class="vns"><span><b>Gürültü engelleme</b><span class="small">${on?"Güçlü: klavye, tıklama ve arka plan seslerini de azaltır":"Normal: fan ve uğultu gibi sabit sesleri keser"}</span></span>
   <div class="seg sm" role="group" aria-label="Gürültü engelleme"><button data-vns="0" aria-pressed="${!on}">Normal</button><button data-vns="1" aria-pressed="${on}">Güçlü</button></div></div>`};
 function shareBlock(){const o=sharerOf(V.pid),k=LS.get("vQ","1080p30");
