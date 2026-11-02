@@ -3606,7 +3606,7 @@ function closePops(){["timerPop","cfgPop","acctPop","bellPop"].forEach(hidePop);
 /* açılır pencere düğmenin altına hizalanır ve düğmeden büyür */
 function anchorPop(el,btn){const b=$(btn);if(!b)return;const r=b.getBoundingClientRect();if(!r.width)return;const w=el.offsetWidth||320,cx=r.left+r.width/2;
   const left=Math.max(12,Math.min(innerWidth-w-12,cx-w/2));el.style.left=left+"px";el.style.right="auto";el.style.top=(r.bottom+8)+"px";el.style.transformOrigin=`${Math.round(cx-left)}px -8px`}
-function togglePop(pop,btn){const el=$(pop);const open=el.hidden||el.classList.contains("closing");closePops();if(open){animShow(el);anchorPop(el,btn);$(btn).setAttribute("aria-expanded","true")}}
+function togglePop(pop,btn){const el=$(pop);const open=el.hidden||el.classList.contains("closing");closePops();if(open){if(LS.get("vhub",false))vhOpen(false);animShow(el);anchorPop(el,btn);$(btn).setAttribute("aria-expanded","true")}}
 $("timerBtn").onclick=e=>{e.stopPropagation();togglePop("timerPop","timerBtn")};
 document.addEventListener("pointerdown",e=>{if(!e.target.closest(".pop,#timerBtn,#cfgBtn"))closePops()});
 $("acctBtn").onclick=e=>{e.stopPropagation();drawAcct();togglePop("acctPop","acctBtn")};
@@ -4880,7 +4880,7 @@ function voiceBar(pid){const inn=voiceIn(pid).filter(u=>u!==CL.me);const me=V.pi
     <button class="vbtn${V.muted?" off":""}" data-vdev title="Mikrofon ve ses ayarları" aria-label="Mikrofon ve ses ayarları">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn leave" data-vleave title="Ayrıl" aria-label="Sesli odadan ayrıl">${HANG_IC}</button></div>`;
   return `<div class="vbar"><span class="vl">${MIC_IC}${inn.length?`<span><b>${inn.length} kişi</b> sesli odada</span>`:"<span>Sesli oda boş</span>"}</span><span class="vavs">${avs}</span><span class="sp"></span><button class="btn sm primary" data-vjoin>Sesli katıl</button></div>`}
 const vhIsOpen=()=>!$("voicePop").hidden&&!$("voicePop").classList.contains("closing");
-function vhOpen(on){LS.set("vhub",!!on);$("voiceBtn").setAttribute("aria-expanded",!!on);if(on)animShow($("voicePop"));else animHide($("voicePop"));drawVoice();drawScreen()}
+function vhOpen(on){if(on)closePops();LS.set("vhub",!!on);$("voiceBtn").setAttribute("aria-expanded",!!on);if(on)animShow($("voicePop"));else animHide($("voicePop"));drawVoice();drawScreen()}
 function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(isShared);const avail=!!CL.me&&!!shared.length;const open=avail&&!!LS.get("vhub",false);
   btn.hidden=!avail||open;if(!avail||!open){if(!$("voicePop").hidden&&!$("voicePop").classList.contains("closing"))animHide($("voicePop"))}else if($("voicePop").hidden)animShow($("voicePop"));if(!avail)return;
   $("vtAv").innerHTML=V.pid?[CL.me,...voiceIn(V.pid).filter(u=>u!==CL.me)].slice(0,5).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join(""):"";
