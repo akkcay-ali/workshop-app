@@ -1273,6 +1273,7 @@ html.wmove,html.wmove *{cursor:move!important;user-select:none}
     <label class="audrow" id="audOutRow"><span>Hoparlör / kulaklık</span><select class="field sm" id="audOut"></select></label>
     <button class="btn sm" id="audPerm" hidden>Cihaz adlarını göster</button>
     <button class="sw2" id="pttSw" role="switch" aria-checked="false"><span><b>Bas-konuş</b><span class="small">Sesli odada mikrofon kapalı durur, Ctrl+Alt+V basılıyken konuşursun. Ctrl+Alt+M mikrofonu, Ctrl+Alt+D kulaklığı açıp kapatır.</span></span><span class="tg"></span></button></div>
+  <div class="cfgsec" id="npSec" hidden><button class="sw2" id="npSw" role="switch" aria-checked="true"><span><b>Şu an çalanı üstte göster</b><span class="small">Kapalıyken üst çubukta yalnızca karakter kalır; şarkı adı ve süre görünmez. Tıklayınca açılan pencere yine çalışır.</span></span><span class="tg"></span></button></div>
   <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
@@ -3558,10 +3559,10 @@ function npTick(){const n=SPO.now;if(!n||!n.d)return;const p=Math.min(n.d,n.p+(D
 setInterval(npTick,1000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)spoNow(true)});
 function drawSpoNow(){queueMicrotask(npfKick);const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
-  const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"off";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=false;np.classList.toggle("idle",!n);np.classList.toggle("solo",!n);
+  const np=$("npChip"),n=LS.get("npShow",true)?SPO.now:null,k=n?n.id+n.n:SPO.now?"hid"+SPO.now.id:SPO.on()?"idle"+(SPO.err||""):"off";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=false;np.classList.toggle("idle",!n);np.classList.toggle("solo",!n);
   if(!n){$("npTm").textContent="";$("npBar").style.width="0"}
   /* çalan yoksa (ya da Spotify bağlı değilse) çip yalnızca yüz kadar küçülür, yüz orada takılır */
-  if(!n){$("npTx").textContent="";np.title=SPO.on()?(SPO.err?"Spotify: "+SPO.err:"Şu an çalan yok · son çalınanlar için tıkla"):"Spotify bağlı değil · Hesap'tan bağlayabilirsin";return}
+  if(!n){$("npTx").textContent="";np.title=SPO.now?"Müzik çalıyor · ayrıntı için tıkla":SPO.on()?(SPO.err?"Spotify: "+SPO.err:"Şu an çalan yok · son çalınanlar için tıkla"):"Spotify bağlı değil · Hesap'tan bağlayabilirsin";return}
   $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a;
   np.classList.remove("npin");void np.offsetWidth;np.classList.add("npin")}
 /* #np'ye tıklayınca: kapak, tam ad, süre ve son çalınan 5 şarkı (recently-played, 30 sn önbellek) */
@@ -3887,8 +3888,10 @@ function drawUiScale(){const on=!!window.__UIK;$("uiSec").hidden=!on;if(on)$("ui
 $("uiScale").addEventListener("click",e=>{const b=e.target.closest("[data-uik]");if(!b)return;const k=+b.dataset.uik;LS.set("uiScale",k);window.__UIK=k;
   const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute("content",`width=device-width,initial-scale=${k},minimum-scale=${k},maximum-scale=${k},user-scalable=no,viewport-fit=cover`);drawUiScale();
   setTimeout(()=>{if(curP()&&boardVisible())applyView()},120)});
-function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("pttSw").setAttribute("aria-checked",pttOn());$("pttSw").hidden=NOKBD;$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("pttSw").setAttribute("aria-checked",pttOn());$("pttSw").hidden=NOKBD;$("npSec").hidden=!SPO.on();$("npSw").setAttribute("aria-checked",npShow());$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
+const npShow=()=>LS.get("npShow",true);
+$("npSw").onclick=()=>{LS.set("npShow",!npShow());$("npSw").setAttribute("aria-checked",npShow());const c=$("npChip");delete c.dataset.k;drawSpoNow()};
 $("pttSw").onclick=()=>{setPtt(!pttOn());$("pttSw").setAttribute("aria-checked",pttOn())};
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
