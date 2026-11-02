@@ -128,4 +128,4 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 
 ## Kullanıcı tercihleri
 - Doğrudan, sade çözümler; riskler baştan söylenir.
-- Animasyonlar yaylı/"pop" hissinde; tema token'ları `:root` + `[data-theme=light|vivid]`.
+- Animasyonlar yaylı/"pop" hissinde; tema token'ları `:root` + `[data-theme=light|vivid|ember|sand]` (Kehribar koyu, Kum göz yormayan açık; açık temaya özel kurallar `:root:is([data-theme="light"],[data-theme="sand"])`, `applyTheme` listesi).

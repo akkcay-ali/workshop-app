@@ -61,12 +61,44 @@ document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.
   --frame-line:rgba(157,176,255,.32); --frame-bg:rgba(157,176,255,.04);
   --glow1:rgba(110,90,255,.26); --glow2:rgba(0,190,210,.2); --glow3:rgba(255,120,170,.12);
 }
+/* Kehribar: mürdüm tonlu koyu zemin, sıcak turuncu vurgu */
+:root[data-theme="ember"]{
+  --bg:#110C10;
+  --glass:rgba(255,220,230,.045); --glass-2:rgba(255,220,230,.075); --glass-3:rgba(255,170,120,.13);
+  --stroke:rgba(255,215,225,.09); --stroke-2:rgba(255,190,170,.2);
+  --ink:#F3EAEC; --ink-2:#B9A3AA; --ink-3:#7E6870;
+  --accent:#FFAA6E; --accent-ink:#1E0F08; --warn:#FF8A8A;
+  --canvas:rgba(10,0,5,.3); --dot:rgba(255,215,225,.08);
+  --t1:#9FB4FF; --t2:#FFC761; --t3:#E59BEA; --t4:#FF8A8A; --t5:#6FD6D2; --t6:#B6E08A;
+  --surface:rgba(32,22,28,.86); --bar:rgba(34,24,30,.68); --field:rgba(10,0,5,.25);
+  --frame-bg:rgba(255,170,110,.035); --frame-line:rgba(255,170,110,.32);
+  --glow1:rgba(230,90,60,.24); --glow2:rgba(170,60,160,.22); --glow3:rgba(255,190,90,.1);
+  color-scheme:dark;
+}
+:root[data-theme="ember"] .card.k-frame:not(.sel) .fl{color:var(--accent)}
+:root[data-theme="ember"] .st[aria-selected="true"]{color:var(--accent)}
+/* Kum: koyu kum zemin (göz yormayan açık tema), yumuşak paneller, kil vurgu, ışık hâlesi yok */
+:root[data-theme="sand"]{
+  --bg:#B9AF9F;
+  --glass:rgba(255,248,238,.16); --glass-2:rgba(255,248,238,.28); --glass-3:rgba(50,40,30,.08);
+  --stroke:rgba(50,40,30,.11); --stroke-2:rgba(50,40,30,.19);
+  --ink:#2A221A; --ink-2:#544739; --ink-3:#7A6C5D;
+  --accent:#9A4A2C; --accent-ink:#FFF8F2; --warn:#A63D2B;
+  --canvas:rgba(255,255,255,.12); --dot:rgba(50,40,30,.14);
+  --paper:#D6CDBE; --paper-ink:#2A221A; --paper-ink-2:#544739;
+  --t1:#3A64A6; --t2:#8A5E0C; --t3:#7C4CA8; --t4:#B03F37; --t5:#1C7E78; --t6:#477E2A;
+  --surface:rgba(200,191,177,.95); --bar:rgba(204,195,182,.85); --field:rgba(50,40,30,.06);
+  --frame-bg:rgba(150,80,50,.035); --frame-line:rgba(150,80,50,.3);
+  --glow1:rgba(0,0,0,0); --glow2:rgba(0,0,0,0); --glow3:rgba(0,0,0,0);
+  color-scheme:light;
+}
+:root[data-theme="sand"] .wmark{--wm:#4A3E33}
 :root[data-theme="vivid"] .card.k-frame:not(.sel) .fl{color:var(--accent)}
 :root[data-theme="vivid"] .tab[aria-selected="true"]{box-shadow:inset 0 -2px 0 var(--accent)}
 :root[data-theme="vivid"] .st[aria-selected="true"]{color:var(--accent)}
 :root[data-theme="vivid"] .wk.is-today .n,:root[data-theme="vivid"] h1.title{color:var(--ink)}
-:root[data-theme="light"] .card.k-image,:root[data-theme="light"] .card.k-note,:root[data-theme="light"] .card.k-link{box-shadow:0 10px 26px -14px rgb(20 24 40 / .35)}
-:root[data-theme="light"] .pop,:root[data-theme="light"] .ctx,:root[data-theme="light"] .skbox{box-shadow:0 24px 50px -22px rgb(20 24 40 / .35)}
+:root:is([data-theme="light"],[data-theme="sand"]) .card.k-image,:root:is([data-theme="light"],[data-theme="sand"]) .card.k-note,:root:is([data-theme="light"],[data-theme="sand"]) .card.k-link{box-shadow:0 10px 26px -14px rgb(20 24 40 / .35)}
+:root:is([data-theme="light"],[data-theme="sand"]) .pop,:root:is([data-theme="light"],[data-theme="sand"]) .ctx,:root:is([data-theme="light"],[data-theme="sand"]) .skbox{box-shadow:0 24px 50px -22px rgb(20 24 40 / .35)}
 /* pano tam ekran (Ctrl+Space) */
 body.boardfs .topbar,body.boardfs .phead{display:none}
 body.boardfs .app{padding:0;gap:0}
@@ -85,6 +117,8 @@ body.boardfs .view{border-radius:0;border:0}
 .thm.dark i{background:#16171B}.thm.dark i::before{background:#D7DEF5}.thm.dark i::after{background:#3A3C42}
 .thm.light i{background:#ECEDF0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.thm.light i::before{background:#3E5BD6}.thm.light i::after{background:#C9CBD2}
 .thm.vivid i{background:radial-gradient(80% 90% at 0% 0%, rgba(110,90,255,.55), transparent 70%),radial-gradient(70% 90% at 100% 100%, rgba(0,190,210,.45), transparent 70%),#111219}
+.thm.ember i{background:radial-gradient(80% 90% at 0% 0%, rgba(230,90,60,.5), transparent 70%),radial-gradient(70% 90% at 100% 100%, rgba(170,60,160,.45), transparent 70%),#140E12}.thm.ember i::before{background:#FFAA6E}.thm.ember i::after{background:#4A353F}
+.thm.sand i{background:#B9AF9F;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}.thm.sand i::before{background:#9A4A2C}.thm.sand i::after{background:#D6CDBE}
 .thm.vivid i::before{background:#9DB0FF}.thm.vivid i::after{background:linear-gradient(90deg,#FFC14D,#FF6F7D,#C08BFF)}
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -117,7 +151,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .sst{display:inline-flex;align-items:center;gap:5px;color:var(--ink-3);margin-left:-2px}
 .sst svg{width:13px;height:13px}
 .sst{transition:color .35s}
-.sst.ok{color:#5BD68A}:root[data-theme="light"] .sst.ok{color:#2E9E5B}
+.sst.ok{color:#5BD68A}:root:is([data-theme="light"],[data-theme="sand"]) .sst.ok{color:#2E9E5B}
 .sst.pend,.sst.off,.sst.demo{color:var(--ink-3)}.sst.err{color:var(--warn)}
 .sst.pend svg{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -618,7 +652,7 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:10
 @media (prefers-reduced-motion:reduce){.ibtn.ding{animation:none}}
 /* imleç: "Damla" (yuvarlak uçlu), tıklanabilirde turkuaz + nokta, çizimde halka */
 :root{--cur:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4.5%203.5%20L19.6%2010.1%20Q20.6%2010.6%2019.6%2011.1%20L13.4%2013.5%20Q12.8%2013.7%2012.6%2014.3%20L10.1%2020.4%20Q9.6%2021.4%209.2%2020.4%20Z%22%20fill%3D%22%23D7DEF5%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 4 3, default;--cur-pt:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4.5%203.5%20L19.6%2010.1%20Q20.6%2010.6%2019.6%2011.1%20L13.4%2013.5%20Q12.8%2013.7%2012.6%2014.3%20L10.1%2020.4%20Q9.6%2021.4%209.2%2020.4%20Z%22%20fill%3D%22%2393CDD6%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3Ccircle%20cx%3D%2217.5%22%20cy%3D%2218%22%20r%3D%222.4%22%20fill%3D%22%2393CDD6%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%221.2%22/%3E%3C/svg%3E") 4 3, pointer;--cur-x:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224.2%22%20fill%3D%22none%22%20stroke%3D%22%230D0E10%22%20stroke-width%3D%223.4%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224.2%22%20fill%3D%22none%22%20stroke%3D%22%23D7DEF5%22%20stroke-width%3D%221.6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%23D7DEF5%22/%3E%3C/svg%3E") 12 12, crosshair}
-:root[data-theme="light"]{--cur:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4.5%203.5%20L19.6%2010.1%20Q20.6%2010.6%2019.6%2011.1%20L13.4%2013.5%20Q12.8%2013.7%2012.6%2014.3%20L10.1%2020.4%20Q9.6%2021.4%209.2%2020.4%20Z%22%20fill%3D%22%231C2233%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 4 3, default;--cur-pt:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4.5%203.5%20L19.6%2010.1%20Q20.6%2010.6%2019.6%2011.1%20L13.4%2013.5%20Q12.8%2013.7%2012.6%2014.3%20L10.1%2020.4%20Q9.6%2021.4%209.2%2020.4%20Z%22%20fill%3D%22%233E5BD6%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3Ccircle%20cx%3D%2217.5%22%20cy%3D%2218%22%20r%3D%222.4%22%20fill%3D%22%233E5BD6%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.2%22/%3E%3C/svg%3E") 4 3, pointer;--cur-x:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224.2%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%223.4%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224.2%22%20fill%3D%22none%22%20stroke%3D%22%231C2233%22%20stroke-width%3D%221.6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%231C2233%22/%3E%3C/svg%3E") 12 12, crosshair}
+:root:is([data-theme="light"],[data-theme="sand"]){--cur:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4.5%203.5%20L19.6%2010.1%20Q20.6%2010.6%2019.6%2011.1%20L13.4%2013.5%20Q12.8%2013.7%2012.6%2014.3%20L10.1%2020.4%20Q9.6%2021.4%209.2%2020.4%20Z%22%20fill%3D%22%231C2233%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") 4 3, default;--cur-pt:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M4.5%203.5%20L19.6%2010.1%20Q20.6%2010.6%2019.6%2011.1%20L13.4%2013.5%20Q12.8%2013.7%2012.6%2014.3%20L10.1%2020.4%20Q9.6%2021.4%209.2%2020.4%20Z%22%20fill%3D%22%233E5BD6%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.4%22%20stroke-linejoin%3D%22round%22/%3E%3Ccircle%20cx%3D%2217.5%22%20cy%3D%2218%22%20r%3D%222.4%22%20fill%3D%22%233E5BD6%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.2%22/%3E%3C/svg%3E") 4 3, pointer;--cur-x:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224.2%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%223.4%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224.2%22%20fill%3D%22none%22%20stroke%3D%22%231C2233%22%20stroke-width%3D%221.6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.1%22%20fill%3D%22%231C2233%22/%3E%3C/svg%3E") 12 12, crosshair}
 html,body{cursor:var(--cur)}
 button,a[href],summary,label[for],select,[data-go],[data-np],[data-af],[data-assign],.check,.chip,.opt,.pcard,.tab,.st,.thm{cursor:var(--cur-pt)}
 button:disabled{cursor:var(--cur)}
@@ -626,7 +660,7 @@ button:disabled{cursor:var(--cur)}
 /* logo */
 .wmark{width:18px;height:16px;flex:0 0 auto}
 .tab.home .wmark{width:21px;height:19px;margin:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}.tab.home:hover .wmark{transform:scale(1.12) rotate(-4deg)}
-:root[data-theme="light"] .wmark{--wm:#3E4A6B}
+:root:is([data-theme="light"],[data-theme="sand"]) .wmark{--wm:#3E4A6B}
 .cmp{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:24px;background:rgb(8 9 11 / .78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .cmpbox{width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px}
 .cmph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink)}.cmph .sp{flex:1}#cmpFade{width:160px}
@@ -711,9 +745,9 @@ button:disabled{cursor:var(--cur)}
 .rdempty{font-size:12px;color:var(--ink-3);line-height:1.5;padding:2px 10px}
 .rdnew{display:flex;gap:6px}.rdnew button{flex:1;border:1px dashed var(--stroke-2);background:transparent;color:var(--ink-2);border-radius:8px;padding:7px 4px;font-size:12px;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
 .rdnew button.rdmine{border-color:rgb(228 196 133 / .4);color:#C9A35E}.rdnew button:hover{transform:translateY(-1px)}.rdnew button:active{transform:scale(.95)}
-:root[data-theme="light"] .rdh.rdmine,:root[data-theme="light"] .rdnew button.rdmine{color:#8A6A2C}
+:root:is([data-theme="light"],[data-theme="sand"]) .rdh.rdmine,:root:is([data-theme="light"],[data-theme="sand"]) .rdnew button.rdmine{color:#8A6A2C}
 .pill.name.priv{display:inline-flex;align-items:center;gap:6px;color:#E4C485;border-color:rgb(228 196 133 / .35)}.pill.name.priv .lk{width:12px;height:12px}
-:root[data-theme="light"] .pill.name.priv{color:#8A6A2C}
+:root:is([data-theme="light"],[data-theme="sand"]) .pill.name.priv{color:#8A6A2C}
 .rdpick{display:none}
 .rdir{transition:transform .32s cubic-bezier(.34,1.35,.64,1),opacity .2s}#sBoard{transition:left .32s cubic-bezier(.34,1.2,.64,1)}
 body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rdc #sBoard.dir{left:0}
@@ -1253,7 +1287,7 @@ html.wmove,html.wmove *{cursor:move!important;user-select:none}
     <button class="btn" id="stoClean" hidden></button>
   </div>
   <div class="cfgsec"><span class="small">Tema · bu cihazda hatırlanır</span><div class="themes" id="themes">
-    <button class="thm dark" data-theme="dark"><i></i>Koyu</button><button class="thm light" data-theme="light"><i></i>Açık</button><button class="thm vivid" data-theme="vivid"><i></i>Renkli</button></div></div>
+    <button class="thm dark" data-theme="dark"><i></i>Koyu</button><button class="thm light" data-theme="light"><i></i>Açık</button><button class="thm vivid" data-theme="vivid"><i></i>Renkli</button><button class="thm ember" data-theme="ember"><i></i>Kehribar</button><button class="thm sand" data-theme="sand"><i></i>Kum</button></div></div>
   <div class="cfgsec" id="uiSec" hidden><span class="small">Arayüz boyutu · bu cihazda</span><div class="seg sm" id="uiScale" role="group" aria-label="Arayüz boyutu"><button data-uik="0.75">%75</button><button data-uik="0.85">%85</button><button data-uik="0.95">%95</button><button data-uik="1">%100</button></div></div>
   <div class="cfgsec" id="audSec"><span class="small">Ses cihazları · sesli oda ve sesli notlar bunları kullanır</span>
     <label class="audrow"><span>Mikrofon</span><select class="field sm" id="audMic"></select></label>
@@ -1386,7 +1420,7 @@ const TA=window.__TAURI__||null;/* masaüstü uygulaması içinde çalışıyors
 
 /* ---------- yazı tipi: Geist (gövde) + Unbounded (başlık) ---------- */
 {const r=document.documentElement.style;r.setProperty("--f-display",'"Unbounded", "Geist", system-ui, sans-serif');r.setProperty("--f-body",'"Geist", system-ui, -apple-system, "Segoe UI", sans-serif');try{localStorage.removeItem("atolye:font")}catch(_){}}
-function applyTheme(t){if(!["dark","light","vivid"].includes(t))t="dark";if(t==="dark")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;
+function applyTheme(t){if(!["dark","light","vivid","ember","sand"].includes(t))t="dark";if(t==="dark")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;
   LS.set("theme",t);document.querySelectorAll("#themes [data-theme]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.theme===t));
   const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()}
 $("themes").addEventListener("click",e=>{const b=e.target.closest("[data-theme]");if(b)applyTheme(b.dataset.theme)});
