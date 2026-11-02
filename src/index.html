@@ -153,7 +153,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .npchip .npart .npeq{position:absolute;inset:auto 0 0 0;height:100%;padding:0 6px 5px;justify-content:center;background:linear-gradient(transparent 30%,rgb(0 0 0 / .55))}.npchip .npart .npeq i{background:#fff}
 .npchip .nptm{font-family:var(--f-mono);font-size:11px;color:var(--muted);flex:0 0 auto;font-variant-numeric:tabular-nums}
 .npchip .npbar{position:absolute;left:0;bottom:0;height:2px;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 50%,transparent),var(--accent));border-radius:0 2px 2px 0;transition:width 1s linear}
-.npchip .npart{display:none}
+.npchip .npart{display:none}.npchip .npface{flex:0 0 auto;image-rendering:pixelated;margin-left:-6px}
 .nppop{width:min(300px,calc(100vw - 32px));display:flex;flex-direction:column;gap:10px;padding:14px}
 .npbig{display:block;border-radius:12px;overflow:hidden;aspect-ratio:1;background:var(--glass);box-shadow:0 18px 40px -18px rgb(0 0 0 / .7)}.npbig img{width:100%;height:100%;object-fit:cover;display:block}
 .npnoart{display:grid;place-items:center;width:100%;height:100%;font-size:40px;color:var(--muted)}.npnoart.sm{width:36px;height:36px;font-size:15px;border-radius:7px;background:var(--glass);flex:0 0 auto}
@@ -1093,12 +1093,17 @@ html.chwin,html.chwin body{height:100%;margin:0;overflow:hidden;background:var(-
 .wctl svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round}
 body.frameless .app{padding-top:8px}
 @media (prefers-reduced-motion:no-preference){.tab,.check,.pill,.tool,.st,.pcard{transition:background .12s,border-color .12s,color .12s}}
+.acspo{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;border:1px solid var(--stroke);background:var(--glass)}
+.acspo .spoic{width:32px;height:32px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:#1ED760;color:#0B0C10}.acspo .spoic svg{width:16px;height:16px}
+.acspo:not(.on) .spoic{background:var(--glass-2,var(--glass));color:var(--ink-2,var(--muted))}
+.acspo .spot{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.acspo .spot b{font-size:13px;font-weight:600}.acspo .spot>span{font-size:11.5px;line-height:1.4;color:var(--muted)}
+.acspo .spost{font-weight:400;font-size:11px;color:var(--muted);margin-left:4px}.acspo.on .spost{color:#1ED760}
 </style>
 
 <div class="app">
   <div class="topbar">
     <div class="tabs" id="tabs" role="tablist" aria-label="Açık projeler"></div>
-    <button type="button" class="npchip" id="npChip" hidden aria-haspopup="dialog"><span class="npart" id="npArt" hidden></span><span class="nptag">#np</span><span class="nptx" id="npTx"></span><span class="nptm" id="npTm"></span><i class="npbar" id="npBar"></i></button>
+    <button type="button" class="npchip" id="npChip" hidden aria-haspopup="dialog"><span class="npart" id="npArt" hidden></span><canvas class="npface" id="npFace" aria-hidden="true"></canvas><span class="nptx" id="npTx"></span><span class="nptm" id="npTm"></span><i class="npbar" id="npBar"></i></button>
     <div class="right">
       <button class="ibtn" id="timerBtn" aria-expanded="false" aria-controls="timerPop" title="Odak zamanlayıcısı">
         <svg class="ring" viewBox="0 0 20 20"><circle class="bgc" cx="10" cy="10" r="8"/><circle class="fg" id="ringFg" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27"/></svg>
@@ -1244,6 +1249,9 @@ body.frameless .app{padding-top:8px}
       <div class="acme"><span class="acbig" id="acBig"></span><div class="acid"><b id="acNm"></b><span id="acWho"></span></div></div>
       <div class="acst" id="acSt"></div>
       <label class="small" for="acName">Görünen ad · ekip seni böyle görür</label><input class="field" id="acName" maxlength="40" placeholder="ör. Ali">
+      <div class="acspo" id="spoSec"><span class="spoic" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12.2V3.6l7-1.4v8.4"/><circle cx="4.3" cy="12.2" r="1.7"/><circle cx="11.3" cy="10.6" r="1.7"/></svg></span>
+        <div class="spot"><b>Spotify <span class="spost" id="spoTxt"></span></b><span>Şu an çalan üstte görünür, odakta dinlediklerin Geçmiş'e yazılır. Yalnızca okur, çalmayı değiştirmez.</span></div>
+        <button class="btn sm" id="spoBtn">Bağlan</button></div>
       <div class="row acbtns"><button class="btn" id="acBug" hidden>Hata bildir</button><button class="btn" id="acOut">Çıkış yap</button></div></div></div>
 </div>
 
@@ -1264,8 +1272,6 @@ body.frameless .app{padding-top:8px}
     <label class="audrow" id="audOutRow"><span>Hoparlör / kulaklık</span><select class="field sm" id="audOut"></select></label>
     <button class="btn sm" id="audPerm" hidden>Cihaz adlarını göster</button>
     <button class="sw2" id="pttSw" role="switch" aria-checked="false"><span><b>Bas-konuş</b><span class="small">Sesli odada mikrofon kapalı durur, Ctrl+Alt+V basılıyken konuşursun. Ctrl+Alt+M mikrofonu, Ctrl+Alt+D kulaklığı açıp kapatır.</span></span><span class="tg"></span></button></div>
-  <div class="cfgsec" id="spoSec"><span class="small">Spotify · odakta çalan şarkılar Geçmiş'e yazılır</span>
-    <div class="row" style="align-items:center"><span class="small" id="spoTxt" style="flex:1"></span><button class="btn sm" id="spoBtn">Bağlan</button></div></div>
   <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
@@ -3490,7 +3496,7 @@ $("histBody").addEventListener("pointerover",e=>{const d=e.target.closest(".hday
 $("histBody").addEventListener("pointerleave",()=>histTip(null));
 $("histBody").addEventListener("click",e=>{const d=e.target.closest(".hday");histTip(d||null)});
 /* --- Spotify: odakta çalan şarkılar geçmişe (PKCE, gizli anahtar yok; Client ID app_config.spotify_client_id) --- */
-const SPO={tok:LS.get("spo",null),now:null,nt:0,on(){return !!(this.tok&&this.tok.refresh)}};
+const SPO={tok:LS.get("spo",null),now:null,nt:0,lastPlay:Date.now(),on(){return !!(this.tok&&this.tok.refresh)}};
 /* masaüstünde dönüş uygulamanın yerel dinleyicisine (lib.rs spo_listen), web'de sayfanın kendisine */
 const SPO_LOOP="http://127.0.0.1:43117/callback";
 const spoRedirect=()=>TA?SPO_LOOP:location.origin+location.pathname.replace(/index\.html$/,"");
@@ -3540,16 +3546,16 @@ async function spoAttach(rid,s,e,again){const id=await Promise.resolve(rid);if(!
 /* odak sürerken sayaçta şu an çalan (pencere açıksa, 20 sn'de bir) */
 /* şu an çalan: üst çubukta #np (sayfa görünürken 15 sn'de bir) ve odakta sayaç penceresinde */
 async function spoNow(force){if(!SPO.on()||document.hidden||(!force&&Date.now()-SPO.nt<15000)){if(!SPO.on()&&SPO.now){SPO.now=null;drawSpoNow()}return}SPO.nt=Date.now();
-  const c=await spoFetch("/me/player/currently-playing");const t=c&&c.item&&c.is_playing?spoTrack(c.item):null;
+  const c=await spoFetch("/me/player/currently-playing");const t=c&&c.item&&c.is_playing?spoTrack(c.item):null;SPO.paused=!!(c&&c.item&&!c.is_playing);if(t)SPO.lastPlay=Date.now();
   if(t){Object.assign(t,spoBig(c.item));t.p=c.progress_ms||0;t.d=c.item.duration_ms||0;t.t=Date.now();const left=t.d-t.p;if(left>0&&left<15000)SPO.nt=Date.now()-15000+left+1500}
-  const was=SPO.now;SPO.now=t;drawSpoNow();npTick();if(!$("npPop").hidden&&((was&&was.id)!==(t&&t.id))){SPO.recentT=0;npRecent()}}
+  const was=SPO.now;if(t&&was&&was.id!==t.id)NPFS.chg=Date.now()+1600;SPO.now=t;drawSpoNow();npTick();if(!$("npPop").hidden&&((was&&was.id)!==(t&&t.id))){SPO.recentT=0;npRecent()}}
 /* çalma süresi yerelde ilerler: istek yok, saniyede bir */
 function npTick(){const n=SPO.now;if(!n||!n.d)return;const p=Math.min(n.d,n.p+(Date.now()-n.t));$("npTm").textContent=mmss(p)+" / "+mmss(n.d);$("npBar").style.width=(p/n.d*100).toFixed(2)+"%";
   const pt=$("nppTm");if(pt){pt.textContent=mmss(p);$("nppD").textContent=mmss(n.d);$("nppBar").style.width=(p/n.d*100).toFixed(2)+"%"}
   if(p>=n.d&&Date.now()-SPO.nt>3000){SPO.nt=0;spoNow(true)}}
 setInterval(npTick,1000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)spoNow(true)});
-function drawSpoNow(){const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
+function drawSpoNow(){queueMicrotask(npfKick);const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
   const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!k;np.classList.toggle("idle",!n);
   if(!n){$("npTm").textContent="";$("npBar").style.width="0"}
   if(!n){if(k){$("npTx").textContent=SPO.err?"Spotify: "+SPO.err:"şu an çalan yok";np.title="Spotify bağlı · son çalınanlar için tıkla"}return}
@@ -3574,7 +3580,106 @@ function spoOpen(id){const web=spoUrl(id),app=id&&!/\s/.test(id)?"spotify:track:
 $("npPop").addEventListener("click",e=>{const b=e.target.closest("[data-spo]");if(b){spoOpen(b.dataset.spo);closePops()}});
 $("npChip").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();const el=$("npPop");const open=el.hidden||el.classList.contains("closing");
   togglePop("npPop","npChip");if(open){drawNpPop();spoNow(true).then(drawNpPop);npRecent()}});
-function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!CL.sb;$("spoTxt").textContent=SPO.on()?"Bağlı · odak bitince çalanlar kaydedilir":"Bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
+/* #np yüzü (piksel, tek renk): 28×22 hücre, çipte 1 hücre = 1 ekran pikseli. Durumlar: idle/sleep/play/change/pause/focus/error; ifadeler arası piksel kaydırmalı geçiş */
+const NPF=(()=>{
+/* daha ince çözünürlük: 28×22 hücre, çipte 1 hücre = 1 ekran pikseli (retina'da 2) → ince, net çizgiler */
+const W=28,H=22,CX=13.5,CY=11.5,RX=9.4,RY=8.6;
+const inside=(x,y)=>(((x+.5-CX)/RX)**2+((y+.5-CY)/RY)**2)<1;
+/* "piksel-mükemmel" elips: açıyla örneklenir, art arda aynı pikseller ve L köşeleri atılır → her yerde tek piksel kalınlık */
+function arc(cx,cy,rx,ry,a0,a1){const L=[];const n=720;for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n,x=Math.round(cx-.5+rx*Math.cos(a)),y=Math.round(cy-.5+ry*Math.sin(a));const l=L[L.length-1];if(!l||l[0]!==y||l[1]!==x)L.push([y,x])}
+  const O=[];for(let i=0;i<L.length;i++){const a=O[O.length-1],b=L[i],c=L[i+1];if(a&&c&&Math.abs(a[0]-c[0])===1&&Math.abs(a[1]-c[1])===1&&(a[0]===b[0]||a[1]===b[1])&&(c[0]===b[0]||c[1]===b[1]))continue;O.push(b)}return O}
+const RING=arc(CX,CY,RX-.5,RY-.5,0,Math.PI*2);
+/* kulaklık: başın üstünde ince bant + yanlarda dolu yastıklar */
+const BAND=arc(CX,CY-.6,RX+1.1,RY+1.1,Math.PI*1.12,Math.PI*1.88);
+const PADS=[];for(const x0 of [2,24])for(let y=9;y<15;y++)for(let x=x0;x<x0+2;x++)PADS.push([y,x]);
+const EL=10,ER=17,EY=10,MX=13,MY=15;
+const pts=(x,y,a)=>a.map(([dx,dy])=>[y+dy,x+dx]);
+const EYE={
+ open:(x,y)=>pts(x,y,[[0,0],[1,0],[0,1],[1,1],[0,2],[1,2]]),
+ blink:(x,y)=>pts(x,y,[[-1,2],[0,2],[1,2],[2,2]]),
+ mid:(x,y)=>pts(x,y,[[0,1],[1,1],[0,2],[1,2]]),
+ closed:(x,y)=>pts(x,y,[[-1,1],[0,2],[1,2],[2,1]]),
+ left:(x,y)=>pts(x-1,y,[[0,0],[1,0],[0,1],[1,1],[0,2],[1,2]]),
+ right:(x,y)=>pts(x+1,y,[[0,0],[1,0],[0,1],[1,1],[0,2],[1,2]]),
+ up:(x,y)=>pts(x,y-1,[[0,0],[1,0],[0,1],[1,1]]),
+ happy:(x,y)=>pts(x,y,[[-1,2],[0,1],[1,1],[2,2]]),
+ big:(x,y)=>pts(x,y,[[-1,-1],[0,-1],[1,-1],[2,-1],[-1,0],[2,0],[-1,1],[2,1],[-1,2],[0,2],[1,2],[2,2],[0,0]]),
+ narrow:(x,y)=>pts(x,y,[[0,1],[1,1],[-1,1],[2,1],[0,2],[1,2]])
+};
+const MOUTH={
+ flat:(x,y)=>pts(x,y,[[-1,0],[0,0],[1,0],[2,0]]),
+ small:(x,y)=>pts(x,y,[[0,0],[1,0]]),
+ smile:(x,y)=>pts(x,y,[[-3,-1],[-2,0],[-1,0],[0,0],[1,0],[2,0],[3,0],[4,-1]]),
+ grin:(x,y)=>pts(x,y,[[-3,-1],[-2,-1],[-1,-1],[0,-1],[1,-1],[2,-1],[3,-1],[4,-1],[-2,0],[3,0],[-1,1],[0,1],[1,1],[2,1]]),
+ o:(x,y)=>pts(x,y,[[0,-1],[1,-1],[-1,0],[2,0],[0,1],[1,1]]),
+ yawn:(x,y)=>pts(x,y,[[-1,-1],[0,-1],[1,-1],[2,-1],[-2,0],[3,0],[-2,1],[3,1],[-1,2],[0,2],[1,2],[2,2]]),
+ wavy:(x,y)=>pts(x,y,[[-3,0],[-2,-1],[-1,0],[0,0],[1,-1],[2,0],[3,0],[4,-1]]),
+ sleep:(x,y)=>pts(x,y,[[0,0],[1,0],[0,1],[1,1]])
+};
+const BROW={
+ angry:()=>[...pts(EL,EY,[[-2,-3],[-1,-3],[0,-2],[1,-2]]),...pts(ER,EY,[[0,-2],[1,-2],[2,-3],[3,-3]])],
+ worried:()=>[...pts(EL,EY,[[-2,-2],[-1,-2],[0,-3],[1,-3]]),...pts(ER,EY,[[0,-3],[1,-3],[2,-2],[3,-2]])]
+};
+const NOTE=[[0,2],[0,3],[1,3],[1,2],[1,4],[2,2],[3,2],[4,0],[4,1],[4,2],[5,0],[5,1]].map(([r,c])=>[r,c]),
+  ZZ=[[0,0],[0,1],[0,2],[0,3],[1,2],[2,1],[3,0],[3,1],[3,2],[3,3]],DROP=[[0,1],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2],[3,1]];
+/* durumlar: [göz, ağız, süre, kulaklık, kaş] */
+const ST={
+ idle:{n:"Müzik yok · sıkılmış",d:"Ciddi ciddi takılıyor: göz kırpar, sağa sola bakar, ara sıra esner.",tx:"şu an çalan yok",
+   seq:[["open","flat",1500],["blink","flat",110],["open","flat",900],["left","flat",1000],["open","flat",400],["right","flat",1000],["open","flat",700],["blink","yawn",200],["closed","yawn",1100],["blink","small",200],["open","small",900],["blink","small",110],["open","small",800]]},
+ play:{n:"Çalıyor · ritim tutuyor",d:"Kulaklığı takar, gözleri mutlu kısılır, kafasını ritme göre sallar; notalar uçuşur.",tx:"<b>Teardrop</b> — Massive Attack",tm:"1:42 / 5:29",bob:1,fx:"notes",
+   seq:[["happy","smile",840,1],["happy","grin",840,1],["happy","smile",840,1],["open","smile",420,1],["happy","grin",840,1]]},
+ change:{n:"Şarkı değişti · şaşırıyor",d:"Yeni şarkı başlayınca bir an gözleri açılır, sonra ritme döner.",tx:"<b>Roygbiv</b> — Boards of Canada",tm:"0:03 / 2:31",
+   seq:[["big","o",800,1],["open","o",300,1],["happy","smile",800,1]]},
+ pause:{n:"Duraklatıldı · bekliyor",d:"Kulaklık takılı, yukarı bakıp bekler; üç nokta belirir.",tx:"<b>Teardrop</b> — duraklatıldı",tm:"1:42 / 5:29",fx:"dots",
+   seq:[["up","flat",1000,1],["open","flat",400,1],["up","flat",1000,1],["right","flat",600,1]]},
+ focus:{n:"Odakta · ciddileşir",d:"Pomodoro sürerken kaşlarını çatar, kulaklık takılı, nadiren göz kırpar.",tx:"<b>Hoppípolla</b> — Sigur Rós",tm:"2:10 / 4:28",
+   seq:[["narrow","flat",2400,1,"angry"],["blink","flat",110,1,"angry"],["narrow","flat",1900,1,"angry"]]},
+ sleep:{n:"Uzun süredir sessiz · uyukluyor",d:"Uzun süre müzik çalmazsa gözleri kapanır, Z'ler uçar.",tx:"şu an çalan yok",fx:"z",
+   seq:[["closed","sleep",1500],["closed","small",900]]},
+ error:{n:"Spotify hata verdi · terliyor",d:"Bağlantı koparsa ya da yetki düşerse endişeli bakar, ter damlası kayar.",tx:"Spotify: bağlantı yok",fx:"sweat",
+   seq:[["open","wavy",800,0,"worried"],["left","wavy",600,0,"worried"],["open","wavy",800,0,"worried"],["blink","wavy",110,0,"worried"]]}
+};
+/* kısa göz kırpmalar ara karelerle: açık → yarım → kapalı → yarım → açık */
+for(const S of Object.values(ST))S.seq=S.seq.flatMap(f=>f[0]==="blink"&&f[2]<=130?[["mid",...f.slice(1,2),40,...f.slice(3)],["blink",...f.slice(1,2),60,...f.slice(3)],["mid",...f.slice(1,2),40,...f.slice(3)]]:[f]);
+const ORDER=["idle","play","change","pause","focus","sleep","error"];
+/* tek renk, yarı saydamlık yok */
+let COL={o:"#B9BDC6",f:"#F4F5F7",h:"#6E727C",n:"#B9BDC6",z:"#6E727C",s:"#B9BDC6"};
+function draw(cv,px,state,t){const c=cv.getContext("2d");c.clearRect(0,0,cv.width,cv.height);const S=ST[state];
+  const tot=S.seq.reduce((a,f)=>a+f[2],0);let k=t%tot,fr=S.seq[0];for(const f of S.seq){if(k<f[2]){fr=f;break}k-=f[2]}
+  /* kafa sallama: vuruşta kafa 1 piksel iner, yüz 50 ms gecikmeyle izler (ikincil hareket) */
+  const bt=t%420,bob=S.bob&&bt<90?1:0,fbob=S.bob&&bt>=50&&bt<160?1:0;
+  const P=(r,x,color,dy=bob)=>{c.fillStyle=color;c.fillRect(x*px,(r+dy)*px,px,px)};
+  const now=performance.now();
+  for(const [r,x] of RING)P(r,x,COL.o);
+  /* kulaklık kayarak takılır/çıkar: hp 0→1 yaylı, adım adım (piksel ızgarasında kalır) */
+  const want=fr[3]?1:0;if(cv._hp==null)cv._hp=want;cv._hp+=(want-cv._hp)*(want?.16:.22);if(Math.abs(want-cv._hp)<.02)cv._hp=want;
+  if(cv._hp>.04){const off=Math.round((1-cv._hp)*-8);for(const [r,x] of BAND)P(r+off,x,COL.h);for(const [r,x] of PADS)P(r+Math.round(off*.6),x,COL.h)}
+  /* yüz parçaları biçim değiştirir: her piksel en yakın karşılığına kayar (yaylı, ~180 ms; durum değişince 320 ms) */
+  const tgt=[...EYE[fr[0]](EL,EY),...EYE[fr[0]](ER,EY),...MOUTH[fr[1]](MX,MY),...(fr[4]?BROW[fr[4]]():[])];const key=fr[0]+fr[1]+(fr[4]||"");
+  if(cv._key!==key){cv._from=cv._cur||tgt;cv._t0=now;cv._dur=cv._st!==state?320:Math.max(40,Math.min(170,fr[2]*.7));cv._key=key;cv._st=state}
+  const p=Math.min(1,(now-cv._t0)/cv._dur),e=p<1?1+2.2*Math.pow(p-1,3)+1.2*Math.pow(p-1,2):1;
+  const cur=morph(cv._from,tgt,e,p);cv._cur=p<1?cur:tgt;for(const [r,x] of cur)P(r,x,COL.f,fbob);
+  /* efektler: sönerek değil, belli bir noktada kaybolarak (net kalsın) */
+  if(S.fx==="notes")for(let i=0;i<2;i++){const ph=((t/1600)+i*.5)%1;if(ph>.8)continue;const y=Math.round(12-ph*12);for(const [r,x] of NOTE)P(y+r,23+x+(i?0:-1),COL.n,0)}
+  if(S.fx==="z")for(let i=0;i<2;i++){const ph=((t/2200)+i*.5)%1;if(ph>.8)continue;const y=Math.round(6-ph*7);for(const [r,x] of ZZ)P(y+r,21+x+Math.round(ph*2),COL.z,0)}
+  if(S.fx==="dots"){const n=Math.floor(t/450)%4;for(let i=0;i<n;i++)P(20,20+i*2,COL.z,0)}
+  if(S.fx==="sweat"){const ph=(t/1700)%1;if(ph<.8)for(const [r,x] of DROP)P(4+Math.round(ph*4)+r,23+x,COL.s,0)}}
+const near=(L,q)=>{let b=L[0],d=1e9;for(const a of L){const k=(a[0]-q[0])**2+(a[1]-q[1])**2;if(k<d){d=k;b=a}}return b};
+function morph(A,B,e,p){if(p>=1||!A.length)return B;const out=new Map(),put=(a,b)=>{const r=Math.round(a[0]+(b[0]-a[0])*e),x=Math.round(a[1]+(b[1]-a[1])*e);out.set(r+","+x,[r,x])};
+  for(const b of B)put(near(A,b),b);if(p<.6)for(const a of A)put(a,near(B,a));return [...out.values()]}
+/* retina'da net: tuvali cihaz pikseline göre büyüt */
+function fit(cv,cell){const d=Math.max(1,Math.round(devicePixelRatio||1));cv.width=W*cell*d;cv.height=H*cell*d;cv.style.width=W*cell+"px";cv.style.height=H*cell+"px";cv.dataset.px=cell*d}
+
+return {draw,fit,color:(o,f,h)=>{COL={o,f,h,n:o,z:h,s:o}}}})();
+const NPFS={st:"idle",t0:0,raf:0,chg:0,colT:0};
+function npfState(){const n=SPO.now;if(SPO.err&&!n)return "error";if(n)return Date.now()<NPFS.chg?"change":focusing()?"focus":"play";if(SPO.paused)return "pause";return Date.now()-(SPO.lastPlay||0)>10*60000?"sleep":"idle"}
+function npfLoop(now){NPFS.raf=0;const cv=$("npFace"),chip=$("npChip");if(!cv||chip.hidden||document.hidden)return;
+  if(!cv.dataset.px)NPF.fit(cv,1);const st=npfState();if(st!==NPFS.st){NPFS.st=st;NPFS.t0=now}
+  if(now-NPFS.colT>1500){NPFS.colT=now;const cs=getComputedStyle(document.documentElement),v=(k,d)=>cs.getPropertyValue(k).trim()||d;NPF.color(v("--ink-2","#B9BDC6"),v("--ink","#F4F5F7"),v("--ink-3",v("--muted","#6E727C")))}
+  NPF.draw(cv,+cv.dataset.px,st,now-NPFS.t0);NPFS.raf=requestAnimationFrame(npfLoop)}
+function npfKick(){if(!NPFS.raf)NPFS.raf=requestAnimationFrame(npfLoop)}
+document.addEventListener("visibilitychange",npfKick);
+function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!CL.sb;sec.classList.toggle("on",SPO.on());$("spoTxt").textContent=SPO.on()?"bağlı":"bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
 $("spoBtn").onclick=()=>SPO.on()?spoOff(false):spoConnect();
 setTimeout(()=>{spoBoot();drawSpo();drawSpoNow();spoNow(true)},0);setInterval(spoNow,5000);
 function drawTimer(){
@@ -4364,7 +4469,7 @@ async function shareInvite(){const m=$("shrIn").value.trim();if(!shPid)return;
   if(error){$("shrMsg").textContent=/bad_email/.test(error.message)?"Geçerli bir e-posta yaz":/not_(owner|admin)/.test(error.message)?"Davet yalnızca yöneticide ve yetki verdiği kişilerde.":"Davet edilemedi: "+error.message;return}
   $("shrIn").value="";$("shrMsg").textContent=data==="added"?m+" eklendi, projeyi hemen görür.":m+" henüz kayıtlı değil. Bu e-postayla Workshop'ta hesap açınca proje ona açılır.";drawShare()}
 function openAcct(){if($("acctPop").hidden)$("acctBtn").click();setTimeout(()=>{const i=$("acEmail");if(i&&!$("acctOut").hidden)i.focus()},120)}
-function drawAcct(){const btn=$("acctBtn");btn.hidden=!cloudAvail();if(btn.hidden)return;
+function drawAcct(){const btn=$("acctBtn");btn.hidden=!cloudAvail();if(btn.hidden)return;drawSpo();
   $("acctOut").hidden=!!CL.me;$("acctIn").hidden=!CL.me;btn.classList.toggle("in",!!CL.me);
   $("acAv").hidden=!CL.me;$("acAv").textContent=CL.me?(CL.email[0]||"?").toUpperCase():"";btn.title=CL.me?"Hesap · "+CL.email:"Hesap · giriş yap";
   if(CL.me&&document.activeElement!==$("acName"))$("acName").value=(CL.prof.get(CL.me)||{}).name||"";
