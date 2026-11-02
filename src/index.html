@@ -4993,7 +4993,7 @@ const volPop=u=>`<div class="vvolpop"><b>${esc(pname(u))}</b><div class="r"><spa
 $("voiceBody").addEventListener("submit",e=>{const f=e.target.closest("[data-vraddf]");if(!f)return;e.preventDefault();const pid=hubPid();addRoom(pid,f.dataset.vraddf,f.querySelector("input").value);S.vradd=null;drawVoice()});
 $("voiceBody").addEventListener("keydown",e=>{const i=e.target.closest("[data-vrenin]");const f=e.target.closest(".vradd");
   if(f&&e.key==="Escape"){S.vradd=null;drawVoice();return}if(!i)return;
-  if(e.key==="Enter"){e.preventDefault();const v=i.value.trim().slice(0,32);const id=i.dataset.vrenin;S.vren=null;if(v)run(api.update(id,{name:v}));drawVoice()}else if(e.key==="Escape"){S.vren=null;drawVoice()}});
+  if(e.key==="Enter"){e.preventDefault();const v=i.value.trim().slice(0,32);const id=i.dataset.vrenin;S.vren=null;if(v){if(id==="main")setMainRoom(hubPid(),i.dataset.vrk,{name:v});else run(api.update(id,{name:v}))}drawVoice()}else if(e.key==="Escape"){S.vren=null;drawVoice()}});
 $("voiceBody").addEventListener("focusout",e=>{if(e.target.closest("[data-vrenin]")&&S.vren){setTimeout(()=>{if(S.vren&&!document.activeElement?.closest?.("[data-vrenin]")){S.vren=null;drawVoice()}},120)}});
 $("voiceBody").addEventListener("input",e=>{const r=e.target.closest("[data-pvol]");if(!r)return;setPvol(r.dataset.pvol,r.value/100);const t=r.nextElementSibling;if(t)t.textContent="%"+r.value});
 $("voiceBody").addEventListener("contextmenu",e=>{const rm=e.target.closest("[data-vrid]");if(rm&&!e.target.closest("[data-vfol]")){roomMenu(e,hubPid(),rm.dataset.vrk,rm.dataset.vrid);return}const r=e.target.closest("[data-vfol]");if(!r)return;e.preventDefault();S.volFor=S.volFor===r.dataset.vfol?null:r.dataset.vfol;drawVoice()});
@@ -5036,7 +5036,9 @@ function drawVChat(){const box=$("vChat");const pid=hubPid();const win=!!CHW&&!C
   if(out&&on){if(D.hidden)animShow(D)}else if(!D.hidden)animHide(D);
   if(win&&!pid){$("vChT").textContent="Sohbet";$("vChL").innerHTML=`<span class="e">Ortak bir projeyi açınca sohbet burada görünür.</span>`;delete $("vChL").dataset.k;return}
   if(!on)return;
-  const sel=vtSel(pid);$("vChT").textContent="#"+roomName(pid,"text",sel);$("vChIn").placeholder="#"+roomName(pid,"text",sel)+" odasına yaz…";
+  const sel=vtSel(pid);$("vChIn").disabled=$("vChAtt").disabled=!sel;
+  if(!sel){$("vChT").textContent="Metin odası yok";$("vChIn").placeholder="Önce bir metin odası ekle";$("vChL").innerHTML=`<span class="e">Metin odası kalmadı. METİN ODALARI'ndaki + ile yeni oda ekleyebilirsin.</span>`;delete $("vChL").dataset.k;return}
+  $("vChT").textContent="#"+roomName(pid,"text",sel);$("vChIn").placeholder="#"+roomName(pid,"text",sel)+" odasına yaz…";
   if(!CL.msgs.has(pid)){loadMsgs(pid);$("vChL").innerHTML=`<span class="e">yükleniyor…</span>`;return}
   const l=(CL.msgs.get(pid)||[]).filter(m=>msgRoom(m)===sel).slice(-40);const mx=l.reduce((a,m)=>Math.max(a,m.id),0);if(mx&&mx>LS.get(vtSeenK(pid,sel),0)){LS.set(vtSeenK(pid,sel),mx);queueMicrotask(()=>{const b=document.querySelector(`[data-vtext="${sel}"] .vub`);if(b)b.remove()})}const L=$("vChL");const atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<30;
   /* aynı içerik yeniden çizilmez: oynayan video ya da yüklenen görsel sıfırlanmasın */
@@ -5069,7 +5071,7 @@ function putXHR(url,blob,type,prog){return new Promise((res,rej)=>{const x=new X
   x.upload.onprogress=e=>{if(e.lengthComputable)prog(e.loaded/e.total)};x.onload=()=>x.status<300?res():rej(new Error("R2 "+x.status));x.onerror=()=>rej(new Error("ağ hatası"));x.send(blob)})}
 const UPS=new Map();
 function drawUps(){const el=$("vChUp");el.hidden=!UPS.size;el.innerHTML=[...UPS.values()].map(u=>`<div class="u"><span>${esc(u.n)}</span><div class="bar"><i style="width:${Math.round(u.p*100)}%"></i></div></div>`).join("")}
-async function chatUpload(files){const pid=hubPid();if(!pid||!CL.sb||!CL.me)return;const sel=vtSel(pid);
+async function chatUpload(files){const pid=hubPid();if(!pid||!CL.sb||!CL.me)return;const sel=vtSel(pid);if(!sel)return;
   let ok=0;
   for(const f0 of [...files]){const k=Math.random().toString(36).slice(2);UPS.set(k,{n:f0.name||"dosya",p:0});drawUps();
     try{let f=f0,w,h;if(/^image\//.test(f0.type)){UPS.get(k).n="küçültülüyor · "+f0.name;drawUps();({f,w,h}=await chatImg(f0));UPS.get(k).n=f0.name}
@@ -5123,7 +5125,7 @@ $("vChFile").onchange=e=>{const fs=[...e.target.files];e.target.value="";if(fs.l
   drag($("vdGrip"),{start:e=>({x:e.clientX,w:$("vchDock").getBoundingClientRect().width}),go:(e,st)=>{DW=Math.round(Math.max(300,Math.min(innerWidth-P.getBoundingClientRect().width-80,st.w+(st.x-e.clientX))));setDW(DW)}},()=>{if(DW)LS.set("vdW",DW)});
   $("vdGrip").addEventListener("dblclick",()=>{LS.set("vdW",0);setDW(0)});
   $("vchGrip").addEventListener("dblclick",()=>{LS.set("vchH",0);setH(0)});$("vhGrip").addEventListener("dblclick",()=>{LS.set("vhW",0);setW(0)})})();
-$("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=hubPid();if(!v||!pid)return;i.value="";const sel=vtSel(pid);
+$("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=hubPid();const sel=pid&&vtSel(pid);if(!v||!pid||!sel)return;i.value="";
   const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:null,text:v,room:sel==="main"?null:sel}).select("id,project_id,sender,recipient,text,at,room,att").single();
   if(error){toast("Mesaj gönderilemedi: "+error.message,null,true);i.value=v;return}const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawVChat();if(curP()===pid)drawChat(pid)});
 function voiceLoop(){let last=0;const tick=t=>{if(!V.pid)return;V.loop=requestAnimationFrame(tick);if(t-last<120)return;last=t;
@@ -5140,20 +5142,24 @@ const vhIsOpen=()=>!$("voicePop").hidden&&!$("voicePop").classList.contains("clo
 function vhOpen(on){if(on)closePops();LS.set("vhub",!!on);$("voiceBtn").setAttribute("aria-expanded",!!on);if(on)animShow($("voicePop"));else animHide($("voicePop"));drawVoice();drawScreen()}
 /* ===== odalar: her projede "Genel" ses ve "genel" metin odası hazır; ekip yenilerini ekler (öğe type:"room", kind voice|text) ===== */
 const ROOM_DEF={voice:{id:"main",name:"Genel",def:true},text:{id:"main",name:"genel",def:true}};
-const roomsOf=(pid,kind)=>[ROOM_DEF[kind],...S.items.filter(i=>i.type==="room"&&i.project===pid&&i.kind===kind&&!i.deleted).sort((a,b)=>(a.created||0)-(b.created||0))];
+/* Genel odalar da yeniden adlandırılıp silinebilir: projede tek bir öğe {type:"room",main:true,kind,name,hidden} varsayılanı ezer */
+const mainOv=(pid,kind)=>S.items.find(i=>i.type==="room"&&i.main&&i.project===pid&&i.kind===kind&&!i.deleted);
+const roomsOf=(pid,kind)=>{const ov=mainOv(pid,kind),d=ov?Object.assign({},ROOM_DEF[kind],{name:ov.name||ROOM_DEF[kind].name}):ROOM_DEF[kind];
+  return [...(ov&&ov.hidden?[]:[d]),...S.items.filter(i=>i.type==="room"&&!i.main&&i.project===pid&&i.kind===kind&&!i.deleted).sort((a,b)=>(a.created||0)-(b.created||0))]};
+function setMainRoom(pid,kind,patch){const ov=mainOv(pid,kind);if(ov)run(api.update(ov.id,patch));else run(api.add(Object.assign({type:"room",main:true,project:pid,kind,by:CL.me,created:Date.now()},patch)))}
 const roomName=(pid,kind,id)=>(roomsOf(pid,kind).find(r=>r.id===id)||{name:id==="main"?ROOM_DEF[kind].name:"oda"}).name;
 const hubPid=()=>V.pid||(isShared(curP())?curP():null);
-const vtSel=pid=>{const r=LS.get("vtxt",{})[pid]||"main";return roomsOf(pid,"text").some(x=>x.id===r)?r:"main"};
+const vtSel=pid=>{const r=LS.get("vtxt",{})[pid]||"main",l=roomsOf(pid,"text");return l.some(x=>x.id===r)?r:(l[0]||{}).id||null};
 function setVtSel(pid,r){const m=LS.get("vtxt",{});m[pid]=r;LS.set("vtxt",m);drawVoice()}
 const msgRoom=m=>m.recipient?null:(m.room||"main");
 const vtSeenK=(pid,r)=>"vts:"+pid+":"+r;
 function vtUnread(pid,r){const last=LS.get(vtSeenK(pid,r),0);return (CL.msgs.get(pid)||[]).filter(m=>msgRoom(m)===r&&m.sender!==CL.me&&m.id>last).length}
-const canRoom=(pid,r)=>!r.def&&(r.by===CL.me||isAdmin(pid));
+const canRoom=(pid,r)=>r.def?isAdmin(pid):(r.by===CL.me||isAdmin(pid));
 const SPK_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2h2.2L8 3.5v9L4.7 9.8H2.5z"/><path d="M10.8 5.6a3.4 3.4 0 010 4.8M12.6 3.8a6 6 0 010 8.4"/></svg>';
 function addRoom(pid,kind,name){name=(name||"").trim().slice(0,32);if(!name||!api)return;run(api.add({type:"room",project:pid,kind,name,by:CL.me,created:Date.now()})).then(r=>{if(kind==="text"&&r&&r.id)setVtSel(pid,r.id)})}
 function roomMenu(e,pid,kind,id){const r=roomsOf(pid,kind).find(x=>x.id===id);if(!r||!canRoom(pid,r))return;e.preventDefault();
   openCtx(e.clientX,e.clientY,(kind==="voice"?"Ses odası · ":"# ")+r.name,[{label:"Yeniden adlandır",fn:()=>{S.vren=id;drawVoice();setTimeout(()=>{const i=document.querySelector("[data-vrenin]");if(i){i.focus();i.select()}},30)}},
-    {label:"Odayı sil",danger:true,fn:()=>{run(api.remove(id));if(kind==="text"&&vtSel(pid)===id)setVtSel(pid,"main");if(kind==="voice"&&V.room===id&&V.pid===pid)toast("Oda silindi · bağlantın sürüyor, istersen Genel'e geç",null,true)}}])}
+    {label:"Odayı sil",danger:true,fn:()=>{if(id==="main")setMainRoom(pid,kind,{hidden:true});else run(api.remove(id));if(kind==="text"&&LS.get("vtxt",{})[pid]===id){const m=LS.get("vtxt",{});delete m[pid];LS.set("vtxt",m)}drawVoice();if(kind==="voice"&&V.room===id&&V.pid===pid)toast("Oda silindi · bağlantın sürüyor, istersen Genel'e geç",null,true)}}])}
 function drawVoice(){queueMicrotask(drawVChat);const btn=$("voiceBtn");const shared=[...CL.pids].filter(isShared);const avail=!!CL.me&&!!shared.length;const open=avail&&!!LS.get("vhub",false);
   btn.hidden=!avail||open;if(!avail||!open){if(!$("voicePop").hidden&&!$("voicePop").classList.contains("closing"))animHide($("voicePop"))}else if($("voicePop").hidden)animShow($("voicePop"));if(!avail)return;
   $("vtAv").innerHTML=V.pid?[CL.me,...roomIn().filter(u=>u!==CL.me)].slice(0,5).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join(""):"";
@@ -5178,7 +5184,7 @@ function drawVoice(){queueMicrotask(drawVChat);const btn=$("voiceBtn");const sha
     return `<div class="vrm${act?" on":""}" data-vjoinr="${esc(r.id)}" data-vrid="${esc(r.id)}" data-vrk="voice"><span class="ic">${SPK_IC}</span>${nameEl("voice",r,"")}<span class="vavs">${(act?[]:inn).slice(0,4).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join("")}${!act&&inn.length>4?`<span class="small">+${inn.length-4}</span>`:""}</span>${act?`<span class="small">${ppl.length} kişi</span>`:inn.length?"":`<span class="small">boş</span>`}</div>${act?ctl:""}`}).join("");
   const sel=vtSel(ctx);
   const trooms=roomsOf(ctx,"text").map(r=>{const un=r.id===sel&&!$("voicePop").hidden?0:vtUnread(ctx,r.id);return `<div class="vtr${r.id===sel?" on":""}" data-vtext="${esc(r.id)}" data-vrid="${esc(r.id)}" data-vrk="text"><span class="ic">#</span>${nameEl("text",r,"")}${un?`<span class="vub">${un>9?"9+":un}</span>`:""}</div>`}).join("");
-  B.innerHTML=`<div class="vsec"><div class="vsech"><span>SES ODALARI</span><button class="vadd" data-vradd="voice" title="Ses odası ekle" aria-label="Ses odası ekle">+</button></div>${addF("voice")}${vrooms}</div>
+  B.innerHTML=`<div class="vsec"><div class="vsech"><span>SES ODALARI</span><button class="vadd" data-vradd="voice" title="Ses odası ekle" aria-label="Ses odası ekle">+</button></div>${addF("voice")}${vrooms}${me&&!roomsOf(ctx,"voice").some(r=>r.id===V.room)?`<div class="vrm on"><span class="ic">${SPK_IC}</span><b>Silinmiş oda</b><span class="small">${ppl.length} kişi</span></div>${ctl}`:""}</div>
     <div class="vsec"><div class="vsech"><span>METİN ODALARI</span><button class="vadd" data-vradd="text" title="Metin odası ekle" aria-label="Metin odası ekle">+</button></div>${addF("text")}${trooms}</div>`;
   const af=B.querySelector("[data-vraddf] input");if(af&&document.activeElement!==af)setTimeout(()=>af.focus(),20)}
 const tfText=()=>{const run=!!TM.endAt,brk=TM.mode==="break";return TF.on?(run?(brk?"Molada":"Odaktasınız")+" · birlikte "+fmt(tLeft()).replace(/^0/,"")+" kaldı":"Açık · biri sayacı başlatınca herkeste başlar")+(TF.by&&TF.by!==CL.me?" · açan "+pname(TF.by):""):"Açınca odadaki herkesin sayacı birlikte çalışır"};
