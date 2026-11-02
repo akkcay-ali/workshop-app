@@ -912,7 +912,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vrm+.vlist{margin:6px 0 4px 6px;padding-left:8px;border-left:1px solid var(--stroke)}
 .vradd{display:flex;gap:6px;padding:2px 4px 6px}.vradd .field,.vrenin{flex:1;min-width:0;padding:5px 8px;font-size:12.5px}
 .vchat{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--stroke);padding-top:10px;min-height:200px;max-height:60%;flex:1.4 1 0}.vchl{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin}
-.vchl .m{font-size:12.5px;line-height:1.4;word-break:break-word;display:flex;align-items:flex-start;gap:8px;margin-top:4px}.vchl .m.cont{margin-top:-3px}.vchl .mav{flex:0 0 24px;width:24px}.vchl .mav .av{width:24px;height:24px;font-size:11px}.vchl .mb{flex:1;min-width:0;padding-top:3px}.vchl .m time{font-size:10.5px;color:var(--muted);padding-top:4px;flex:0 0 auto;opacity:0;transition:opacity .15s}.vchl .m:hover time,.vchl .m:not(.cont) time{opacity:1}.vchl .e{font-size:11.5px;color:var(--muted)}
+.vchl .m{font-size:12.5px;line-height:1.4;word-break:break-word;display:flex;align-items:flex-start;gap:8px;margin-top:4px}.vchl .m.cont{margin-top:-3px}.vchl>:first-child{margin-top:auto}.vchl .mav{flex:0 0 24px;width:24px}.vchl .mav .av{width:24px;height:24px;font-size:11px}.vchl .mb{flex:1;min-width:0;padding-top:3px}.vchl .m time{font-size:10.5px;color:var(--muted);padding-top:4px;flex:0 0 auto;opacity:0;transition:opacity .15s}.vchl .m:hover time,.vchl .m:not(.cont) time{opacity:1}.vchl .e{font-size:11.5px;color:var(--muted)}
 .vchat form{display:flex;gap:6px}
 .vchat{position:relative}.vchat.sized{flex:0 0 var(--vchh);max-height:calc(100% - 120px)}
 .vgrip{position:absolute;z-index:3;display:block}.vgrip::after{content:"";position:absolute;border-radius:2px;background:var(--stroke-2);opacity:0;transition:opacity .15s}
@@ -938,7 +938,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 
 .vavs{display:flex;gap:4px}.vav{border-radius:50%;transition:box-shadow .15s}.vav .av{width:26px;height:26px;font-size:11px}
 /* ses panelinde profil simgesi gibi dolu avatar */
-#voicePop .vav .av,#voiceBtn .vav .av{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 70%,#fff),var(--c));color:#16171B;border:0;font-weight:700;box-shadow:inset 0 1px 0 rgb(255 255 255 / .25)}
+#voicePop .vav .av,#voiceBtn .vav .av,#vChat .mav .av{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 70%,#fff),var(--c));color:#16171B;border:0;font-weight:700;box-shadow:inset 0 1px 0 rgb(255 255 255 / .25)}
 #voicePop .vrow .vav .av{width:30px;height:30px;font-size:13px}
 .vav.talk{box-shadow:0 0 0 2px var(--t5),0 0 12px color-mix(in srgb,var(--t5) 60%,transparent)}.vav.mut{opacity:.55}
 .vctl{display:flex;align-items:center;gap:8px;border-top:1px solid var(--stroke);padding-top:12px;position:relative}
@@ -5067,7 +5067,7 @@ $("vChFile").onchange=e=>{const fs=[...e.target.files];e.target.value="";if(fs.l
   $("vChIn").addEventListener("paste",e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();toast("Ekli dosyalar 7 gün sonra otomatik silinir",null,true);chatUpload(fs)}})})();
 /* boyut: sohbetin üst kenarından yükseklik, panelin sol kenarından genişlik sürüklenir (LS vchH / vhW), çift tık sıfırlar */
 (()=>{const P=$("voicePop"),C=$("vChat");
-  const setH=h=>{if(h){C.style.setProperty("--vchh",h+"px");C.classList.add("sized")}else{C.style.removeProperty("--vchh");C.classList.remove("sized")}};
+  const setH=h=>{const L=$("vChL"),end=L.scrollHeight-L.scrollTop-L.clientHeight<30;requestAnimationFrame(()=>{if(end)L.scrollTop=L.scrollHeight});if(h){C.style.setProperty("--vchh",h+"px");C.classList.add("sized")}else{C.style.removeProperty("--vchh");C.classList.remove("sized")}};
   const setW=w=>{if(w)P.style.setProperty("--vhw",w+"px");else P.style.removeProperty("--vhw")};
   setH(LS.get("vchH",0));setW(LS.get("vhW",0));
   const drag=(g,move,done)=>{g.addEventListener("pointerdown",e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();g.setPointerCapture(e.pointerId);g.classList.add("on");const st=move.start(e);
