@@ -92,7 +92,6 @@ document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.
   --glow1:rgba(0,0,0,0); --glow2:rgba(0,0,0,0); --glow3:rgba(0,0,0,0);
   color-scheme:light;
 }
-:root[data-theme="sand"] .wmark{--wm:#4A3E33}
 :root[data-theme="vivid"] .card.k-frame:not(.sel) .fl{color:var(--accent)}
 :root[data-theme="vivid"] .tab[aria-selected="true"]{box-shadow:inset 0 -2px 0 var(--accent)}
 :root[data-theme="vivid"] .st[aria-selected="true"]{color:var(--accent)}
@@ -662,6 +661,9 @@ button:disabled{cursor:var(--cur)}
 .wmark{width:18px;height:16px;flex:0 0 auto}
 .tab.home .wmark{width:21px;height:19px;margin:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}.tab.home:hover .wmark{transform:scale(1.12) rotate(-4deg)}
 :root:is([data-theme="light"],[data-theme="sand"]) .wmark{--wm:#3E4A6B}
+/* logo temaya uyar: Kum = koyu kahve + kil noktası, Kehribar = turuncu nokta */
+:root[data-theme="sand"] .wmark{--wm:#3A2E24;--wm2:#8C7B68;--wmd:#9A4A2C}
+:root[data-theme="ember"] .wmark{--wm:#F3E3E6;--wm2:#8E7680;--wmd:#FFAA6E}
 .cmp{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:24px;background:rgb(8 9 11 / .78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .cmpbox{width:min(1400px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px}
 .cmph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink)}.cmph .sp{flex:1}#cmpFade{width:160px}
@@ -1482,7 +1484,7 @@ function run(p){return Promise.resolve(p).catch(err=>{toast(err&&err.code==="quo
 
 /* ---------- tabs / navigation ---------- */
 /* Workshop logosu (W + iğne) */
-const WMARK='<svg class="wmark" viewBox="16 18 88 80" aria-hidden="true"><path d="M27 42 L44 86 L60 54" fill="none" stroke="#7D8596" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 54 L76 86 L93 42" fill="none" stroke="var(--wm,#D7DEF5)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="31" r="7" fill="#93CDD6"/></svg>';
+const WMARK='<svg class="wmark" viewBox="16 18 88 80" aria-hidden="true"><path d="M27 42 L44 86 L60 54" fill="none" stroke="var(--wm2,#7D8596)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 54 L76 86 L93 42" fill="none" stroke="var(--wm,#D7DEF5)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="31" r="7" fill="var(--wmd,#93CDD6)"/></svg>';
 const WLOCK=`<span class="wlock">${WMARK}<span>Workshop</span></span>`;
 const ICON={
   home:WMARK,
