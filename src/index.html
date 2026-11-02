@@ -4428,7 +4428,7 @@ function presSync(){if(!CL.sb||!CL.me)return;const want=new Set([...CL.pids].fil
   for(const [pid,ch] of CL.pres)if(!want.has(pid)){CL.sb.removeChannel(ch);CL.pres.delete(pid);CL.here.delete(pid)}
   for(const pid of want){if(CL.pres.has(pid))continue;
     const ch=CL.sb.channel("proj:"+pid,{config:{private:true,presence:{key:CL.me}}});CL.pres.set(pid,ch);
-    ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:!!s.v,m:!!s.m,s:!!s.s,f:s.f||0});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
+    ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:!!s.v,m:!!s.m,d:!!s.d,s:!!s.s,f:s.f||0});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
       .on("broadcast",{event:"rtc"},({payload})=>onRtc(pid,payload))
       .on("broadcast",{event:"hide"},({payload})=>onHide(pid,payload))
       .on("broadcast",{event:"cur"},({payload})=>onCur(pid,payload))
@@ -4440,7 +4440,7 @@ function presTrack(force){if(!CL.me)return;curCheck();if(force){presSent.clear()
 function presFlush(){presT=null;if(!CL.me)return;const pid=curP();const w=pid?subOf(pid):"";let wait=0;
   /* sesli odadayken başka sayfaya geçince de o projede görünmeye devam et */
   for(const [p,ch] of CL.pres){if(ch.state!=="joined")continue;
-    const st=p===pid||p===V.pid?{w:p===pid?w:"",n:pname(CL.me),v:V.pid===p,m:V.pid===p&&V.muted,s:V.pid===p&&!!V.screen,f:focusPres()}:null;
+    const st=p===pid||p===V.pid?{w:p===pid?w:"",n:pname(CL.me),v:V.pid===p,m:V.pid===p&&V.muted,d:V.pid===p&&!!V.deaf,s:V.pid===p&&!!V.screen,f:focusPres()}:null;
     const key=st?JSON.stringify(st):"-";const prev=presSent.get(p);if(prev===key||(prev===undefined&&!st))continue;
     const gap=Date.now()-(presAt.get(p)||0);if(gap<1200){wait=Math.max(wait,1200-gap);continue}
     presSent.set(p,key);presAt.set(p,Date.now());try{if(st)ch.track(st);else ch.untrack()}catch(_){}}
@@ -4784,7 +4784,7 @@ async function voiceDevMenu(x,y){let ds=[];try{ds=await navigator.mediaDevices.e
   const curMic=V.stream&&V.stream.getAudioTracks()[0]&&V.stream.getAudioTracks()[0].getSettings().deviceId;const curOut=LS.get("vOut","")||"default";
   const ins=ds.filter(d=>d.kind==="audioinput"&&d.deviceId!=="communications"),outs=ds.filter(d=>d.kind==="audiooutput"&&d.deviceId!=="communications");
   const nm=(d,i,k)=>(d.label||(k+" "+(i+1))).replace(/\s*\([0-9a-f]{4}:[0-9a-f]{4}\)$/i,"");
-  const it=[{label:V.muted?"Mikrofonu aç":"Mikrofonu kapat",fn:voiceMute},{label:"Güçlü gürültü engelleme",on:nsMode()==="strong",fn:()=>setNs(nsMode()==="strong"?"normal":"strong")},"-",{label:"MİKROFON",head:true}];
+  const it=[{label:"MİKROFON",head:true}];
   ins.forEach((d,i)=>it.push({label:nm(d,i,"Mikrofon"),on:d.deviceId===curMic||(!curMic&&d.deviceId==="default"),fn:()=>setMic(d.deviceId)}));
   if(outs.length&&HTMLMediaElement.prototype.setSinkId){it.push("-",{label:"HOPARLÖR / KULAKLIK",head:true});outs.forEach((d,i)=>it.push({label:nm(d,i,"Çıkış"),on:d.deviceId===curOut,fn:()=>setOut(d.deviceId)}))}
   openCtx(x,y,"Ses ayarları",it)}
@@ -4802,8 +4802,13 @@ async function voiceJoin(pid){if(V.pid===pid)return;if(V.pid)voiceLeave();
   rtcSend("*",{k:"join"});for(const u of voiceIn(pid))if(u!==CL.me)peerFor(u)}
 function voiceLeave(){if(!V.pid)return;shareStop();tfOff();S.scrHide=false;rtcSend("*",{k:"bye"});for(const u of [...V.peers.keys()])peerClose(u);
   if(V.stream)V.stream.getTracks().forEach(t=>t.stop());V.stream=null;V.meAn=null;const pid=V.pid;V.pid=null;V.speak.clear();cancelAnimationFrame(V.loop);
-  presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
-function voiceMute(){if(!V.stream)return;V.muted=!V.muted;V.stream.getAudioTracks().forEach(t=>t.enabled=!V.muted);presTrack(true);drawVoice()}
+  V.deaf=false;V.deafMic=false;presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
+function voiceMute(){if(!V.stream)return;if(V.deaf&&V.muted){voiceDeaf();return}V.muted=!V.muted;V.stream.getAudioTracks().forEach(t=>t.enabled=!V.muted);presTrack(true);drawVoice()}
+/* kulaklığı kapat (sağırlaştır): kimseyi duymazsın; mikrofon da kapanır, açınca önceki hâline döner */
+function voiceDeaf(){if(!V.pid)return;V.deaf=!V.deaf;
+  if(V.deaf){V.deafMic=!V.muted;if(!V.muted){V.muted=true;V.stream&&V.stream.getAudioTracks().forEach(t=>t.enabled=false)}}
+  else if(V.deafMic){V.muted=false;V.stream&&V.stream.getAudioTracks().forEach(t=>t.enabled=true);V.deafMic=false}
+  for(const p of V.peers.values())if(p.audio)p.audio.muted=!!V.deaf;presTrack(true);drawVoice()}
 function chimeJoin(on){if(!sndOn())return;ensureAudio();if(!actx)return;try{const t=actx.currentTime+.02;bell(t,on?660:880,.12);bell(t+.12,on?880:660,.1)}catch(_){}}
 /* bağlantılar: küçük kimlik teklif eder (çakışmayı önler) */
 /* bağlantılar: "kusursuz pazarlık" (perfect negotiation) – iki taraf da teklif yapabilir,
@@ -4816,7 +4821,7 @@ function peerFor(u){if(!V.pid||u===CL.me)return null;let p=V.peers.get(u);if(p)r
   pc.onsignalingstatechange=()=>{if(pc.signalingState==="stable"&&p.ssnd)applyEnc(p.ssnd)};
   pc.onicecandidate=e=>{if(e.candidate)rtcSend(u,{k:"ice",c:e.candidate.toJSON()})};
   pc.ontrack=e=>{const tr=e.track;
-    if(tr.kind==="audio"){const st=e.streams[0]||new MediaStream([tr]);if(!p.audio){p.audio=new Audio();p.audio.autoplay=true}p.audio.srcObject=st;const so=LS.get("vOut","");if(so&&p.audio.setSinkId)p.audio.setSinkId(so).catch(()=>{});p.audio.play().catch(()=>{});p.an=analyse(st);return}
+    if(tr.kind==="audio"){const st=e.streams[0]||new MediaStream([tr]);if(!p.audio){p.audio=new Audio();p.audio.autoplay=true}p.audio.muted=!!V.deaf;p.audio.srcObject=st;const so=LS.get("vOut","");if(so&&p.audio.setSinkId)p.audio.setSinkId(so).catch(()=>{});p.audio.play().catch(()=>{});p.an=analyse(st);return}
     p.video=new MediaStream([tr]);tr.onmute=drawScreen;tr.onunmute=drawScreen;tr.onended=()=>{p.video=null;drawScreen()};S.scrHide=false;drawScreen()};
   pc.onconnectionstatechange=()=>{const st=pc.connectionState;if(st==="failed"){toast(pname(u)+" ile ses bağlantısı kurulamadı"+(V.ice&&V.ice.list===STUN?" · ara sunucu (TURN) ayarlı değil":""),null,true);peerClose(u)}drawVoice()};
   return p}
@@ -4919,12 +4924,12 @@ function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(is
   btn.classList.toggle("on",!!V.pid);btn.classList.toggle("sharing",!!V.screen);btn.classList.toggle("muted",!!V.pid&&V.muted);btn.classList.toggle("talk",!!V.pid&&[...V.speak].some(u=>u!==CL.me));
   const shown=V.pid?n:others;$("voiceN").hidden=!shown;$("voiceN").textContent=shown;btn.title=V.pid?"Sesli oda · "+((proj(V.pid)||{}).name||""):others?others+" kişi sesli odada":"Sesli oda";
   if(!open)return;drawPrev();const B=$("voiceBody");
-  const row=u=>`<div class="vrow"><span class="vav${V.speak.has(u)?" talk":""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?" mut":""}" data-vu="${esc(u)}">${avatar(u)}</span><span class="vn">${esc(u===CL.me?"Sen":pname(u))}</span>${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?`<span class="vmut">${MICOFF_IC}</span>`:""}</div>`;
+  const row=u=>`<div class="vrow"><span class="vav${V.speak.has(u)?" talk":""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?" mut":""}" data-vu="${esc(u)}">${avatar(u)}</span><span class="vn">${esc(u===CL.me?"Sen":pname(u))}</span>${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?`<span class="vmut">${MICOFF_IC}</span>`:""}${(u===CL.me&&V.deaf)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).d?`<span class="vmut">${HPOFF_IC}</span>`:""}</div>`;
   if(V.pid){const ppl=[CL.me,...voiceIn(V.pid).filter(u=>u!==CL.me)];
     B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">${esc((proj(V.pid)||{}).name||"")} · ${ppl.length} kişi</span></div></div>
       <div class="vlist">${ppl.map(row).join("")}</div>
       ${tfRow()}${shareBlock()}
-      <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}" data-vmute title="${V.muted?"Mikrofonu aç":"Mikrofonu kapat"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button>${nsBtn()}
+      <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}" data-vmute title="${V.muted?"Mikrofonu aç":"Mikrofonu kapat"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}
         <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`}
   else{const ps=cp?[cp]:[];
     if(!cp){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Odaya katılmak için önce ortak bir projeyi aç. Her projenin kendi odası var.</span></div></div>`;return}
@@ -4995,10 +5000,13 @@ document.addEventListener("click",e=>{
   {const b=e.target.closest("[data-vtf]");if(b){if((b.dataset.vtf==="1")!==TF.on)tfToggle();return}}
   if(e.target.closest("[data-vtfgo]")){if(TM.endAt)tPause();else tStart();drawVoice();return}
   if(e.target.closest("[data-vmute]")){voiceMute();return}
+  if(e.target.closest("[data-vdeaf]")){voiceDeaf();return}
   const dv=e.target.closest("[data-vdev]");if(dv){e.stopPropagation();const r=dv.getBoundingClientRect();voiceDevMenu(r.left,r.bottom+6);return}
 });
 window.addEventListener("beforeunload",()=>{if(V.pid)voiceLeave()});
 const MIC_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5.6" y="1.8" width="4.8" height="8" rx="2.4"/><path d="M3.3 7.6a4.7 4.7 0 009.4 0M8 12.3v2"/></svg>';
+const HP_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 10V8a5.5 5.5 0 0111 0v2"/><rect x="2" y="9.5" width="3" height="4.5" rx="1.3"/><rect x="11" y="9.5" width="3" height="4.5" rx="1.3"/></svg>';
+const HPOFF_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 10V8a5.5 5.5 0 019.1-4.1M13.3 6.6c.1.5.2.9.2 1.4v2"/><rect x="2" y="9.5" width="3" height="4.5" rx="1.3"/><rect x="11" y="9.5" width="3" height="4.5" rx="1.3"/><path d="M2 2l12 12"/></svg>';
 const MICOFF_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5.6" y="1.8" width="4.8" height="8" rx="2.4"/><path d="M3.3 7.6a4.7 4.7 0 009.4 0M8 12.3v2M2.5 2.5l11 11"/></svg>';
 const HANG_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.6c3.6-3 8.4-3 12 0l-1.5 1.9-2.3-.9V9c-1.4-.4-2.9-.4-4.4 0v1.6l-2.3.9z"/></svg>';
 
