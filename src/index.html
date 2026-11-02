@@ -3586,7 +3586,7 @@ $("npChip").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();
 /* #np yüzü (piksel, tek renk): 28×22 hücre, çipte 1 hücre = 1 ekran pikseli. Durumlar: idle/sleep/play/change/pause/focus/error; ifadeler arası piksel kaydırmalı geçiş */
 const NPF=(()=>{
 /* daha ince çözünürlük: 28×22 hücre, çipte 1 hücre = 1 ekran pikseli (retina'da 2) → ince, net çizgiler */
-const W=28,H=22,OY=4,CX=13.5,CY=11.5,RX=9.4,RY=8.6;/* OY: alevler için üstte 4 satır pay */
+const W=28,H=22,OY=6,CX=13.5,CY=11.5,RX=9.4,RY=8.6;/* OY: alevler için üstte 6 satır pay */
 const inside=(x,y)=>(((x+.5-CX)/RX)**2+((y+.5-CY)/RY)**2)<1;
 /* "piksel-mükemmel" elips: açıyla örneklenir, art arda aynı pikseller ve L köşeleri atılır → her yerde tek piksel kalınlık */
 function arc(cx,cy,rx,ry,a0,a1){const L=[];const n=720;for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n,x=Math.round(cx-.5+rx*Math.cos(a)),y=Math.round(cy-.5+ry*Math.sin(a));const l=L[L.length-1];if(!l||l[0]!==y||l[1]!==x)L.push([y,x])}
@@ -3637,6 +3637,8 @@ const ST={
    seq:[["up","flat",1000,1],["open","flat",400,1],["up","flat",1000,1],["right","flat",600,1]]},
  focus:{n:"Odakta · ciddileşir",d:"Pomodoro sürerken kaşlarını çatar, kulaklık takılı, nadiren göz kırpar.",tx:"<b>Hoppípolla</b> — Sigur Rós",tm:"2:10 / 4:28",
    seq:[["narrow","flat",2400,1,"angry"],["blink","flat",110,1,"angry"],["narrow","flat",1900,1,"angry"]]},
+ focus0:{n:"Odakta · ciddileşir",d:"Pomodoro sürerken kaşlarını çatar, kulaklık takılı, nadiren göz kırpar.",tx:"<b>Hoppípolla</b> — Sigur Rós",tm:"2:10 / 4:28",
+   seq:[["narrow","flat",2400,0,"angry"],["blink","flat",110,0,"angry"],["narrow","flat",1900,0,"angry"]]},
  sleep:{n:"Uzun süredir sessiz · uyukluyor",d:"Uzun süre müzik çalmazsa gözleri kapanır, Z'ler uçar.",tx:"şu an çalan yok",fx:"z",
    seq:[["closed","sleep",1500],["closed","small",900]]},
  error:{n:"Spotify hata verdi · terliyor",d:"Bağlantı koparsa ya da yetki düşerse endişeli bakar, ter damlası kayar.",tx:"Spotify: bağlantı yok",fx:"sweat",
@@ -3688,7 +3690,7 @@ function fit(cv,cell){const d=Math.max(1,Math.round(devicePixelRatio||1));cv.wid
 
 return {draw,fit,color:(o,f,h)=>{COL={o,f,h,n:o,z:h,s:o}}}})();
 const NPFS={st:"idle",t0:0,raf:0,chg:0,colT:0};
-function npfState(){const n=SPO.now;if(SPO.err&&!n)return "error";if(n)return Date.now()<NPFS.chg?"change":focusing()?"focus":"play";if(SPO.paused)return "pause";return Date.now()-(SPO.lastPlay||0)>10*60000?"sleep":"idle"}
+function npfState(){const n=SPO.now;if(SPO.err&&!n)return "error";if(n)return Date.now()<NPFS.chg?"change":focusing()?"focus":"play";if(focusing())return "focus0";if(SPO.paused)return "pause";return Date.now()-(SPO.lastPlay||0)>10*60000?"sleep":"idle"}
 function npfLoop(now){NPFS.raf=0;const cv=$("npFace"),chip=$("npChip");if(!cv||chip.hidden||document.hidden)return;
   if(!cv.dataset.px)NPF.fit(cv,1);const st=npfState();if(st!==NPFS.st){NPFS.st=st;NPFS.t0=now}
   if(now-NPFS.colT>1500){NPFS.colT=now;const cs=getComputedStyle(document.documentElement),v=(k,d)=>cs.getPropertyValue(k).trim()||d;NPF.color(v("--ink-2","#B9BDC6"),v("--ink","#F4F5F7"),v("--ink-3",v("--muted","#6E727C")))}
