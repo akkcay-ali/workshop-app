@@ -897,7 +897,19 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .scr video{display:block;width:100%;aspect-ratio:16/9;background:#000;object-fit:contain}
 @media (prefers-reduced-motion:no-preference){.scr:not([hidden]){animation:popIn .42s linear both}}
 .vhead{display:flex;gap:12px;align-items:flex-start}.vhead>svg{width:22px;height:22px;color:var(--t5);flex:0 0 auto;margin-top:2px}.vhead h3{margin:0 0 2px}.vhead .small{display:block}
-.vlist{display:flex;flex-direction:column;gap:2px;margin:12px 0}.vrow{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:8px}.vrow .vn{flex:1}
+.vlist{display:flex;flex-direction:column;gap:2px;margin:12px 0}.vrow{display:flex;align-items:center;gap:10px;padding:6px 6px;border-radius:9px;position:relative}.vrow .vn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.vrow.can{cursor:pointer;transition:background .15s}.vrow.can:hover{background:var(--glass)}.vrow.fol{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.vrow .vloc{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vrow .vloc.fx{color:#E6C07B}.vrow .vfl{font-size:10.5px;color:var(--accent);flex:0 0 auto}
+.vvolpop{position:absolute;right:0;top:calc(100% + 4px);z-index:4;width:220px;padding:10px 12px;border-radius:12px;background:var(--panel-solid,rgb(24 25 29 / .97));border:1px solid var(--stroke-2);box-shadow:0 16px 36px -14px rgb(0 0 0 / .6);display:flex;flex-direction:column;gap:8px;animation:popIn .35s linear both;cursor:default}
+.vvolpop b{font-size:12px;font-weight:500}.vvolpop .r{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)}.vvolpop input[type=range]{flex:1;accent-color:var(--accent)}
+.vkeys{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}.vkeys kbd{font-size:10.5px}.vkeys .sp{flex:1}
+.vchat{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--stroke);padding-top:10px;min-height:0;max-height:42%}.vchl{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin}
+.vchl .m{font-size:12.5px;line-height:1.4;word-break:break-word}.vchl .m b{font-weight:600;margin-right:6px}.vchl .m time{font-size:10.5px;color:var(--muted);margin-left:6px}.vchl .e{font-size:11.5px;color:var(--muted)}
+.vchat form{display:flex;gap:6px}.vchat .field{flex:1;min-width:0;padding:7px 10px;font-size:12.5px}
+.vbtn[data-vmute]{box-shadow:0 0 0 calc(var(--lvl,0) * 4px) color-mix(in srgb,var(--accent) 45%,transparent);transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .15s,box-shadow .12s linear}
+.vbtn.ptt{border-color:color-mix(in srgb,var(--accent) 45%,var(--stroke-2))}
+.folbar{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:61;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:99px;background:var(--panel-solid,rgb(24 25 29 / .96));border:1px solid color-mix(in srgb,var(--accent) 45%,var(--stroke-2));box-shadow:0 12px 30px -14px rgb(0 0 0 / .6);font-size:12.5px;animation:popIn .4s linear both}
+.folbar .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
 .vmut svg{width:14px;height:14px;color:#E6A3B4}
 .vavs{display:flex;gap:4px}.vav{border-radius:50%;transition:box-shadow .15s}.vav .av{width:26px;height:26px;font-size:11px}
 .vav.talk{box-shadow:0 0 0 2px var(--t5),0 0 12px color-mix(in srgb,var(--t5) 60%,transparent)}.vav.mut{opacity:.55}
@@ -1240,7 +1252,9 @@ body.frameless .app{padding-top:8px}
 <div class="sk" id="tpk" hidden role="dialog" aria-label="Yeni pano"><div class="skbox tpbox"><div class="kbhead"><h2 id="tpT">Yeni pano</h2><button class="btn" id="tpClose">Vazgeç <kbd>Esc</kbd></button></div><div id="tpBody"></div></div></div>
 <aside class="vhub" id="voicePop" hidden aria-label="Ses ve yayın"><div class="vhh"><b>Ses ve yayın</b><span class="sp"></span><button class="vhx" id="vhClose" title="Paneli gizle" aria-label="Paneli gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
   <div class="vhprev" id="vhPrev" hidden><video id="vhV" autoplay playsinline muted></video><div class="vhpb"><span class="dot"></span><span id="vhPl"></span><span class="sp"></span><button class="btn sm" data-vhbig>Büyük izle</button></div></div>
-  <div class="vhbody" id="voiceBody"></div></aside>
+  <div class="vhbody" id="voiceBody"></div>
+  <div class="vchat" id="vChat" hidden><div class="vchl" id="vChL"></div><form id="vChF" autocomplete="off"><input class="field" id="vChIn" maxlength="500" placeholder="Odaya yaz…"><button class="btn sm" type="submit">Gönder</button></form></div></aside>
+<div class="folbar" id="folBar" hidden><span class="dot"></span><span id="folT"></span><button class="btn sm" id="folStop">Bırak</button></div>
 <div class="pop" id="bellPop" hidden role="dialog" aria-label="Bildirimler"><div class="bellh"><h3>Bildirimler</h3><button class="mini" id="bellSys" title="Pencere arkadayken sistem bildirimi göster"></button><button class="mini" id="bellAll">tümünü okundu say</button></div><div class="bell" id="bellList"></div></div>
 <div class="sk" id="npk" hidden role="dialog" aria-label="Yeni proje"><div class="skbox npbox"><div class="kbhead"><h2>Yeni proje</h2><button class="btn" id="npClose">Vazgeç <kbd>Esc</kbd></button></div>
   <div class="npopts" id="npOpts"></div><span class="small npmsg" id="npMsg"></span></div></div>
@@ -1741,7 +1755,7 @@ addEventListener("resize",()=>{if(curP())placeInd(curP())});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(curP()){S.ind=null;placeInd(curP())}});
 function renderSub(){
   const s=subOf(curP());const key=curP()+":"+s;
-  if(S.shownSub!==key){S.shownSub=key;presTrack();const el=s==="hub"?$("sHub"):s==="tasks"||s==="team"?$("sTasks"):s==="cal"?$("sCal"):$("sBoard");
+  if(S.shownSub!==key){S.shownSub=key;presTrack();viewSend();const el=s==="hub"?$("sHub"):s==="tasks"||s==="team"?$("sTasks"):s==="cal"?$("sCal"):$("sBoard");
     requestAnimationFrame(()=>{el.classList.remove("enter");void el.offsetWidth;el.classList.add("enter");el.addEventListener("animationend",()=>el.classList.remove("enter"),{once:true})})}
   const dir=isShared(curP())&&s.startsWith("b:");$("rdir").hidden=!dir;$("sBoard").classList.toggle("dir",dir);if(dir)renderDir();
   $("sHub").hidden=s!=="hub";$("sTasks").hidden=s!=="tasks"&&s!=="team";$("sCal").hidden=s!=="cal";$("sBoard").hidden=!s.startsWith("b:");
@@ -1813,7 +1827,7 @@ $("sCal").addEventListener("click",e=>{
 const stage=$("stage"),world=$("world");
 const views=LS.get("views",{});
 function view(){const b=curBoard()||"_";return views[b]||(views[b]={x:60,y:70,z:1})}
-function applyView(){const v=view();const dp=window.devicePixelRatio||1,rx=Math.round(v.x*dp)/dp,ry=Math.round(v.y*dp)/dp;world.style.transform=`translate(${rx}px,${ry}px) scale(${v.z})`;
+function applyView(){viewSend();const v=view();const dp=window.devicePixelRatio||1,rx=Math.round(v.x*dp)/dp,ry=Math.round(v.y*dp)/dp;world.style.transform=`translate(${rx}px,${ry}px) scale(${v.z})`;
   /* nokta ızgarası uzaklaştıkça seyrelir: ekranda aralık hep 16–48 px (iPad'de sık noktalar parazit gibi görünüyordu) */
   {let g=24*v.z;while(g<16)g*=2;while(g>48)g/=2;stage.style.backgroundSize=`${g}px ${g}px`;stage.style.backgroundPosition=`${v.x}px ${v.y}px`}$("zoomv").textContent=Math.round(v.z*100)+"%"}
 let svT;function saveView(){clearTimeout(svT);svT=setTimeout(()=>LS.set("views",views),300)}
@@ -4738,10 +4752,11 @@ async function sendChat(){const i=$("chatIn");const v=i.value.trim();const pid=c
   const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawChat(pid)}
 function onMsg(p){const m=p.new;if(!m||!m.id||!CL.pids.has(m.project_id))return;const l=CL.msgs.get(m.project_id);if(l&&l.some(x=>x.id===m.id))return;
   if(l)l.push(m);else{CL.msgs.set(m.project_id,[m])}
+  if(m.project_id===V.pid&&!m.recipient)drawVChat();
   const viewing=curP()===m.project_id&&subOf(m.project_id)==="hub"&&(CL.chatTo.get(m.project_id)||"g")===convOf(m);
   if(m.sender!==CL.me){if(viewing&&document.hasFocus())drawChat(m.project_id);
     else{drawChat(m.project_id);drawChatBadge();const pn=(proj(m.project_id)||{}).name||"";const who=pname(m.sender)+(m.recipient?" (özel)":" · "+pn);
-      if(m.recipient||!viewing){toast(who+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{go(m.project_id);S.sub[m.project_id]="hub";CL.chatTo.set(m.project_id,convOf(m));save();renderProject()}});
+      if(m.recipient||(!viewing&&!(m.project_id===V.pid&&!$("voicePop").hidden))){toast(who+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{go(m.project_id);S.sub[m.project_id]="hub";CL.chatTo.set(m.project_id,convOf(m));save();renderProject()}});
         /* sistem bildirimi: özel mesaj ya da adın geçtiyse; genel sohbet her mesajda rahatsız etmesin */
         if(m.recipient||(pname(CL.me)&&m.text.includes("@"+pname(CL.me))))teamNotify(who,m.text.slice(0,140),true)}}}}
 document.addEventListener("click",e=>{const c=e.target.closest("[data-chat]");if(!c)return;const pid=curP();CL.chatTo.set(pid,c.dataset.chat);const L=$("chatList");if(L)delete L.dataset.init;drawChat(pid);setTimeout(()=>{const i=$("chatIn");if(i)i.focus()},0)});
@@ -4752,7 +4767,7 @@ document.addEventListener("submit",e=>{if(e.target.id==="chatForm"){e.preventDef
    üzerinden (broadcast "rtc"). Kim odada: presence durumunda v:true.
    Doğrudan bağlanamayanlar için Cloudflare TURN (edge function turn-ice).
    ===================================================================== */
-const V={pid:null,stream:null,peers:new Map(),muted:false,ice:null,speak:new Set(),actx:null,loop:0,meAn:null};
+const V={pid:null,stream:null,peers:new Map(),muted:false,ice:null,speak:new Set(),actx:null,loop:0,meAn:null,follow:null,fans:new Set(),deaf:false,pttDown:false};
 /* cihaz seçimi: mikrofon (vMic) ve hoparlör (vOut) bu cihazda hatırlanır */
 function rawMic(id,ns){const a={echoCancellation:true,noiseSuppression:ns,autoGainControl:true};if(id)a.deviceId={exact:id};
   return navigator.mediaDevices.getUserMedia({audio:a,video:false}).catch(e=>{if(id&&(e.name==="OverconstrainedError"||e.name==="NotFoundError")){LS.set("vMic","");return rawMic("",ns)}throw e})}
@@ -4798,17 +4813,17 @@ async function voiceJoin(pid){if(V.pid===pid)return;if(V.pid)voiceLeave();
   catch(e){toast("Mikrofona erişilemedi: "+(e&&e.name==="NotAllowedError"?"izin verilmedi":(e&&e.message)||e),null,true);return}
   V.pid=pid;V.muted=false;await iceServers();
   if(!V.actx)try{V.actx=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}
-  V.meAn=analyse(V.stream);voiceLoop();presTrack(true);drawVoice();chimeJoin(true);
+  V.meAn=analyse(V.stream);if(pttOn()){V.muted=true;V.stream.getAudioTracks().forEach(t=>t.enabled=false)}voiceLoop();presTrack(true);drawVoice();chimeJoin(true);
   rtcSend("*",{k:"join"});for(const u of voiceIn(pid))if(u!==CL.me)peerFor(u)}
 function voiceLeave(){if(!V.pid)return;shareStop();tfOff();S.scrHide=false;rtcSend("*",{k:"bye"});for(const u of [...V.peers.keys()])peerClose(u);
   if(V.stream)V.stream.getTracks().forEach(t=>t.stop());V.stream=null;V.meAn=null;const pid=V.pid;V.pid=null;V.speak.clear();cancelAnimationFrame(V.loop);
-  V.deaf=false;V.deafMic=false;presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
+  V.deaf=false;V.deafMic=false;V.pttDown=false;if(V.follow){V.follow=null;drawFol()}V.fans.clear();presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
 function voiceMute(){if(!V.stream)return;if(V.deaf&&V.muted){voiceDeaf();return}V.muted=!V.muted;V.stream.getAudioTracks().forEach(t=>t.enabled=!V.muted);presTrack(true);drawVoice()}
 /* kulaklığı kapat (sağırlaştır): kimseyi duymazsın; mikrofon da kapanır, açınca önceki hâline döner */
 function voiceDeaf(){if(!V.pid)return;V.deaf=!V.deaf;
   if(V.deaf){V.deafMic=!V.muted;if(!V.muted){V.muted=true;V.stream&&V.stream.getAudioTracks().forEach(t=>t.enabled=false)}}
   else if(V.deafMic){V.muted=false;V.stream&&V.stream.getAudioTracks().forEach(t=>t.enabled=true);V.deafMic=false}
-  for(const p of V.peers.values())if(p.audio)p.audio.muted=!!V.deaf;presTrack(true);drawVoice()}
+  for(const u of V.peers.keys())applyVol(u);presTrack(true);drawVoice()}
 function chimeJoin(on){if(!sndOn())return;ensureAudio();if(!actx)return;try{const t=actx.currentTime+.02;bell(t,on?660:880,.12);bell(t+.12,on?880:660,.1)}catch(_){}}
 /* bağlantılar: küçük kimlik teklif eder (çakışmayı önler) */
 /* bağlantılar: "kusursuz pazarlık" (perfect negotiation) – iki taraf da teklif yapabilir,
@@ -4821,7 +4836,7 @@ function peerFor(u){if(!V.pid||u===CL.me)return null;let p=V.peers.get(u);if(p)r
   pc.onsignalingstatechange=()=>{if(pc.signalingState==="stable"&&p.ssnd)applyEnc(p.ssnd)};
   pc.onicecandidate=e=>{if(e.candidate)rtcSend(u,{k:"ice",c:e.candidate.toJSON()})};
   pc.ontrack=e=>{const tr=e.track;
-    if(tr.kind==="audio"){const st=e.streams[0]||new MediaStream([tr]);if(!p.audio){p.audio=new Audio();p.audio.autoplay=true}p.audio.muted=!!V.deaf;p.audio.srcObject=st;const so=LS.get("vOut","");if(so&&p.audio.setSinkId)p.audio.setSinkId(so).catch(()=>{});p.audio.play().catch(()=>{});p.an=analyse(st);return}
+    if(tr.kind==="audio"){const st=e.streams[0]||new MediaStream([tr]);if(!p.audio){p.audio=new Audio();p.audio.autoplay=true}p.audio.muted=!!V.deaf||pmute(u);p.audio.volume=pvol(u);p.audio.srcObject=st;const so=LS.get("vOut","");if(so&&p.audio.setSinkId)p.audio.setSinkId(so).catch(()=>{});p.audio.play().catch(()=>{});p.an=analyse(st);return}
     p.video=new MediaStream([tr]);tr.onmute=drawScreen;tr.onunmute=drawScreen;tr.onended=()=>{p.video=null;drawScreen()};S.scrHide=false;drawScreen()};
   pc.onconnectionstatechange=()=>{const st=pc.connectionState;if(st==="failed"){toast(pname(u)+" ile ses bağlantısı kurulamadı"+(V.ice&&V.ice.list===STUN?" · ara sunucu (TURN) ayarlı değil":""),null,true);peerClose(u)}drawVoice()};
   return p}
@@ -4831,8 +4846,10 @@ async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||p
   /* odaya giriş/çıkış: presence gecikse ya da kısılsa da bağlantı kurulur */
   if(m.k==="join"){if(!p)peerFor(m.from);rtcSend(m.from,{k:"here"});if(TF.on)rtcSend(m.from,{k:"tf",on:true,tog:1,quiet:1,lead:TF.lead,tm:TM.endAt?tfSnap():null});return}
   if(m.k==="tf"){tfOnRtc(m);return}
+  if(m.k==="fol"){if(m.on){V.fans.add(m.from);toast(pname(m.from)+" seni takip ediyor",null,true);viewSend()}else V.fans.delete(m.from);drawVoice();return}
+  if(m.k==="vw"){onView(m);return}
   if(m.k==="here"){if(!p)peerFor(m.from);return}
-  if(m.k==="bye"){peerClose(m.from);return}
+  if(m.k==="bye"){peerClose(m.from);V.fans.delete(m.from);if(V.follow===m.from){V.follow=null;drawFol();toast(pname(m.from)+" odadan ayrıldı · takip bitti",null,true)}return}
   try{if(m.k==="offer"||m.k==="answer"){if(!p)p=peerFor(m.from);const pc=p.pc;
       const collision=m.k==="offer"&&(p.making||pc.signalingState!=="stable");p.ignore=!p.polite&&collision;if(p.ignore)return;
       await pc.setRemoteDescription({type:m.k,sdp:fastStart(m.sdp)});for(const c of p.pend.splice(0))await pc.addIceCandidate(c).catch(()=>{});
@@ -4904,7 +4921,64 @@ function voiceSync(pid){if(V.pid!==pid)return;const inn=new Set(voiceIn(pid));fo
 /* konuşan kişiyi göster */
 function analyse(stream){if(!V.actx)return null;try{const s=V.actx.createMediaStreamSource(stream),a=V.actx.createAnalyser();a.fftSize=512;s.connect(a);return {a,buf:new Uint8Array(a.fftSize)}}catch(_){return null}}
 function level(an){if(!an)return 0;an.a.getByteTimeDomainData(an.buf);let m=0;for(const v of an.buf){const d=Math.abs(v-128);if(d>m)m=d}return m}
+/* ===== ses merkezi ekleri ===== */
+/* kim nerede: presence w (sayfa) + f (odak) */
+const SUB_TR={hub:"Merkez'de",tasks:"Görevlerde",team:"Ekip panosunda",cal:"Takvimde"};
+function locOf(u){const h=(CL.here.get(V.pid)||[]).find(x=>x.u===u);if(!h)return null;
+  if(h.f>1&&h.f>Date.now())return {t:"Odakta · "+Math.max(1,Math.ceil((h.f-Date.now())/60000))+" dk kaldı",fx:true};
+  if(h.f===1)return {t:"Kronometre çalışıyor",fx:true};
+  const w=h.w||"";if(!w)return {t:"başka bir sayfada"};
+  if(w.startsWith("b:")){const b=boards(V.pid).find(x=>x.id===w.slice(2));return {t:b?(b.name||"Pano")+" panosunda":"bir panoda"}}
+  return {t:SUB_TR[w]||"projede"}}
+/* kişi başına ses düzeyi ve sessize alma (yalnızca bu cihazda) */
+const pvol=u=>{const m=LS.get("vVol",{});return m[u]==null?1:Math.max(0,Math.min(1,+m[u]))};
+const pmute=u=>!!(LS.get("vPm",{})[u]);
+function applyVol(u){const p=V.peers.get(u);if(p&&p.audio){p.audio.volume=pvol(u);p.audio.muted=!!V.deaf||pmute(u)}}
+function setPvol(u,v){const m=LS.get("vVol",{});m[u]=v;LS.set("vVol",m);applyVol(u)}
+function setPmute(u,on){const m=LS.get("vPm",{});if(on)m[u]=1;else delete m[u];LS.set("vPm",m);applyVol(u)}
+const volPop=u=>`<div class="vvolpop"><b>${esc(pname(u))}</b><div class="r"><span>Ses</span><input type="range" min="0" max="100" value="${Math.round(pvol(u)*100)}" data-pvol="${esc(u)}"><span>%${Math.round(pvol(u)*100)}</span></div>
+  <button class="btn sm" data-pmute="${esc(u)}">${pmute(u)?"Sesini aç":"Bu kişiyi sessize al"}</button></div>`;
+$("voiceBody").addEventListener("input",e=>{const r=e.target.closest("[data-pvol]");if(!r)return;setPvol(r.dataset.pvol,r.value/100);const t=r.nextElementSibling;if(t)t.textContent="%"+r.value});
+$("voiceBody").addEventListener("contextmenu",e=>{const r=e.target.closest("[data-vfol]");if(!r)return;e.preventDefault();S.volFor=S.volFor===r.dataset.vfol?null:r.dataset.vfol;drawVoice()});
+/* bas-konuş (LS vPtt): açıkken mikrofon kapalı durur, Ctrl+Alt+V basılıyken açılır */
+const pttOn=()=>!!LS.get("vPtt",false);
+function micSet(on){if(!V.stream)return;V.muted=!on;V.stream.getAudioTracks().forEach(t=>t.enabled=on);presTrack(true);drawVoice()}
+function setPtt(on){LS.set("vPtt",!!on);if(V.pid){if(on&&!V.muted)micSet(false);if(!on&&V.muted&&!V.deaf)micSet(true)}drawVoice();toast(on?"Bas-konuş açık · Ctrl+Alt+V basılıyken konuşursun":"Bas-konuş kapalı",null,true)}
+function pttKey(down){if(!V.pid||!pttOn()||V.deaf)return;if(down===V.pttDown)return;V.pttDown=down;micSet(down)}
+function vKey(k,down){if(!V.pid)return;if(k==="ptt"){pttKey(down);return}if(!down)return;if(k==="mute"){if(pttOn()){toast("Bas-konuş açık · Ctrl+Alt+V basılı tut",null,true);return}voiceMute()}else if(k==="deaf")voiceDeaf()}
+if(TA&&TA.event)TA.event.listen("vkey",e=>{const p=e.payload||[];vKey(p[0],!!p[1])});
+else{document.addEventListener("keydown",e=>{if(!e.ctrlKey||!e.altKey||e.repeat)return;const k={KeyM:"mute",KeyD:"deaf",KeyV:"ptt"}[e.code];if(!k||!V.pid)return;e.preventDefault();vKey(k,true)});
+  document.addEventListener("keyup",e=>{if(e.code==="KeyV"||((e.key==="Control"||e.key==="Alt")&&V.pttDown))vKey("ptt",false)})}
+/* takip et: lider görünümünü (proje, sekme, pano kaydırma/yakınlaştırma) yollar, takip eden aynısına geçer */
+function followToggle(u){if(!V.pid||u===CL.me)return;if(V.follow===u){followStop();return}if(V.follow)rtcSend(V.follow,{k:"fol",on:0});
+  V.follow=u;rtcSend(u,{k:"fol",on:1});const h=(CL.here.get(V.pid)||[]).find(x=>x.u===u);if(h&&h.w){if(curP()!==V.pid)go(V.pid);if(subOf(V.pid)!==h.w){S.sub[V.pid]=h.w;save();renderProject()}}
+  drawFol();drawVoice();toast(pname(u)+" takip ediliyor · panoda kaydırınca bırakılır",null,true)}
+function followStop(msg){if(!V.follow)return;rtcSend(V.follow,{k:"fol",on:0});V.follow=null;drawFol();drawVoice();if(msg)toast(msg,null,true)}
+function drawFol(){const b=$("folBar");b.hidden=!V.follow;if(V.follow)$("folT").textContent=pname(V.follow)+" takip ediliyor"}
+$("folStop").onclick=()=>followStop();
+let vwT=0,vwLast=0;
+function viewSend(){if(!V.pid||!V.fans.size)return;clearTimeout(vwT);const now=Date.now(),wait=Math.max(0,120-(now-vwLast));vwT=setTimeout(()=>{vwLast=Date.now();const pid=curP();if(pid!==V.pid){rtcSend("*",{k:"vw",out:1});return}
+  const sub=subOf(pid),m={k:"vw",pid,sub};if(sub.startsWith("b:")){const v=view(),r=stage.getBoundingClientRect();Object.assign(m,{x:v.x,y:v.y,z:v.z,w:r.width,h:r.height})}rtcSend("*",m)},wait)}
+function onView(m){if(V.follow!==m.from)return;if(m.out){$("folT").textContent=pname(m.from)+" başka bir projede";return}drawFol();
+  if(curP()!==m.pid){if(!CL.pids.has(m.pid))return;V.folApply=true;go(m.pid)}
+  if(subOf(m.pid)!==m.sub){if(m.sub.startsWith("b:")&&!boards(m.pid).some(b=>b.id===m.sub.slice(2))){$("folT").textContent=pname(m.from)+" senin göremediğin bir panoda";return}
+    V.folApply=true;S.sub[m.pid]=m.sub;save();renderProject()}
+  if(m.z&&m.sub.startsWith("b:")){const v=view(),r=stage.getBoundingClientRect(),cx=(m.w/2-m.x)/m.z,cy=(m.h/2-m.y)/m.z;v.z=m.z;v.x=r.width/2-cx*m.z;v.y=r.height/2-cy*m.z;V.folApply=true;applyView()}
+  V.folApply=false}
+/* takip ederken panoya dokunmak takibi bırakır */
+stage.addEventListener("pointerdown",()=>{if(V.follow)followStop("Takip bırakıldı")},true);
+stage.addEventListener("wheel",()=>{if(V.follow)followStop("Takip bırakıldı")},{capture:true,passive:true});
+/* oda sohbeti: projenin genel sohbeti, sesli odadayken panelin altında */
+function drawVChat(){const box=$("vChat");const on=!!V.pid&&!$("voicePop").hidden;box.hidden=!on;if(!on)return;
+  if(!CL.msgs.has(V.pid)){loadMsgs(V.pid);$("vChL").innerHTML=`<span class="e">yükleniyor…</span>`;return}
+  const l=(CL.msgs.get(V.pid)||[]).filter(m=>!m.recipient).slice(-30);const L=$("vChL");const atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<30;
+  L.innerHTML=l.length?l.map(m=>`<div class="m"><b style="color:${pcol(m.sender)}">${esc(m.sender===CL.me?"Sen":pname(m.sender))}</b>${esc(m.text)}<time>${new Date(m.at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}</time></div>`).join(""):`<span class="e">Bu hafta odada yazışma yok. Yazdıkların Merkez'deki genel sohbete de düşer.</span>`;
+  if(atEnd)L.scrollTop=L.scrollHeight}
+$("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=V.pid;if(!v||!pid)return;i.value="";
+  const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:null,text:v}).select("id,project_id,sender,recipient,text,at").single();
+  if(error){toast("Mesaj gönderilemedi: "+error.message,null,true);i.value=v;return}const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawVChat();if(curP()===pid)drawChat(pid)});
 function voiceLoop(){let last=0;const tick=t=>{if(!V.pid)return;V.loop=requestAnimationFrame(tick);if(t-last<120)return;last=t;
+  {const mb=document.querySelector("[data-vmute]");if(mb)mb.style.setProperty("--lvl",V.muted?0:Math.min(1,level(V.meAn)/55).toFixed(2))}
   const now=new Set();if(!V.muted&&level(V.meAn)>14)now.add(CL.me);for(const [u,p] of V.peers)if(level(p.an)>14)now.add(u);
   const key=[...now].sort().join();if(key!==[...V.speak].sort().join()){V.speak=now;document.querySelectorAll("[data-vu]").forEach(e=>e.classList.toggle("talk",now.has(e.dataset.vu)));$("voiceBtn").classList.toggle("talk",[...now].some(u=>u!==CL.me))}};V.loop=requestAnimationFrame(tick)}
 /* arayüz: Merkez'deki sohbetin üstünde + başka sayfadayken alt köşede */
@@ -4915,7 +4989,7 @@ function voiceBar(pid){const inn=voiceIn(pid).filter(u=>u!==CL.me);const me=V.pi
   return `<div class="vbar"><span class="vl">${MIC_IC}${inn.length?`<span><b>${inn.length} kişi</b> sesli odada</span>`:"<span>Sesli oda boş</span>"}</span><span class="vavs">${avs}</span><span class="sp"></span><button class="btn sm primary" data-vjoin>Sesli katıl</button></div>`}
 const vhIsOpen=()=>!$("voicePop").hidden&&!$("voicePop").classList.contains("closing");
 function vhOpen(on){if(on)closePops();LS.set("vhub",!!on);$("voiceBtn").setAttribute("aria-expanded",!!on);if(on)animShow($("voicePop"));else animHide($("voicePop"));drawVoice();drawScreen()}
-function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(isShared);const avail=!!CL.me&&!!shared.length;const open=avail&&!!LS.get("vhub",false);
+function drawVoice(){queueMicrotask(drawVChat);const btn=$("voiceBtn");const shared=[...CL.pids].filter(isShared);const avail=!!CL.me&&!!shared.length;const open=avail&&!!LS.get("vhub",false);
   btn.hidden=!avail||open;if(!avail||!open){if(!$("voicePop").hidden&&!$("voicePop").classList.contains("closing"))animHide($("voicePop"))}else if($("voicePop").hidden)animShow($("voicePop"));if(!avail)return;
   $("vtAv").innerHTML=V.pid?[CL.me,...voiceIn(V.pid).filter(u=>u!==CL.me)].slice(0,5).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join(""):"";
   const ctx=V.pid||(isShared(curP())?curP():null);const n=ctx?voiceIn(ctx).filter(u=>u!==CL.me).length+(V.pid?1:0):0;
@@ -4924,13 +4998,14 @@ function drawVoice(){const btn=$("voiceBtn");const shared=[...CL.pids].filter(is
   btn.classList.toggle("on",!!V.pid);btn.classList.toggle("sharing",!!V.screen);btn.classList.toggle("muted",!!V.pid&&V.muted);btn.classList.toggle("talk",!!V.pid&&[...V.speak].some(u=>u!==CL.me));
   const shown=V.pid?n:others;$("voiceN").hidden=!shown;$("voiceN").textContent=shown;btn.title=V.pid?"Sesli oda · "+((proj(V.pid)||{}).name||""):others?others+" kişi sesli odada":"Sesli oda";
   if(!open)return;drawPrev();const B=$("voiceBody");
-  const row=u=>`<div class="vrow"><span class="vav${V.speak.has(u)?" talk":""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?" mut":""}" data-vu="${esc(u)}">${avatar(u)}</span><span class="vn">${esc(u===CL.me?"Sen":pname(u))}</span>${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?`<span class="vmut">${MICOFF_IC}</span>`:""}${(u===CL.me&&V.deaf)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).d?`<span class="vmut">${HPOFF_IC}</span>`:""}</div>`;
+  const row=u=>{const lc=u===CL.me?null:locOf(u);return `<div class="vrow${u!==CL.me?" can":""}${V.follow===u?" fol":""}"${u!==CL.me?` data-vfol="${esc(u)}" title="Tıkla: takip et · sağ tık: ses düzeyi"`:""}><span class="vav${V.speak.has(u)?" talk":""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?" mut":""}" data-vu="${esc(u)}">${avatar(u)}</span><span class="vn"><span>${esc(u===CL.me?"Sen":pname(u))}${pvol(u)<1&&u!==CL.me?` <span class="vloc">· %${Math.round(pvol(u)*100)}</span>`:""}</span>${lc?`<span class="vloc${lc.fx?" fx":""}">${esc(lc.t)}</span>`:u===CL.me&&V.fans.size?`<span class="vloc">${V.fans.size} kişi seni takip ediyor</span>`:""}</span>${V.follow===u?`<span class="vfl">takipte</span>`:""}${pmute(u)?`<span class="vmut">${HPOFF_IC}</span>`:""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?`<span class="vmut">${MICOFF_IC}</span>`:""}${(u===CL.me&&V.deaf)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).d?`<span class="vmut">${HPOFF_IC}</span>`:""}${S.volFor===u?volPop(u):""}</div>`};
   if(V.pid){const ppl=[CL.me,...voiceIn(V.pid).filter(u=>u!==CL.me)];
     B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">${esc((proj(V.pid)||{}).name||"")} · ${ppl.length} kişi</span></div></div>
       <div class="vlist">${ppl.map(row).join("")}</div>
       ${tfRow()}${shareBlock()}
-      <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}" data-vmute title="${V.muted?"Mikrofonu aç":"Mikrofonu kapat"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}
-        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`}
+      <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}${pttOn()?" ptt":""}" data-vmute title="${pttOn()?"Bas-konuş açık · Ctrl+Alt+V basılıyken konuşursun":V.muted?"Mikrofonu aç · Ctrl+Alt+M":"Mikrofonu kapat · Ctrl+Alt+M"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}
+        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>
+      <div class="vkeys">${NOKBD?"":`<span><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>M</kbd> mikrofon · <kbd>D</kbd> kulaklık</span>`}<span class="sp"></span>${NOKBD?"":`<span title="Açıkken mikrofon kapalı durur; Ctrl+Alt+V basılıyken konuşursun">Bas-konuş</span><div class="seg sm" role="group" aria-label="Bas-konuş"><button data-vptt="0" aria-pressed="${!pttOn()}">Kapalı</button><button data-vptt="1" aria-pressed="${pttOn()}">Açık</button></div>`}</div>`}
   else{const ps=cp?[cp]:[];
     if(!cp){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Odaya katılmak için önce ortak bir projeyi aç. Her projenin kendi odası var.</span></div></div>`;return}
     B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Çalışırken ekiple konuş; sayfa değiştirsen de bağlı kalırsın.</span></div></div>
@@ -5001,6 +5076,10 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-vtfgo]")){if(TM.endAt)tPause();else tStart();drawVoice();return}
   if(e.target.closest("[data-vmute]")){voiceMute();return}
   if(e.target.closest("[data-vdeaf]")){voiceDeaf();return}
+  {const b=e.target.closest("[data-vptt]");if(b){setPtt(b.dataset.vptt==="1");return}}
+  if(e.target.closest(".vvolpop")){const mb=e.target.closest("[data-pmute]");if(mb){setPmute(mb.dataset.pmute,!pmute(mb.dataset.pmute));drawVoice()}return}
+  if(S.volFor){S.volFor=null;drawVoice();if(!e.target.closest("[data-vfol]"))return}
+  {const r=e.target.closest("[data-vfol]");if(r){followToggle(r.dataset.vfol);return}}
   const dv=e.target.closest("[data-vdev]");if(dv){e.stopPropagation();const r=dv.getBoundingClientRect();voiceDevMenu(r.left,r.bottom+6);return}
 });
 window.addEventListener("beforeunload",()=>{if(V.pid)voiceLeave()});

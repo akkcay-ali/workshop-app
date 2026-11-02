@@ -323,13 +323,25 @@ pub fn run() {
             let snip = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyW);
             let quick = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::Space);
             let refp = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyR);
+            // sesli oda: Ctrl+Alt+M mikrofon, Ctrl+Alt+D kulaklık, Ctrl+Alt+V basılı tut = konuş
+            let vmute = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyM);
+            let vdeaf = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyD);
+            let vptt = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyV);
             builder = builder.plugin(
                 tauri_plugin_global_shortcut::Builder::new()
                     .with_handler(move |app, sc, ev| {
+                        if sc == &vptt {
+                            let _ = app.emit("vkey", ("ptt", ev.state() == ShortcutState::Pressed));
+                            return;
+                        }
                         if ev.state() != ShortcutState::Pressed {
                             return;
                         }
-                        if sc == &snip {
+                        if sc == &vmute {
+                            let _ = app.emit("vkey", ("mute", true));
+                        } else if sc == &vdeaf {
+                            let _ = app.emit("vkey", ("deaf", true));
+                        } else if sc == &snip {
                             let _ = app.emit("snip", ());
                         } else if sc == &quick {
                             let _ = app.emit("quick", ());
@@ -389,7 +401,7 @@ pub fn run() {
             #[cfg(desktop)]
             {
                 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
-                for code in [Code::KeyW, Code::Space, Code::KeyR] {
+                for code in [Code::KeyW, Code::Space, Code::KeyR, Code::KeyM, Code::KeyD, Code::KeyV] {
                     let _ = _app
                         .global_shortcut()
                         .register(Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), code));
