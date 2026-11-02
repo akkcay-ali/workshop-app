@@ -762,7 +762,7 @@ dependencies = [
 
 [[package]]
 name = "deranged"
-version = "0.6.0"
+version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e9de72ce2ad1f90dc62fa25f0f430ef85eb4b0d8fa0be4f30373bc40a21d28e"
 dependencies = [
@@ -5406,7 +5406,7 @@ checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
 name = "workshop-app"
-version = "0.5.9"
+version = "0.6.0"
 dependencies = [
  "arboard",
  "png 0.17.16",
