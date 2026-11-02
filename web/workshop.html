@@ -5208,16 +5208,19 @@ const HEAD_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke
   $("scrH").addEventListener("pointerup",()=>{d=null})})();
 $("voiceBtn").onclick=e=>{e.stopPropagation();vhOpen(true)};$("vhClose").onclick=()=>vhOpen(false);
 /* paneli sağa iterek kapat: boş bir yerinden tut, sağa sürükle (fare ya da parmak) */
-(()=>{const P=$("voicePop");let d=null;
-  P.addEventListener("pointerdown",e=>{if(e.button!==0||e.target.closest("button,input,select,a,video,.seg,.vrow,[data-vu],.vgrip"))return;d={x:e.clientX,y:e.clientY,id:e.pointerId,dx:0,t:performance.now(),on:false}});
+function swipeClose(P,close,skip){let d=null;
+  P.addEventListener("pointerdown",e=>{if(e.button!==0||e.target.closest("button,input,select,a,video,audio,img,form,.seg,.vrow,[data-vu],.vgrip"+(skip?","+skip:"")))return;d={x:e.clientX,y:e.clientY,id:e.pointerId,dx:0,t:performance.now(),on:false}});
   P.addEventListener("pointermove",e=>{if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x;
     if(!d.on){if(Math.abs(dx)<6)return;if(Math.abs(e.clientY-d.y)>Math.abs(dx)){d=null;return}d.on=true;P.setPointerCapture(d.id);P.classList.add("drag")}
     d.dx=Math.max(-14,dx<0?dx*.25:dx);P.style.transform=`translateX(${d.dx}px)`;P.style.opacity=String(Math.max(.35,1-d.dx/420))});
   const end=e=>{if(!d)return;const was=d;d=null;if(!was.on)return;P.classList.remove("drag");const v=was.dx/Math.max(1,performance.now()-was.t);
     if(was.dx>110||(was.dx>40&&v>.5)){P.classList.add("fling");P.style.transform="translateX(110%)";P.style.opacity="0";
-      setTimeout(()=>{P.classList.remove("fling");P.style.transform="";P.style.opacity="";LS.set("vhub",false);P.hidden=true;$("voiceBtn").setAttribute("aria-expanded","false");drawVoice();drawScreen()},220)}
+      setTimeout(()=>{P.classList.remove("fling");P.style.transform="";P.style.opacity="";P.hidden=true;close()},220)}
     else{P.classList.add("back");P.style.transform="";P.style.opacity="";setTimeout(()=>P.classList.remove("back"),380)}};
-  P.addEventListener("pointerup",end);P.addEventListener("pointercancel",end)})();
+  P.addEventListener("pointerup",end);P.addEventListener("pointercancel",end)}
+swipeClose($("voicePop"),()=>{LS.set("vhub",false);$("voiceBtn").setAttribute("aria-expanded","false");drawVoice();drawScreen()});
+/* yandaki sohbet çekmecesi de sağa itilerek kapanır: sohbet panele geri döner (mesaj satırlarında metin seçimi bozulmasın diye oradan başlamaz) */
+swipeClose($("vchDock"),()=>chatDock(false),".vchl .m");
 /* panelde yayın önizlemesi: büyük pencereyle aynı akış */
 function drawPrev(){let src=null,who=null;const mine=!!(V.screen&&V.screen.getVideoTracks().some(t=>t.readyState==="live"));if(mine){src=V.screen;who=CL.me}else for(const p of V.peers.values())if(p.video&&p.video.getVideoTracks().some(t=>t.readyState==="live"&&!t.muted)){src=p.video;who=p.u;break}
   const w=$("vhPrev"),v=$("vhV");
