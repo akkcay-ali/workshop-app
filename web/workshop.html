@@ -139,7 +139,7 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .npchip .npart .npeq{position:absolute;inset:auto 0 0 0;height:100%;padding:0 6px 5px;justify-content:center;background:linear-gradient(transparent 30%,rgb(0 0 0 / .55))}.npchip .npart .npeq i{background:#fff}
 .npchip .nptm{font-family:var(--f-mono);font-size:11px;color:var(--muted);flex:0 0 auto;font-variant-numeric:tabular-nums}
 .npchip .npbar{position:absolute;left:0;bottom:0;height:2px;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 50%,transparent),var(--accent));border-radius:0 2px 2px 0;transition:width 1s linear}
-.npchip .npart{display:none}.npchip .npface{flex:0 0 auto;image-rendering:pixelated;margin-left:-6px}
+.npchip .npart{display:none}.npchip .npface{flex:0 0 auto;image-rendering:pixelated;margin-left:-6px}.npchip.solo{padding:0 7px;gap:0;max-width:none}.npchip.solo .npface{margin:0}.npchip.solo .nptx,.npchip.solo .nptm,.npchip.solo .npbar{display:none}
 .nppop{width:min(300px,calc(100vw - 32px));display:flex;flex-direction:column;gap:10px;padding:14px}
 .npbig{display:block;border-radius:12px;overflow:hidden;aspect-ratio:1;background:var(--glass);box-shadow:0 18px 40px -18px rgb(0 0 0 / .7)}.npbig img{width:100%;height:100%;object-fit:cover;display:block}
 .npnoart{display:grid;place-items:center;width:100%;height:100%;font-size:40px;color:var(--muted)}.npnoart.sm{width:36px;height:36px;font-size:15px;border-radius:7px;background:var(--glass);flex:0 0 auto}
@@ -3542,15 +3542,17 @@ function npTick(){const n=SPO.now;if(!n||!n.d)return;const p=Math.min(n.d,n.p+(D
 setInterval(npTick,1000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)spoNow(true)});
 function drawSpoNow(){queueMicrotask(npfKick);const el=$("tspo"),t=focusing()?SPO.now:null;el.hidden=!t;if(t)el.innerHTML=(t.img?`<img src="${esc(t.img)}" alt="">`:"♪")+` ${esc(t.n)} — ${esc(t.a)}`;
-  const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=!k;np.classList.toggle("idle",!n);
+  const np=$("npChip"),n=SPO.now,k=n?n.id+n.n:SPO.on()?"idle"+(SPO.err||""):"off";if(np.dataset.k===k)return;np.dataset.k=k;np.hidden=false;np.classList.toggle("idle",!n);np.classList.toggle("solo",!n);
   if(!n){$("npTm").textContent="";$("npBar").style.width="0"}
-  if(!n){if(k){$("npTx").textContent=SPO.err?"Spotify: "+SPO.err:"şu an çalan yok";np.title="Spotify bağlı · son çalınanlar için tıkla"}return}
+  /* çalan yoksa (ya da Spotify bağlı değilse) çip yalnızca yüz kadar küçülür, yüz orada takılır */
+  if(!n){$("npTx").textContent="";np.title=SPO.on()?(SPO.err?"Spotify: "+SPO.err:"Şu an çalan yok · son çalınanlar için tıkla"):"Spotify bağlı değil · Hesap'tan bağlayabilirsin";return}
   $("npTx").innerHTML=`<b>${esc(n.n)}</b> — ${esc(n.a)}`;np.title=n.n+" — "+n.a;
   np.classList.remove("npin");void np.offsetWidth;np.classList.add("npin")}
 /* #np'ye tıklayınca: kapak, tam ad, süre ve son çalınan 5 şarkı (recently-played, 30 sn önbellek) */
 const spoUrl=id=>id&&!/\s/.test(id)?"https://open.spotify.com/track/"+encodeURIComponent(id):"https://open.spotify.com/";
 function agoTxt(at){const m=Math.round((Date.now()-at)/60000);return m<1?"az önce":m<60?m+" dk önce":m<1440?Math.round(m/60)+" sa önce":Math.round(m/1440)+" gün önce"}
 function drawNpPop(){const el=$("npPop");if(el.hidden)return;const n=SPO.now,R=SPO.recent;
+  if(!SPO.on()){el.innerHTML=`<div class="npnone"><b>Spotify bağlı değil</b><br>Bağlayınca şu an çalan burada görünür, odakta dinlediklerin Geçmiş'e yazılır.</div>${cloudAvail()?`<button class="btn sm primary npopen" data-spoacct>${CL.me?"Hesap'tan bağla":"Giriş yap ve bağla"}</button>`:""}`;return}
   el.innerHTML=(n?`<div class="npbig">${n.big||n.img?`<img src="${esc(n.big||n.img)}" alt="">`:`<span class="npnoart">♪</span>`}</div>
     <div class="npmeta"><b>${esc(n.n)}</b><span>${esc(n.a)}</span>${n.al?`<em>${esc(n.al)}</em>`:""}</div>
     <div class="npprog"><i id="nppBar"></i></div><div class="nptimes"><span id="nppTm">0:00</span><span id="nppD">${mmss(n.d||0)}</span></div>`
@@ -3563,9 +3565,9 @@ async function npRecent(){if(SPO.recentT&&Date.now()-SPO.recentT<30000){drawNpPo
 /* masaüstünde Spotify uygulaması açılır (spotify: adresi), yoksa ya da web'de open.spotify.com */
 function spoOpen(id){const web=spoUrl(id),app=id&&!/\s/.test(id)?"spotify:track:"+id:"spotify:";
   if(TA&&TA.opener)TA.opener.openUrl(app).catch(()=>TA.opener.openUrl(web));else window.open(web,"_blank","noopener")}
-$("npPop").addEventListener("click",e=>{const b=e.target.closest("[data-spo]");if(b){spoOpen(b.dataset.spo);closePops()}});
+$("npPop").addEventListener("click",e=>{if(e.target.closest("[data-spoacct]")){e.stopPropagation();closePops();setTimeout(()=>{drawAcct();togglePop("acctPop","acctBtn")},60);return}const b=e.target.closest("[data-spo]");if(b){spoOpen(b.dataset.spo);closePops()}});
 $("npChip").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();const el=$("npPop");const open=el.hidden||el.classList.contains("closing");
-  togglePop("npPop","npChip");if(open){drawNpPop();spoNow(true).then(drawNpPop);npRecent()}});
+  togglePop("npPop","npChip");if(open){drawNpPop();if(SPO.on()){spoNow(true).then(drawNpPop);npRecent()}}});
 /* #np yüzü (piksel, tek renk): 28×22 hücre, çipte 1 hücre = 1 ekran pikseli. Durumlar: idle/sleep/play/change/pause/focus/error; ifadeler arası piksel kaydırmalı geçiş */
 const NPF=(()=>{
 /* daha ince çözünürlük: 28×22 hücre, çipte 1 hücre = 1 ekran pikseli (retina'da 2) → ince, net çizgiler */
