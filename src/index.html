@@ -5077,7 +5077,7 @@ async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||p
 const SQ={"1440p30":{w:2560,h:1440,f:30,b:8000e3,hint:"detail",l:"1440p30"},"1080p60":{w:1920,h:1080,f:60,b:7000e3,hint:"motion",l:"1080p60"},"1080p30":{w:1920,h:1080,f:30,b:4500e3,hint:"detail",l:"1080p30"},
   "720p60":{w:1280,h:720,f:60,b:3500e3,hint:"motion",l:"720p60"},"720p30":{w:1280,h:720,f:30,b:2200e3,hint:"detail",l:"720p30"},"low":{w:854,h:480,f:30,b:1200e3,hint:"detail",l:"480p30"},"480p60":{w:854,h:480,f:60,b:1800e3,hint:"motion",l:"480p60"}};
 /* kalite iki seçimden: çözünürlük × kare hızı */
-/* 2K (1440p) yalnızca 30 fps */
+/* 1440p yalnızca 30 fps */
 const vqKey=(r,f)=>r==="1440p"?"1440p30":r==="480p"&&f===30?"low":r+f;
 const vqParts=k=>{const q=SQ[k]||SQ["1080p30"];return {r:q.h+"p",f:q.f}};
 const sq=()=>SQ[LS.get("vQ","1080p30")]||SQ["1080p30"];
@@ -5372,7 +5372,7 @@ const TF_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-w
 const scrBtn=()=>{const o=sharerOf(V.pid),mine=o===CL.me,oth=o&&!mine;return `<button class="vbtn vscrb${mine?" strong":""}${S.scrOpen?" open":""}" data-vscr title="${mine?"Ekranını paylaşıyorsun · kalite ya da durdur":oth?pname(o)+" ekranını paylaşıyor":"Ekran paylaş"}" aria-label="Ekran paylaşımı" aria-expanded="${!!S.scrOpen}">${SCR_IC}${mine?'<i class="vnsd live"></i>':""}</button>`};
 const tfBtn=()=>`<button class="vbtn${TF.on?" strong":""}" data-vtfb title="${TF.on?"Ekip odağını kapat":"Ekip odağı · odadakilerin sayacı birlikte çalışır"}" aria-label="Ekip odağı" aria-pressed="${TF.on}">${TF_IC}${TF.on?'<i class="vnsd"></i>':""}</button>`;
 function scrPop(){if(!S.scrOpen)return "";const o=sharerOf(V.pid),k=LS.get("vQ","1080p30"),cur=vqParts(k);
-  const seg=`<div class="vqrow"><div class="seg sm vq" role="group" aria-label="Çözünürlük">${["1440p","1080p","720p","480p"].map(r=>`<button data-vq="${vqKey(r,cur.f)}" aria-pressed="${r===cur.r}">${r==="1440p"?"2K":r}</button>`).join("")}</div><div class="seg sm vq" role="group" aria-label="Kare hızı">${[30,60].map(f=>`<button data-vq="${vqKey(cur.r,f)}" aria-pressed="${f===cur.f}"${cur.r==="1440p"&&f===60?` disabled title="2K yalnızca 30 fps"`:""}>${f} fps</button>`).join("")}</div></div>`;
+  const seg=`<div class="vqrow"><div class="seg sm vq" role="group" aria-label="Çözünürlük">${["1440p","1080p","720p","480p"].map(r=>`<button data-vq="${vqKey(r,cur.f)}" aria-pressed="${r===cur.r}">${r}</button>`).join("")}</div><div class="seg sm vq" role="group" aria-label="Kare hızı">${[30,60].map(f=>`<button data-vq="${vqKey(cur.r,f)}" aria-pressed="${f===cur.f}"${cur.r==="1440p"&&f===60?` disabled title="1440p yalnızca 30 fps"`:""}>${f} fps</button>`).join("")}</div></div>`;
   if(o&&o!==CL.me)return `<div class="vnspop vscrpop"><b>Ekran paylaşımı</b><div class="vsrow"><span>${esc(pname(o))} paylaşıyor · aynı anda tek kişi</span>${S.scrHide?`<button class="btn sm" data-swatch>İzle</button>`:""}</div></div>`;
   return `<div class="vnspop vscrpop"><b>${o===CL.me?"Ekranını paylaşıyorsun":"Yayın kalitesi"}</b>${seg}<div class="vsrow"><span class="sp"></span>${o===CL.me?`<button class="btn sm danger" data-sstop>Durdur</button>`:`<button class="btn sm primary" data-sgo>Başlat</button>`}</div></div>`}
 /* yalnızca gerekince görünen ince satırlar: ekip odağı açıksa durum + başlat, paylaşım sürerken kim/kalite */
@@ -5380,8 +5380,8 @@ function tfLine(){if(!TF.on)return "";const run=!!TM.endAt;return `<div class="v
 function shareLine(){const o=sharerOf(V.pid);if(!o)return "";if(o===CL.me)return `<div class="vline">${SCR_IC}<span class="small"><b>Paylaşıyorsun</b> <span id="vsQ">${esc(V.sstat||"")}</span></span></div>`;
   return `<div class="vline">${SCR_IC}<span class="small"><b>${esc(pname(o))}</b> ekranını paylaşıyor</span>${S.scrHide?`<button class="btn sm" data-swatch>İzle</button>`:""}</div>`}
 function shareBlock(){const o=sharerOf(V.pid),k=LS.get("vQ","1080p30");
-  const cur=vqParts(k);const seg=`<div class="vqrow"><div class="seg sm vq" role="group" aria-label="Çözünürlük">${["1440p","1080p","720p","480p"].map(r=>`<button data-vq="${vqKey(r,cur.f)}" aria-pressed="${r===cur.r}">${r==="1440p"?"2K":r}</button>`).join("")}</div>
-    <div class="seg sm vq" role="group" aria-label="Kare hızı">${[30,60].map(f=>`<button data-vq="${vqKey(cur.r,f)}" aria-pressed="${f===cur.f}"${cur.r==="1440p"&&f===60?` disabled title="2K yalnızca 30 fps"`:""}>${f} fps</button>`).join("")}</div></div>`;
+  const cur=vqParts(k);const seg=`<div class="vqrow"><div class="seg sm vq" role="group" aria-label="Çözünürlük">${["1440p","1080p","720p","480p"].map(r=>`<button data-vq="${vqKey(r,cur.f)}" aria-pressed="${r===cur.r}">${r}</button>`).join("")}</div>
+    <div class="seg sm vq" role="group" aria-label="Kare hızı">${[30,60].map(f=>`<button data-vq="${vqKey(cur.r,f)}" aria-pressed="${f===cur.f}"${cur.r==="1440p"&&f===60?` disabled title="1440p yalnızca 30 fps"`:""}>${f} fps</button>`).join("")}</div></div>`;
   if(o===CL.me)return `<div class="vshare on"><div class="vsh">${SCR_IC}<span><b>Ekranını paylaşıyorsun</b><span class="vsq" id="vsQ">${esc(V.sstat||"")}</span></span><span class="sp"></span><button class="btn sm danger" data-sstop>Durdur</button></div>${seg}</div>`;
   if(o)return `<div class="vshare"><div class="vsh">${SCR_IC}<span><b>${esc(pname(o))}</b> ekranını paylaşıyor</span><span class="sp"></span>${S.scrHide?`<button class="btn sm" data-swatch>İzle</button>`:""}</div></div>`;
   /* kalite seçenekleri yalnızca paylaşmaya niyetlenince (Paylaş) ve paylaşırken görünür */
