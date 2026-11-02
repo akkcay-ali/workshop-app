@@ -1216,7 +1216,8 @@ body.frameless .app{padding-top:8px}
   <div class="cfgsec" id="audSec"><span class="small">Ses cihazları · sesli oda ve sesli notlar bunları kullanır</span>
     <label class="audrow"><span>Mikrofon</span><select class="field sm" id="audMic"></select></label>
     <label class="audrow" id="audOutRow"><span>Hoparlör / kulaklık</span><select class="field sm" id="audOut"></select></label>
-    <button class="btn sm" id="audPerm" hidden>Cihaz adlarını göster</button></div>
+    <button class="btn sm" id="audPerm" hidden>Cihaz adlarını göster</button>
+    <button class="sw2" id="pttSw" role="switch" aria-checked="false"><span><b>Bas-konuş</b><span class="small">Sesli odada mikrofon kapalı durur, Ctrl+Alt+V basılıyken konuşursun. Ctrl+Alt+M mikrofonu, Ctrl+Alt+D kulaklığı açıp kapatır.</span></span><span class="tg"></span></button></div>
   <div class="cfgsec" id="spoSec"><span class="small">Spotify · odakta çalan şarkılar Geçmiş'e yazılır</span>
     <div class="row" style="align-items:center"><span class="small" id="spoTxt" style="flex:1"></span><button class="btn sm" id="spoBtn">Bağlan</button></div></div>
   <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
@@ -3688,8 +3689,9 @@ function drawUiScale(){const on=!!window.__UIK;$("uiSec").hidden=!on;if(on)$("ui
 $("uiScale").addEventListener("click",e=>{const b=e.target.closest("[data-uik]");if(!b)return;const k=+b.dataset.uik;LS.set("uiScale",k);window.__UIK=k;
   const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute("content",`width=device-width,initial-scale=${k},minimum-scale=${k},maximum-scale=${k},user-scalable=no,viewport-fit=cover`);drawUiScale();
   setTimeout(()=>{if(curP()&&boardVisible())applyView()},120)});
-function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("pttSw").setAttribute("aria-checked",pttOn());$("pttSw").hidden=NOKBD;$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
+$("pttSw").onclick=()=>{setPtt(!pttOn());$("pttSw").setAttribute("aria-checked",pttOn())};
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
   run(api.set("settings",Object.assign({},c,{type:"settings",hq:v})));drawCfg();toast(v?"Görseller yüksek kalitede eklenecek":"Görseller optimize edilerek eklenecek")};
@@ -5004,8 +5006,7 @@ function drawVoice(){queueMicrotask(drawVChat);const btn=$("voiceBtn");const sha
       <div class="vlist">${ppl.map(row).join("")}</div>
       ${tfRow()}${shareBlock()}
       <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}${pttOn()?" ptt":""}" data-vmute title="${pttOn()?"Bas-konuş açık · Ctrl+Alt+V basılıyken konuşursun":V.muted?"Mikrofonu aç · Ctrl+Alt+M":"Mikrofonu kapat · Ctrl+Alt+M"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}
-        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>
-      <div class="vkeys">${NOKBD?"":`<span><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>M</kbd> mikrofon · <kbd>D</kbd> kulaklık</span>`}<span class="sp"></span>${NOKBD?"":`<span title="Açıkken mikrofon kapalı durur; Ctrl+Alt+V basılıyken konuşursun">Bas-konuş</span><div class="seg sm" role="group" aria-label="Bas-konuş"><button data-vptt="0" aria-pressed="${!pttOn()}">Kapalı</button><button data-vptt="1" aria-pressed="${pttOn()}">Açık</button></div>`}</div>`}
+        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`}
   else{const ps=cp?[cp]:[];
     if(!cp){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Odaya katılmak için önce ortak bir projeyi aç. Her projenin kendi odası var.</span></div></div>`;return}
     B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Çalışırken ekiple konuş; sayfa değiştirsen de bağlı kalırsın.</span></div></div>
