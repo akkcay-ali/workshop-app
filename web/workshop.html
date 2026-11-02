@@ -27,7 +27,7 @@ document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.
   --accent:#D7DEF5; --accent-ink:#121316; --warn:#EFA48F;
   --canvas:rgba(0,0,0,.28); --dot:rgba(255,255,255,.075);
   --paper:#E4E5E8; --paper-ink:#18191C; --paper-ink-2:#5D6068;
-  --t1:#A9BBF2; --t2:#E4C485; --t3:#C7AAEC; --t4:#EC9F9F; --t5:#93CDD6;
+  --t1:#A9BBF2; --t2:#E4C485; --t3:#C7AAEC; --t4:#EC9F9F; --t5:#93CDD6; --t6:#A8D5A2;
   --f-display:"Unbounded", "Geist", system-ui, sans-serif;
   --f-body:"Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -46,7 +46,7 @@ document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.
   --accent:#3E5BD6; --accent-ink:#FFFFFF; --warn:#C4513A;
   --canvas:rgba(255,255,255,.42); --dot:rgba(22,26,40,.13);
   --paper:#FFFFFF; --paper-ink:#18191C; --paper-ink-2:#6A6E78;
-  --t1:#4467DC; --t2:#B07D1E; --t3:#8455CF; --t4:#CC4B45; --t5:#23939F;
+  --t1:#4467DC; --t2:#B07D1E; --t3:#8455CF; --t4:#CC4B45; --t5:#23939F; --t6:#3F8F3A;
   --surface:rgba(250,250,252,.9); --bar:rgba(255,255,255,.8); --field:rgba(22,26,40,.045);
   --frame-bg:rgba(22,26,40,.025); --frame-line:rgba(22,26,40,.2);
   --glow1:rgba(170,182,220,.45); --glow2:rgba(200,190,220,.35); --glow3:rgba(255,255,255,.6);
@@ -56,7 +56,7 @@ document.addEventListener("touchmove",e=>{if(e.touches&&e.touches.length>1&&!(e.
 :root[data-theme="vivid"]{
   --bg:#0C0D12;
   --accent:#9DB0FF; --accent-ink:#0E1020; --warn:#FF8A73;
-  --t1:#7D9BFF; --t2:#FFC14D; --t3:#C08BFF; --t4:#FF6F7D; --t5:#45DCEB;
+  --t1:#7D9BFF; --t2:#FFC14D; --t3:#C08BFF; --t4:#FF6F7D; --t5:#45DCEB; --t6:#7BE38A;
   --glass-3:rgba(157,176,255,.14); --stroke-2:rgba(170,185,255,.2);
   --frame-line:rgba(157,176,255,.32); --frame-bg:rgba(157,176,255,.04);
   --glow1:rgba(110,90,255,.26); --glow2:rgba(0,190,210,.2); --glow3:rgba(255,120,170,.12);
@@ -5234,7 +5234,7 @@ document.addEventListener("click",e=>{
   if(e.target.closest(".vvolpop")){const mb=e.target.closest("[data-pmute]");if(mb){setPmute(mb.dataset.pmute,!pmute(mb.dataset.pmute));drawVoice()}return}
   if(S.volFor){S.volFor=null;drawVoice();if(!e.target.closest("[data-vfol]"))return}
   {const r=e.target.closest("[data-vfol]");if(r){followToggle(r.dataset.vfol);return}}
-  const dv=e.target.closest("[data-vdev]");if(dv){e.stopPropagation();const r=dv.getBoundingClientRect();voiceDevMenu(r.left,r.bottom+6);return}
+  const dv=e.target.closest("[data-vdev]");if(dv){e.stopPropagation();/* açık gürültü seçicisi kapanınca panel yeniden çizilir: güncel düğmeyi ölç */const live=dv.isConnected?dv:$("voicePop").querySelector("[data-vdev]")||dv;const r=live.getBoundingClientRect();voiceDevMenu(r.left,r.bottom+6);return}
 });
 window.addEventListener("beforeunload",()=>{if(V.pid)voiceLeave()});
 const MIC_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5.6" y="1.8" width="4.8" height="8" rx="2.4"/><path d="M3.3 7.6a4.7 4.7 0 009.4 0M8 12.3v2"/></svg>';
