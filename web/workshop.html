@@ -1120,6 +1120,7 @@ body.frameless .app{padding-top:8px}
 .acspo .spost{font-weight:400;font-size:11px;color:var(--muted);margin-left:4px}.acspo.on .spost{color:#1ED760}
 html.wmove,html.wmove *{cursor:move!important;user-select:none}
 .seg button:disabled{opacity:.35;cursor:not-allowed}
+.minr .t .lk{width:12px;height:12px;vertical-align:-1px;opacity:.7}
 </style>
 
 <div class="app">
@@ -2146,7 +2147,15 @@ const CLIPB={docs:null,at:0,src:null,bid:null,n:0,mouse:null,mt:0,last:null};
 stage.addEventListener("pointermove",e=>{CLIPB.mouse=toWorld(e.clientX,e.clientY);CLIPB.mt=Date.now()},{passive:true});
 function copySel(cut){const ids=[...S.selSet];const docs=S.items.filter(i=>i.type==="card"&&ids.includes(i.id)).map(d=>JSON.parse(JSON.stringify(d)));if(!docs.length)return false;
   CLIPB.docs=docs;CLIPB.at=Date.now();CLIPB.src=curP();CLIPB.bid=curBoard();CLIPB.n=0;
-  try{navigator.clipboard&&navigator.clipboard.writeText("workshop:"+CLIPB.at).catch(()=>{})}catch(_){}
+  /* görsel kart kopyalanınca görselin kendisi de sistem panosuna PNG olarak gider (Photoshop vb. uygulamalara yapıştırılabilsin);
+     yanında işaret metni de olur, uygulama içinde yapıştırınca yine kart olarak gelir */
+  const im=docs.find(d=>d.kind==="image"&&d.assetId);const mark="workshop:"+CLIPB.at;
+  try{if(im&&navigator.clipboard&&window.ClipboardItem){
+      const png=(async()=>{const b=await blobOf(im.assetId);if(!b)throw new Error("görsel yok");if(b.type==="image/png")return b;
+        const bm=await createImageBitmap(b),cv=document.createElement("canvas");cv.width=bm.width;cv.height=bm.height;cv.getContext("2d").drawImage(bm,0,0);bm.close&&bm.close();
+        return await new Promise((r,j)=>cv.toBlob(x=>x?r(x):j(new Error("png")),"image/png"))})();
+      navigator.clipboard.write([new ClipboardItem({"image/png":png,"text/plain":new Blob([mark],{type:"text/plain"})})]).catch(()=>navigator.clipboard.writeText(mark).catch(()=>{}))}
+    else if(navigator.clipboard)navigator.clipboard.writeText(mark).catch(()=>{})}catch(_){try{navigator.clipboard.writeText(mark).catch(()=>{})}catch(__){}}
   if(cut){const lk=docs.filter(d=>d.locked).length;deleteSelected();toast((docs.length-lk)+" kart kesildi · başka bir panoya Ctrl+V ile yapıştır",null,true)}
   else toast(docs.length>1?docs.length+" kart kopyalandı · Ctrl+V ile yapıştır":"Kopyalandı · Ctrl+V ile yapıştır",null,true);return true}
 async function pasteCards(){const docs=CLIPB.docs;if(!docs||!api||!boardVisible())return;const pid=curP(),bid=curBoard();
@@ -4730,7 +4739,8 @@ const dShort=d=>{const x=parse(d);return x.getDate()+" "+MSH[x.getMonth()]};
 
 /* ---------- MERKEZ görünümü ---------- */
 function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";renderSub();return}
-  const all=teamOf(pid);const mine=all.filter(t=>t.assignee===CL.me&&statusOf(t)!=="done").sort((a,b)=>STS.findIndex(s=>s[0]===statusOf(b))-STS.findIndex(s=>s[0]===statusOf(a))||(a.date||"9").localeCompare(b.date||"9"));
+  /* Merkez'de bana atanan ekip görevleri + yalnızca benim gördüğüm özel görevler */
+  const all=teamOf(pid);const mine=[...all.filter(t=>t.assignee===CL.me),...tasksOf(pid).filter(t=>t.private)].filter(t=>statusOf(t)!=="done"&&!t.done).sort((a,b)=>STS.findIndex(s=>s[0]===statusOf(b))-STS.findIndex(s=>s[0]===statusOf(a))||(a.date||"9").localeCompare(b.date||"9"));
   const ms=milestones(pid);const next=ms.find(m=>m.date&&m.date>=TODAY)||ms[ms.length-1];
   const prog=m=>{const ts=all.filter(t=>t.milestone===m.id);return {n:ts.length,d:ts.filter(t=>t.done).length,r:ts.filter(t=>statusOf(t)==="review").length}};
   let msH;if(next){const p=prog(next),dd=next.date?daysTo(next.date):null;
@@ -4746,9 +4756,9 @@ function renderHub(){const pid=curP();if(!isShared(pid)){S.sub[pid]="tasks";rend
   $("sHub").innerHTML=`<div class="scroll"><div class="hubw"><div class="hub">
     <section class="block hb"><div class="bhead"><h2>Sıradaki hedef</h2><button class="mini" data-msadd>+ kilometre taşı</button></div>${msH}
       <form class="msform" id="msForm" hidden autocomplete="off"><input class="field" name="n" placeholder="ör. Greybox teslimi" maxlength="60" required><input class="field" name="d" type="date"><button class="btn primary" type="submit">Ekle</button></form></section>
-    <section class="block hb"><div class="bhead"><h2>Bana atananlar</h2><span class="count">${mine.length?mine.length+" açık":""}</span></div>
-      ${mine.length?`<div class="mine">${mine.slice(0,6).map(t=>`<button class="minr" data-topen="${esc(t.id)}">${stPill(statusOf(t))}<span class="t">${esc(t.title)}</span><span class="small">${commentsOf(t.id).length?commentsOf(t.id).length+" yorum":t.date?(t.date===TODAY?"bugün":dShort(t.date)):"tarihsiz"}</span></button>`).join("")}</div>`
-        :`<div class="empty">Sana atanmış açık görev yok.</div>`}</section>
+    <section class="block hb"><div class="bhead"><h2>Görevlerim</h2><span class="count">${mine.length?mine.length+" açık":""}</span></div>
+      ${mine.length?`<div class="mine">${mine.slice(0,8).map(t=>`<button class="minr" data-topen="${esc(t.id)}"${t.private?` title="Özel görev · yalnızca sen görürsün"`:""}>${stPill(statusOf(t))}<span class="t">${t.private?PRIV_IC+" ":""}${esc(t.title)}</span><span class="small">${commentsOf(t.id).length?commentsOf(t.id).length+" yorum":t.date?(t.date===TODAY?"bugün":dShort(t.date)):"tarihsiz"}</span></button>`).join("")}</div>`
+        :`<div class="empty">Sana atanmış ya da kendine yazdığın açık görev yok.</div>`}</section>
     ${briefBlock(pid).replace('class="block brief"','class="block brief hb"')}
     <section class="block hb span2 fixh"><div class="bhead"><h2>İş akışı</h2><button class="mini" data-kanban>Panoyu aç →</button></div>
       ${asgBar(pid)}<div class="mkgrid">${STS.map(s=>col(s[0])).join("")}</div></section>
