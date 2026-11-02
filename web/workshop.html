@@ -3200,7 +3200,8 @@ function finish0(silent){
     else{notify("Mola bitti","Odaklanmaya hazır mısın?");toast("Mola bitti",{label:"Odak başlat",fn:()=>{tSetSec(TM.fdur,"focus");tStart()}})}
     return}
   const ftk=TM.task,fpr=TM.proj;TM.task=null;TM.proj=null;
-  if(TM.cday!==TODAY){TM.cday=TODAY;TM.cycle=0}if(mins>5)TM.cycle++;tSave();
+  if(TM.cday!==TODAY){TM.cday=TODAY;TM.cycle=0}if(mins>5){TM.cycle++;const nw=Date.now();TM.streak=TM.lastF&&nw-TM.lastF<streakWin()?(TM.streak||0)+1:1;TM.lastF=nw;
+    const lv=Math.min(TM.streak,4);if(lv>=2&&TM.streak<=4)setTimeout(()=>toast(["","","İkinci odak üst üste · ısınıyor","Üçüncü odak · alev aldı","Dördüncü odak · tam güç"][lv],null,true),1200)}tSave();
   let rid=null;
   if(ftk||mins>5){if(api&&S.loaded)rid=creditTask(ftk,mins,TODAY,fpr);else{(TM.pend=TM.pend||[]).push([ftk,mins,TODAY,fpr]);tSave()}}
   if(mins>5){const f=LS.get("focus",{});const d=f[TODAY]||{n:0,m:0};d.n++;d.m+=mins;f[TODAY]=d;LS.set("focus",f)}
@@ -3571,7 +3572,7 @@ $("npChip").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();
 /* #np yüzü (piksel, tek renk): 28×22 hücre, çipte 1 hücre = 1 ekran pikseli. Durumlar: idle/sleep/play/change/pause/focus/error; ifadeler arası piksel kaydırmalı geçiş */
 const NPF=(()=>{
 /* daha ince çözünürlük: 28×22 hücre, çipte 1 hücre = 1 ekran pikseli (retina'da 2) → ince, net çizgiler */
-const W=28,H=22,CX=13.5,CY=11.5,RX=9.4,RY=8.6;
+const W=28,H=22,OY=4,CX=13.5,CY=11.5,RX=9.4,RY=8.6;/* OY: alevler için üstte 4 satır pay */
 const inside=(x,y)=>(((x+.5-CX)/RX)**2+((y+.5-CY)/RY)**2)<1;
 /* "piksel-mükemmel" elips: açıyla örneklenir, art arda aynı pikseller ve L köşeleri atılır → her yerde tek piksel kalınlık */
 function arc(cx,cy,rx,ry,a0,a1){const L=[];const n=720;for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n,x=Math.round(cx-.5+rx*Math.cos(a)),y=Math.round(cy-.5+ry*Math.sin(a));const l=L[L.length-1];if(!l||l[0]!==y||l[1]!==x)L.push([y,x])}
@@ -3632,13 +3633,15 @@ for(const S of Object.values(ST))S.seq=S.seq.flatMap(f=>f[0]==="blink"&&f[2]<=13
 const ORDER=["idle","play","change","pause","focus","sleep","error"];
 /* tek renk, yarı saydamlık yok */
 let COL={o:"#B9BDC6",f:"#F4F5F7",h:"#6E727C",n:"#B9BDC6",z:"#6E727C",s:"#B9BDC6"};
-function draw(cv,px,state,t){const c=cv.getContext("2d");c.clearRect(0,0,cv.width,cv.height);const S=ST[state];
+function draw(cv,px,state,t,lvl=0,burst=-1){const c=cv.getContext("2d");c.clearRect(0,0,cv.width,cv.height);const S=ST[state];
   const tot=S.seq.reduce((a,f)=>a+f[2],0);let k=t%tot,fr=S.seq[0];for(const f of S.seq){if(k<f[2]){fr=f;break}k-=f[2]}
+  /* seri yükselince bir an gözler açılır, sırıtır */
+  if(burst>=0&&burst<800)fr=["big","grin",800,fr[3],null];else if(lvl>=3&&!fr[4]&&fr[0]!=="closed")fr=[fr[0],fr[1],fr[2],fr[3],"angry"];
   /* kafa sallama: vuruşta kafa 1 piksel iner, yüz 50 ms gecikmeyle izler (ikincil hareket) */
   const bt=t%420,bob=S.bob&&bt<90?1:0,fbob=S.bob&&bt>=50&&bt<160?1:0;
-  const P=(r,x,color,dy=bob)=>{c.fillStyle=color;c.fillRect(x*px,(r+dy)*px,px,px)};
+  const P=(r,x,color,dy=bob)=>{c.fillStyle=color;c.fillRect(x*px,(r+dy+OY)*px,px,px)};
   const now=performance.now();
-  for(const [r,x] of RING)P(r,x,COL.o);
+  for(const [r,x] of (lvl>=4?RING4:RING))P(r,x,COL.o);
   /* kulaklık kayarak takılır/çıkar: hp 0→1 yaylı, adım adım (piksel ızgarasında kalır) */
   const want=fr[3]?1:0;if(cv._hp==null)cv._hp=want;cv._hp+=(want-cv._hp)*(want?.16:.22);if(Math.abs(want-cv._hp)<.02)cv._hp=want;
   if(cv._hp>.04){const off=Math.round((1-cv._hp)*-8);for(const [r,x] of BAND)P(r+off,x,COL.h);for(const [r,x] of PADS)P(r+Math.round(off*.6),x,COL.h)}
@@ -3651,12 +3654,23 @@ function draw(cv,px,state,t){const c=cv.getContext("2d");c.clearRect(0,0,cv.widt
   if(S.fx==="notes")for(let i=0;i<2;i++){const ph=((t/1600)+i*.5)%1;if(ph>.8)continue;const y=Math.round(12-ph*12);for(const [r,x] of NOTE)P(y+r,23+x+(i?0:-1),COL.n,0)}
   if(S.fx==="z")for(let i=0;i<2;i++){const ph=((t/2200)+i*.5)%1;if(ph>.8)continue;const y=Math.round(6-ph*7);for(const [r,x] of ZZ)P(y+r,21+x+Math.round(ph*2),COL.z,0)}
   if(S.fx==="dots"){const n=Math.floor(t/450)%4;for(let i=0;i<n;i++)P(20,20+i*2,COL.z,0)}
-  if(S.fx==="sweat"){const ph=(t/1700)%1;if(ph<.8)for(const [r,x] of DROP)P(4+Math.round(ph*4)+r,23+x,COL.s,0)}}
+  if(S.fx==="sweat"){const ph=(t/1700)%1;if(ph<.8)for(const [r,x] of DROP)P(4+Math.round(ph*4)+r,23+x,COL.s,0)}
+  if(lvl>=2)fire(P,lvl,t);
+  if(burst>=0&&burst<1400){const q=burst/1400;for(let i=0;i<12;i++){const a=i/12*Math.PI*2,rr=5+q*11;const r=Math.round(CY-.5+Math.sin(a)*rr*.85),x=Math.round(CX-.5+Math.cos(a)*rr);if(q<.85&&(i+Math.floor(burst/70))%3)P(r,x,COL.f,0)}}}
+/* seri alevi: 2 = küçük alev, 3 = üç dil + kıvılcım, 4 = büyük alev, kafa 1 piksel büyür. Titreme ~12 kare/sn (piksel ateş gibi) */
+const RING4=arc(CX,CY,RX,RY,0,Math.PI*2);
+function fire(P,lvl,t){const f=Math.floor(t/85),rnd=(a,b)=>{const x=Math.sin(a*12.9898+b*78.233+f*37.719)*43758.5453;return x-Math.floor(x)};
+  const tg=lvl===2?[[13.5,2.2,4]]:lvl===3?[[10,1.7,4],[13.5,2.3,6],[17,1.7,4]]:[[7.6,1.6,4],[10.6,2,6],[13.5,2.7,8],[16.4,2,6],[19.4,1.6,4]];
+  const top=lvl>=4?3:3,cells=new Map();
+  for(const [cx,hw,h] of tg)for(let x=Math.floor(cx-hw);x<=Math.ceil(cx+hw);x++){const d=Math.abs(x+.5-cx)/hw;if(d>1)continue;const hh=Math.max(1,Math.round(h*(1-d*d)*(.72+.38*rnd(x,cx))));
+    for(let k=0;k<hh;k++){const r=top-k,key=r+","+x,core=k<hh*.55&&d<.55;const o=cells.get(key);if(!o||core)cells.set(key,[r,x,core])}}
+  for(const [r,x,core] of cells.values())P(r,x,core?COL.f:COL.o);
+  if(lvl>=3){const n=lvl>=4?5:2;for(let i=0;i<n;i++){const ph=((t/1000)+i/n)%1;if(ph>.8)continue;const x=Math.round(8+(i*5.3)%12+Math.sin(t/260+i*2));P(Math.round(top-3-ph*5),x,COL.o)}}}
 const near=(L,q)=>{let b=L[0],d=1e9;for(const a of L){const k=(a[0]-q[0])**2+(a[1]-q[1])**2;if(k<d){d=k;b=a}}return b};
 function morph(A,B,e,p){if(p>=1||!A.length)return B;const out=new Map(),put=(a,b)=>{const r=Math.round(a[0]+(b[0]-a[0])*e),x=Math.round(a[1]+(b[1]-a[1])*e);out.set(r+","+x,[r,x])};
   for(const b of B)put(near(A,b),b);if(p<.6)for(const a of A)put(a,near(B,a));return [...out.values()]}
 /* retina'da net: tuvali cihaz pikseline göre büyüt */
-function fit(cv,cell){const d=Math.max(1,Math.round(devicePixelRatio||1));cv.width=W*cell*d;cv.height=H*cell*d;cv.style.width=W*cell+"px";cv.style.height=H*cell+"px";cv.dataset.px=cell*d}
+function fit(cv,cell){const d=Math.max(1,Math.round(devicePixelRatio||1));cv.width=W*cell*d;cv.height=(H+OY)*cell*d;cv.style.width=W*cell+"px";cv.style.height=(H+OY)*cell+"px";cv.dataset.px=cell*d}
 
 return {draw,fit,color:(o,f,h)=>{COL={o,f,h,n:o,z:h,s:o}}}})();
 const NPFS={st:"idle",t0:0,raf:0,chg:0,colT:0};
@@ -3664,7 +3678,11 @@ function npfState(){const n=SPO.now;if(SPO.err&&!n)return "error";if(n)return Da
 function npfLoop(now){NPFS.raf=0;const cv=$("npFace"),chip=$("npChip");if(!cv||chip.hidden||document.hidden)return;
   if(!cv.dataset.px)NPF.fit(cv,1);const st=npfState();if(st!==NPFS.st){NPFS.st=st;NPFS.t0=now}
   if(now-NPFS.colT>1500){NPFS.colT=now;const cs=getComputedStyle(document.documentElement),v=(k,d)=>cs.getPropertyValue(k).trim()||d;NPF.color(v("--ink-2","#B9BDC6"),v("--ink","#F4F5F7"),v("--ink-3",v("--muted","#6E727C")))}
-  NPF.draw(cv,+cv.dataset.px,st,now-NPFS.t0);NPFS.raf=requestAnimationFrame(npfLoop)}
+  const lv=focusStreak();if(lv>(NPFS.lv||0)&&lv>=2)NPFS.burst=now;NPFS.lv=lv;
+  NPF.draw(cv,+cv.dataset.px,st,now-NPFS.t0,lv,NPFS.burst?now-NPFS.burst:-1);NPFS.raf=requestAnimationFrame(npfLoop)}
+/* arka arkaya odak serisi: 2, 3, 4'te karakter değişir (4'ten sonra aynı kalır). Zincir, son odaktan sonra odak+mola+20 dk içinde yeni odak bitmezse kopar */
+const streakWin=()=>((TM.fdur||1500)*2+bDur()+20*60)*1000;
+function focusStreak(){if(!TM.lastF||Date.now()-TM.lastF>streakWin())return 0;const n=Math.min(TM.streak||0,4);return n>=2?n:0}
 function npfKick(){if(!NPFS.raf)NPFS.raf=requestAnimationFrame(npfLoop)}
 document.addEventListener("visibilitychange",npfKick);
 function drawSpo(){const sec=$("spoSec");if(!sec)return;sec.hidden=!CL.sb;sec.classList.toggle("on",SPO.on());$("spoTxt").textContent=SPO.on()?"bağlı":"bağlı değil";$("spoBtn").textContent=SPO.on()?"Bağlantıyı kes":"Bağlan"}
