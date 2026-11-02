@@ -872,7 +872,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vtf.on b{color:var(--accent)}.vtf .btn{flex:0 0 auto}
 .vns{display:flex;align-items:center;gap:10px;padding:10px 2px 2px;border-top:1px solid var(--stroke);margin-top:8px}.vns>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12.5px}.vns b{font-weight:500}
 .vshare{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--stroke);padding:12px 0}.vsh{display:flex;align-items:center;gap:8px}.vsh svg{width:16px;height:16px;color:var(--ink-2)}.vsh b{font-weight:500}.vsh .sp{flex:1}
-.vshare.on .vsh svg{color:#E6A3B4}.vshare .btn.danger{background:#c42b1c;border-color:#c42b1c;color:#fff}.vq{align-self:flex-start}.vq button{padding:4px 8px;font-size:11px}
+.vshare.on .vsh svg{color:#E6A3B4}.vshare .btn.danger{background:#c42b1c;border-color:#c42b1c;color:#fff}.vq{align-self:stretch;display:flex}.vq button{flex:1;padding:4px 4px;font-size:11px;white-space:nowrap}
 .vcb.sharing::after{content:"";position:absolute;left:5px;top:5px;width:7px;height:7px;border-radius:50%;background:#E6604F;box-shadow:0 0 0 2px var(--bar,#111)}
 .scr{position:fixed;right:20px;bottom:20px;z-index:58;width:min(460px,calc(100vw - 40px));border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--stroke-2);box-shadow:0 24px 50px -18px rgb(0 0 0 / .8);display:flex;flex-direction:column;transition:width .35s cubic-bezier(.34,1.3,.64,1)}
 .scr.big{width:min(72vw,1280px)}.scrq{font-family:var(--f-mono);font-size:10.5px;color:rgb(255 255 255 / .55);margin-left:8px;white-space:nowrap}
@@ -4816,8 +4816,8 @@ async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||p
     else if(m.k==="ice"&&p){if(p.pc.remoteDescription)await p.pc.addIceCandidate(m.c).catch(()=>{});else p.pend.push(m.c)}}catch(_){}}
 
 /* ---------- Ekran paylaşımı (aynı anda tek kişi) ---------- */
-const SQ={"1080p30":{w:1920,h:1080,f:30,b:4500e3,hint:"detail",l:"1080p · 30"},"720p30":{w:1280,h:720,f:30,b:2200e3,hint:"detail",l:"720p · 30"},
-  "720p60":{w:1280,h:720,f:60,b:3500e3,hint:"motion",l:"720p · 60"},"low":{w:854,h:480,f:15,b:600e3,hint:"detail",l:"480p · 15"}};
+const SQ={"1080p60":{w:1920,h:1080,f:60,b:7000e3,hint:"motion",l:"1080p60"},"1080p30":{w:1920,h:1080,f:30,b:4500e3,hint:"detail",l:"1080p30"},
+  "720p60":{w:1280,h:720,f:60,b:3500e3,hint:"motion",l:"720p60"},"720p30":{w:1280,h:720,f:30,b:2200e3,hint:"detail",l:"720p30"},"low":{w:854,h:480,f:30,b:1200e3,hint:"detail",l:"480p30"}};
 const sq=()=>SQ[LS.get("vQ","1080p30")]||SQ["1080p30"];
 const sharerOf=pid=>V.screen&&V.pid===pid?CL.me:((CL.here.get(pid)||[]).find(h=>h.s&&h.v)||{}).u||null;
 function applyEnc(snd){const q=sq();try{const pr=snd.getParameters();if(!pr.encodings||!pr.encodings.length)return;pr.encodings[0].maxBitrate=q.b;pr.encodings[0].maxFramerate=q.f;pr.encodings[0].scaleResolutionDownBy=1;pr.encodings[0].priority="high";pr.encodings[0].networkPriority="high";
