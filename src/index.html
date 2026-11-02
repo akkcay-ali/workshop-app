@@ -947,9 +947,11 @@ html.chwin,html.chwin body{height:100%;margin:0;overflow:hidden;background:var(-
 #voicePop .vrow .vav .av{width:30px;height:30px;font-size:13px}
 .vav.talk{box-shadow:0 0 0 2px var(--t5),0 0 12px color-mix(in srgb,var(--t5) 60%,transparent)}.vav.mut{opacity:.55}
 .vctl{display:flex;align-items:center;gap:8px;border-top:1px solid var(--stroke);padding-top:12px;position:relative}
-.vnsb{position:relative}.vnsb svg{width:16px;height:16px}.vnsb.strong{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--stroke-2))}.vnsb.open{background:var(--glass-2,var(--glass))}
+.vnsb,.vbtn{position:relative}.vbtn.strong{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--stroke-2))}.vbtn.open{background:var(--glass-2,var(--glass))}.vnsb svg{width:16px;height:16px}.vnsb.strong{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--stroke-2))}.vnsb.open{background:var(--glass-2,var(--glass))}
 .vnsb.nsoff{color:var(--muted)}.vnsb.nsoff::after{content:"";position:absolute;width:20px;height:1.5px;background:currentColor;transform:rotate(-45deg);border-radius:2px}
-.vnsd{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent)}.vnsd.half{background:none;box-shadow:inset 0 0 0 1.5px var(--accent)}
+.vnsd{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent)}.vscrpop{width:min(300px,100%);gap:8px}.vscrpop .vqrow{display:flex;gap:6px;flex-wrap:wrap;padding:0 4px}.vsrow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:0 4px 2px}.vsrow .sp{flex:1}.vsrow span{flex:1}
+.vnsd.live{background:#E6604F}.vline{display:flex;align-items:center;gap:8px;padding:2px 2px}.vline>svg{width:15px;height:15px;flex:0 0 auto;color:var(--muted)}.vline .small{flex:1;min-width:0;line-height:1.35}.vline .small b{font-weight:600;color:var(--ink)}.vtfl>svg{color:var(--accent)}
+.vnsd.half{background:none;box-shadow:inset 0 0 0 1.5px var(--accent)}
 .vnspop{position:absolute;left:0;top:calc(100% + 6px);z-index:3;width:min(270px,100%);padding:8px;gap:2px;border-radius:12px;background:var(--panel-solid,rgb(24 25 29 / .97));border:1px solid var(--stroke-2);box-shadow:0 16px 36px -14px rgb(0 0 0 / .6);display:flex;flex-direction:column;gap:4px;animation:popIn .35s linear both;transform-origin:20% 0}
 .vnspop b{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.04em;padding:0 6px 4px}
 .vnspop button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;padding:6px 10px;border-radius:9px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
@@ -5167,9 +5169,9 @@ function drawVoice(){queueMicrotask(drawVChat);const btn=$("voiceBtn");const sha
     return `<div class="vrow vic${me_?"":" can"}${V.follow===u?" fol":""}${lc&&lc.fx?" fx":""}"${me_?"":` data-vfol="${esc(u)}"`} title="${esc(tip)}"><span class="vav${V.speak.has(u)?" talk":""}${mu?" mut":""}" data-vu="${esc(u)}">${avatar(u)}</span>${de||pmute(u)?`<span class="vbdg">${HPOFF_IC}</span>`:mu?`<span class="vbdg">${MICOFF_IC}</span>`:""}${S.volFor===u?volPop(u):""}</div>`};
   if(!ctx){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Odalar</h3><span class="small">Ses ve metin odaları ortak projelerde. Önce ortak bir projeyi aç.</span></div></div>`;return}
   const me=V.pid===ctx;const ppl=me?[CL.me,...roomIn().filter(u=>u!==CL.me)]:[];
-  const ctl=`<div class="vlist vics">${ppl.map(row).join("")}</div>${tfRow()}${shareBlock()}
-      <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}${pttOn()?" ptt":""}" data-vmute title="${pttOn()?"Bas-konuş açık · Ctrl+Alt+V basılıyken konuşursun":V.muted?"Mikrofonu aç · Ctrl+Alt+M":"Mikrofonu kapat · Ctrl+Alt+M"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}
-        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`;
+  const ctl=`<div class="vlist vics">${ppl.map(row).join("")}</div>${tfLine()}${shareLine()}
+      <div class="vctl">${nsPop()}${scrPop()}<button class="vbtn${V.muted?" off":""}${pttOn()?" ptt":""}" data-vmute title="${pttOn()?"Bas-konuş açık · Ctrl+Alt+V basılıyken konuşursun":V.muted?"Mikrofonu aç · Ctrl+Alt+M":"Mikrofonu kapat · Ctrl+Alt+M"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}${scrBtn()}${tfBtn()}
+<button class="vbtn" data-vdev title="Ses ayarları · mikrofon ve hoparlör" aria-label="Ses ayarları"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="6" cy="11.5" r="1.5"/></svg></button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`;
   const nameEl=(kind,r,pre)=>S.vren===r.id?`<input class="field vrenin" data-vrenin="${esc(r.id)}" data-vrk="${kind}" value="${esc(r.name)}" maxlength="32">`:`<b>${pre}${esc(r.name)}</b>`;
   const addF=kind=>S.vradd===kind?`<form class="vradd" data-vraddf="${kind}"><input class="field" maxlength="32" placeholder="${kind==="voice"?"Ses odası adı":"metin odası adı"}"><button class="btn sm primary">Ekle</button></form>`:"";
   const vrooms=roomsOf(ctx,"voice").map(r=>{const act=me&&V.room===r.id;const inn=voiceIn(ctx,r.id).filter(u=>u!==CL.me||act);
@@ -5193,6 +5195,18 @@ const nsPop=()=>{if(!S.nsOpen)return "";const m=nsMode();return `<div class="vns
   <button data-vns="strong" aria-pressed="${m==="strong"}"><span>RNNoise · Güçlü</span><em>Klavye, tıklama da tamamen kesilir</em></button></div>`};
 const nsRow=()=>{const on=!!LS.get("vNs",false);return `<div class="vns"><span><b>Gürültü engelleme</b><span class="small">${on?"Güçlü: klavye, tıklama ve arka plan seslerini de azaltır":"Normal: fan ve uğultu gibi sabit sesleri keser"}</span></span>
   <div class="seg sm" role="group" aria-label="Gürültü engelleme"><button data-vns="0" aria-pressed="${!on}">Normal</button><button data-vns="1" aria-pressed="${on}">Güçlü</button></div></div>`};
+/* ekran paylaşımı ve ekip odağı: alt sıradaki simgeler. Paylaş simgesi kalite seçiciyi açar (düğmenin altında), paylaşırken kalite + Durdur */
+const TF_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="9" r="5.3"/><path d="M8 6.2V9l1.8 1.2M6.3 1.8h3.4"/></svg>';
+const scrBtn=()=>{const o=sharerOf(V.pid),mine=o===CL.me,oth=o&&!mine;return `<button class="vbtn vscrb${mine?" strong":""}${S.scrOpen?" open":""}" data-vscr title="${mine?"Ekranını paylaşıyorsun · kalite ya da durdur":oth?pname(o)+" ekranını paylaşıyor":"Ekran paylaş"}" aria-label="Ekran paylaşımı" aria-expanded="${!!S.scrOpen}">${SCR_IC}${mine?'<i class="vnsd live"></i>':""}</button>`};
+const tfBtn=()=>`<button class="vbtn${TF.on?" strong":""}" data-vtfb title="${TF.on?"Ekip odağını kapat":"Ekip odağı · odadakilerin sayacı birlikte çalışır"}" aria-label="Ekip odağı" aria-pressed="${TF.on}">${TF_IC}${TF.on?'<i class="vnsd"></i>':""}</button>`;
+function scrPop(){if(!S.scrOpen)return "";const o=sharerOf(V.pid),k=LS.get("vQ","1080p30"),cur=vqParts(k);
+  const seg=`<div class="vqrow"><div class="seg sm vq" role="group" aria-label="Çözünürlük">${["1080p","720p","480p"].map(r=>`<button data-vq="${vqKey(r,cur.f)}" aria-pressed="${r===cur.r}">${r}</button>`).join("")}</div><div class="seg sm vq" role="group" aria-label="Kare hızı">${[30,60].map(f=>`<button data-vq="${vqKey(cur.r,f)}" aria-pressed="${f===cur.f}">${f} fps</button>`).join("")}</div></div>`;
+  if(o&&o!==CL.me)return `<div class="vnspop vscrpop"><b>Ekran paylaşımı</b><div class="vsrow"><span>${esc(pname(o))} paylaşıyor · aynı anda tek kişi</span>${S.scrHide?`<button class="btn sm" data-swatch>İzle</button>`:""}</div></div>`;
+  return `<div class="vnspop vscrpop"><b>${o===CL.me?"Ekranını paylaşıyorsun":"Yayın kalitesi"}</b>${seg}<div class="vsrow"><span class="sp"></span>${o===CL.me?`<button class="btn sm danger" data-sstop>Durdur</button>`:`<button class="btn sm primary" data-sgo>Başlat</button>`}</div></div>`}
+/* yalnızca gerekince görünen ince satırlar: ekip odağı açıksa durum + başlat, paylaşım sürerken kim/kalite */
+function tfLine(){if(!TF.on)return "";const run=!!TM.endAt;return `<div class="vline vtfl">${TF_IC}<span class="small" id="vtfT">${esc(tfText())}</span><button class="btn sm${run?"":" primary"}" data-vtfgo>${run?"Duraklat":"Başlat"}</button></div>`}
+function shareLine(){const o=sharerOf(V.pid);if(!o)return "";if(o===CL.me)return `<div class="vline">${SCR_IC}<span class="small"><b>Paylaşıyorsun</b> <span id="vsQ">${esc(V.sstat||"")}</span></span></div>`;
+  return `<div class="vline">${SCR_IC}<span class="small"><b>${esc(pname(o))}</b> ekranını paylaşıyor</span>${S.scrHide?`<button class="btn sm" data-swatch>İzle</button>`:""}</div>`}
 function shareBlock(){const o=sharerOf(V.pid),k=LS.get("vQ","1080p30");
   const cur=vqParts(k);const seg=`<div class="vqrow"><div class="seg sm vq" role="group" aria-label="Çözünürlük">${["1080p","720p","480p"].map(r=>`<button data-vq="${vqKey(r,cur.f)}" aria-pressed="${r===cur.r}">${r}</button>`).join("")}</div>
     <div class="seg sm vq" role="group" aria-label="Kare hızı">${[30,60].map(f=>`<button data-vq="${vqKey(cur.r,f)}" aria-pressed="${f===cur.f}">${f} fps</button>`).join("")}</div></div>`;
@@ -5234,12 +5248,15 @@ document.addEventListener("click",e=>{
   {const r=e.target.closest("[data-vjoinr]");if(r&&!r.classList.contains("on")){const pid=hubPid();if(pid)voiceJoin(pid,r.dataset.vjoinr);return}}
   if(e.target.closest("[data-sstart]")){S.sharePick=true;drawVoice();return}
   if(e.target.closest("[data-scancel]")){S.sharePick=false;drawVoice();return}
-  if(e.target.closest("[data-sgo]")){S.sharePick=false;closePops();shareStart().finally(drawVoice);return}
-  if(e.target.closest("[data-sstop]")){shareStop();return}
+  if(e.target.closest("[data-sgo]")){S.sharePick=false;S.scrOpen=false;closePops();shareStart().finally(drawVoice);return}
+  if(e.target.closest("[data-sstop]")){S.scrOpen=false;shareStop();return}
   const vq=e.target.closest("[data-vq]");if(vq){setQuality(vq.dataset.vq);return}
   const vn=e.target.closest("[data-vns]");if(vn){S.nsOpen=false;if(vn.getAttribute("aria-pressed")!=="true")setNs({"0":"normal","1":"strong"}[vn.dataset.vns]||vn.dataset.vns);else drawVoice();return}
-  if(e.target.closest("[data-vnsm]")){S.nsOpen=!S.nsOpen;drawVoice();if(S.nsOpen)requestAnimationFrame(()=>{const q=document.querySelector(".vnspop"),B=$("voiceBody");if(q&&B){const d=q.getBoundingClientRect().bottom-B.getBoundingClientRect().bottom+6;if(d>0)B.scrollTop+=d}});return}
+  if(e.target.closest("[data-vscr]")){S.scrOpen=!S.scrOpen;S.nsOpen=false;drawVoice();if(S.scrOpen)requestAnimationFrame(()=>{const q=document.querySelector(".vscrpop"),B=$("voiceBody");if(q&&B){const d=q.getBoundingClientRect().bottom-B.getBoundingClientRect().bottom+6;if(d>0)B.scrollTop+=d}});return}
+  if(e.target.closest("[data-vtfb]")){tfToggle();return}
+  if(e.target.closest("[data-vnsm]")){S.scrOpen=false;S.nsOpen=!S.nsOpen;drawVoice();if(S.nsOpen)requestAnimationFrame(()=>{const q=document.querySelector(".vnspop"),B=$("voiceBody");if(q&&B){const d=q.getBoundingClientRect().bottom-B.getBoundingClientRect().bottom+6;if(d>0)B.scrollTop+=d}});return}
   if(S.nsOpen&&!e.target.closest(".vnspop")){S.nsOpen=false;drawVoice()}
+  if(S.scrOpen&&!e.target.closest(".vnspop")&&!e.target.closest("[data-vscr]")){S.scrOpen=false;drawVoice()}
   if(e.target.closest("[data-swatch]")||e.target.closest("[data-vhbig]")){S.scrHide=false;S.scrPop=true;if(e.target.closest("[data-vhbig]")){LS.set("scrBig",true);$("scr").classList.add("big")}drawScreen();return}
   if(e.target.closest("[data-scrx]")){if(vhIsOpen())S.scrPop=false;else S.scrHide=true;drawScreen();toast("Büyük pencere gizlendi · yayın sağdaki Ses ve yayın panelinde sürüyor",null,true);return}
   if(e.target.closest("[data-scrsize]")){LS.set("scrBig",$("scr").classList.toggle("big"));return}
