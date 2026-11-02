@@ -4849,12 +4849,16 @@ async function voiceJoin(pid,room){room=room||"main";if(V.pid===pid&&V.room===ro
 function voiceLeave(){if(!V.pid)return;shareStop();tfOff();S.scrHide=false;rtcSend("*",{k:"bye"});for(const u of [...V.peers.keys()])peerClose(u);
   if(V.stream)V.stream.getTracks().forEach(t=>t.stop());V.stream=null;V.meAn=null;const pid=V.pid;V.pid=null;V.speak.clear();cancelAnimationFrame(V.loop);
   V.deaf=false;V.deafMic=false;V.pttDown=false;if(V.follow){V.follow=null;drawFol()}V.fans.clear();presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
-function voiceMute(){if(!V.stream)return;if(V.deaf&&V.muted){voiceDeaf();return}V.muted=!V.muted;V.stream.getAudioTracks().forEach(t=>t.enabled=!V.muted);presTrack(true);drawVoice()}
+/* mikrofon/kulaklık sesi: kendin ve odadakiler duyar (rtc snd; bas-konuşta çalmaz). Kodla üretilen kısa iki nota */
+const VSND={mute:[587,392],unmute:[392,587],deaf:[494,330],undeaf:[330,494]};
+function vSnd(k,other){const f=VSND[k];if(!f||!sndOn())return;ensureAudio();if(!actx)return;try{const t=actx.currentTime+.02,v=other?.07:.1;bell(t,f[0],v);bell(t+.09,f[1],v)}catch(_){}}
+function vSndSend(k){vSnd(k);if(V.pid)rtcSend("*",{k:"snd",s:k})}
+function voiceMute(){if(!V.stream)return;if(V.deaf&&V.muted){voiceDeaf();return}V.muted=!V.muted;V.stream.getAudioTracks().forEach(t=>t.enabled=!V.muted);vSndSend(V.muted?"mute":"unmute");presTrack(true);drawVoice()}
 /* kulaklığı kapat (sağırlaştır): kimseyi duymazsın; mikrofon da kapanır, açınca önceki hâline döner */
 function voiceDeaf(){if(!V.pid)return;V.deaf=!V.deaf;
   if(V.deaf){V.deafMic=!V.muted;if(!V.muted){V.muted=true;V.stream&&V.stream.getAudioTracks().forEach(t=>t.enabled=false)}}
   else if(V.deafMic){V.muted=false;V.stream&&V.stream.getAudioTracks().forEach(t=>t.enabled=true);V.deafMic=false}
-  for(const u of V.peers.keys())applyVol(u);presTrack(true);drawVoice()}
+  vSndSend(V.deaf?"deaf":"undeaf");for(const u of V.peers.keys())applyVol(u);presTrack(true);drawVoice()}
 function chimeJoin(on){if(!sndOn())return;ensureAudio();if(!actx)return;try{const t=actx.currentTime+.02;bell(t,on?660:880,.12);bell(t+.12,on?880:660,.1)}catch(_){}}
 /* bağlantılar: küçük kimlik teklif eder (çakışmayı önler) */
 /* bağlantılar: "kusursuz pazarlık" (perfect negotiation) – iki taraf da teklif yapabilir,
@@ -4877,6 +4881,7 @@ async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||p
   /* odaya giriş/çıkış: presence gecikse ya da kısılsa da bağlantı kurulur */
   if(m.k==="join"){if(!p)peerFor(m.from);rtcSend(m.from,{k:"here"});if(TF.on)rtcSend(m.from,{k:"tf",on:true,tog:1,quiet:1,lead:TF.lead,tm:TM.endAt?tfSnap():null});return}
   if(m.k==="tf"){tfOnRtc(m);return}
+  if(m.k==="snd"){if(!V.deaf&&!pmute(m.from))vSnd(m.s,true);return}
   if(m.k==="fol"){if(m.on){V.fans.add(m.from);toast(pname(m.from)+" seni takip ediyor",null,true);viewSend()}else V.fans.delete(m.from);drawVoice();return}
   if(m.k==="vw"){onView(m);return}
   if(m.k==="here"){if(!p)peerFor(m.from);return}
