@@ -1,5 +1,6 @@
 // Workshop dosyaları için Cloudflare R2 aracısı.
 // Yetki: çağıranın oturumuyla public.r2_can(paths) (üyelik + özel pano sahipliği), Supabase depolamasıyla aynı kural.
+// Sohbet ekleri c/<pid>/… altında (R2 yaşam döngüsü kuralı 7 günde siler).
 // İşlemler: sign (GET/PUT için kısa süreli imzalı adres), del, copy, purge (proje sahibi), migrate (geliştirici, eski dosyaları taşır).
 import { AwsClient } from "npm:aws4fetch@1.0.20";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
@@ -71,11 +72,13 @@ Deno.serve(async (req) => {
       const pid = String(body.pid ?? "");
       const { data: own } = await sb.from("projects").select("id").eq("id", pid).eq("owner", (await sb.auth.getUser()).data.user?.id ?? "").maybeSingle();
       if (!own) return out({ error: "forbidden" }, 403);
-      let token = "", n = 0;
+      let n = 0;
+      for (const prefix of [pid + "/", "c/" + pid + "/"]) {
+      let token = "";
       do {
         const u = new URL(BASE);
         u.searchParams.set("list-type", "2");
-        u.searchParams.set("prefix", pid + "/");
+        u.searchParams.set("prefix", prefix);
         if (token) u.searchParams.set("continuation-token", token);
         const x = await (await r2.fetch(u.toString())).text();
         const keys = [...x.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => m[1]);
@@ -83,6 +86,7 @@ Deno.serve(async (req) => {
         n += keys.length;
         token = (x.match(/<NextContinuationToken>([^<]+)<\/NextContinuationToken>/) ?? [])[1] ?? "";
       } while (token);
+      }
       return out({ ok: true, n });
     }
     if (op === "usage") {
@@ -99,7 +103,7 @@ Deno.serve(async (req) => {
           const key = (m[1].match(/<Key>([^<]+)<\/Key>/) ?? [])[1] ?? "";
           const size = +((m[1].match(/<Size>(\d+)<\/Size>/) ?? [])[1] ?? 0);
           total += size; count++;
-          if (key.startsWith(pid + "/")) { pbytes += size; pfiles++; }
+          if (key.startsWith(pid + "/") || key.startsWith("c/" + pid + "/")) { pbytes += size; pfiles++; }
         }
         token = (x.match(/<NextContinuationToken>([^<]+)<\/NextContinuationToken>/) ?? [])[1] ?? "";
       } while (token);
