@@ -168,12 +168,13 @@ kbd{font-family:var(--f-mono);font-size:10px;padding:1px 5px;border-radius:4px;b
 .ibtn:hover{color:var(--ink);border-color:var(--stroke-2)}
 .ibtn svg{width:15px;height:15px}
 .ibtn[aria-expanded="true"]{background:var(--glass-3);color:var(--ink)}
-.npchip{display:flex;align-items:center;gap:9px;height:40px;top:calc(100% + 24px);padding:0 16px;border-radius:13px;overflow:visible;background:var(--glass);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 rgb(255 255 255 / .05),0 6px 18px -10px rgb(0 0 0 / .6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex:0 1 auto;color:var(--ink-2);font:inherit;font-size:12px;text-decoration:none;position:absolute;left:0;right:0;margin-inline:auto;width:max-content;max-width:min(460px,max(150px,calc(100vw - 1120px)));min-width:0;z-index:30;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.npchip{display:flex;align-items:center;gap:9px;height:46px;top:calc(100% + 21px);padding:0 16px;border-radius:13px;overflow:visible;background:var(--glass);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 rgb(255 255 255 / .05),0 6px 18px -10px rgb(0 0 0 / .6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex:0 1 auto;color:var(--ink-2);font:inherit;font-size:12px;text-decoration:none;position:absolute;left:0;right:0;margin-inline:auto;width:max-content;max-width:min(460px,max(150px,calc(100vw - 1120px)));min-width:0;z-index:30;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .3s cubic-bezier(.34,1.56,.64,1)}
 .npchip .npart{position:relative;width:24px;height:24px;flex:0 0 auto;border-radius:7px;background:rgb(255 255 255 / .06) center/cover no-repeat;display:grid;place-items:center;overflow:hidden}
 .npchip .npart .npeq{position:absolute;inset:auto 0 0 0;height:100%;padding:0 6px 5px;justify-content:center;background:linear-gradient(transparent 30%,rgb(0 0 0 / .55))}.npchip .npart .npeq i{background:#fff}
 .npchip .nptm{font-family:var(--f-mono);font-size:11px;color:var(--muted);flex:0 0 auto;font-variant-numeric:tabular-nums}
 .npchip .npbar{position:absolute;left:8px;max-width:calc(100% - 16px);bottom:0;height:2px;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 50%,transparent),var(--accent));border-radius:0 2px 2px 0;transition:width 1s linear}
-.npchip .npart{display:none}.npchip .npface{flex:0 0 auto;image-rendering:pixelated;margin-left:-8px;align-self:flex-end;margin-bottom:1px}.npchip.solo{padding:0 8px;gap:0;max-width:none}.npchip.solo .npface{margin:0}.npchip.solo .nptx,.npchip.solo .nptm,.npchip.solo .npbar{display:none}
+.npchip .npart{display:none}/* tuvalin üstünde alevler için 6 boş satır var: yüzün kendisi çipin ortasına gelsin diye yukarı kaydırılır */
+.npchip .npface{flex:0 0 auto;image-rendering:pixelated;margin-left:-8px;align-self:center;margin-top:calc(var(--npcell,2px) * -6.5);margin-bottom:calc(var(--npcell,2px) * 0.5)}.npchip.solo{padding:0 6px;gap:0;max-width:none}.npchip.solo .npface{margin-left:0}.npchip.solo .nptx,.npchip.solo .nptm,.npchip.solo .npbar{display:none}
 .nppop{width:min(300px,calc(100vw - 32px));display:flex;flex-direction:column;gap:10px;padding:14px}
 .npbig{display:block;border-radius:12px;overflow:hidden;aspect-ratio:1;background:var(--glass);box-shadow:0 18px 40px -18px rgb(0 0 0 / .7)}.npbig img{width:100%;height:100%;object-fit:cover;display:block}
 .npnoart{display:grid;place-items:center;width:100%;height:100%;font-size:40px;color:var(--muted)}.npnoart.sm{width:36px;height:36px;font-size:15px;border-radius:7px;background:var(--glass);flex:0 0 auto}
@@ -3719,13 +3720,13 @@ function morph(A,B,e,p){if(p>=1||!A.length)return B;const out=new Map(),put=(a,b
   for(const b of B)put(near(A,b),b);if(p<.6)for(const a of A)put(a,near(B,a));return [...out.values()]}
 /* retina'da net: tuvali cihaz pikseline göre büyüt */
 /* net çizim: bir hücre tam sayı kadar ekran pikseli (ölçek %125/%150'de de bulanıklaşmaz); CSS boyutu buna göre hesaplanır */
-function fit(cv,cell){const d=devicePixelRatio||1,px=Math.max(1,Math.round(d*cell));cv.width=W*px;cv.height=(H+OY)*px;cv.style.width=W*px/d+"px";cv.style.height=(H+OY)*px/d+"px";cv.dataset.px=px;cv.dataset.dpr=d}
+function fit(cv,cell){const d=devicePixelRatio||1,px=Math.max(1,Math.round(d*cell));cv.width=W*px;cv.height=(H+OY)*px;cv.style.width=W*px/d+"px";cv.style.height=(H+OY)*px/d+"px";cv.dataset.px=px;cv.dataset.dpr=d;cv.style.setProperty("--npcell",px/d+"px")}
 
 return {draw,fit,color:(o,f,h)=>{COL={o,f,h,n:o,z:h,s:o}}}})();
 const NPFS={st:"idle",t0:0,raf:0,chg:0,colT:0};
 function npfState(){const n=SPO.now;if(SPO.err&&!n)return "error";if(n)return Date.now()<NPFS.chg?"change":focusing()?"focus":"play";if(focusing())return "focus0";if(SPO.paused)return "pause";return Date.now()-(SPO.lastPlay||0)>10*60000?"sleep":"idle"}
 function npfLoop(now){NPFS.raf=0;const cv=$("npFace"),chip=$("npChip");if(!cv||chip.hidden||document.hidden)return;
-  if(!cv.dataset.px||+cv.dataset.dpr!==(devicePixelRatio||1))NPF.fit(cv,1.5);const st=npfState();if(st!==NPFS.st){NPFS.st=st;NPFS.t0=now}
+  if(!cv.dataset.px||+cv.dataset.dpr!==(devicePixelRatio||1))NPF.fit(cv,2);const st=npfState();if(st!==NPFS.st){NPFS.st=st;NPFS.t0=now}
   if(now-NPFS.colT>1500){NPFS.colT=now;const cs=getComputedStyle(document.documentElement),v=(k,d)=>cs.getPropertyValue(k).trim()||d;NPF.color(v("--ink-2","#B9BDC6"),v("--ink","#F4F5F7"),v("--ink-3",v("--muted","#6E727C")))}
   const lv=focusStreak();if(lv>(NPFS.lv||0)&&lv>=2)NPFS.burst=now;NPFS.lv=lv;
   NPF.draw(cv,+cv.dataset.px,st,now-NPFS.t0,lv,NPFS.burst?now-NPFS.burst:-1);NPFS.raf=requestAnimationFrame(npfLoop)}
