@@ -1276,7 +1276,7 @@ body.frameless .app{padding-top:8px}
 <aside class="vhub" id="voicePop" hidden aria-label="Ses ve yayın"><div class="vhh"><b>Ses ve yayın</b><span class="sp"></span><button class="vhx" id="vhClose" title="Paneli gizle" aria-label="Paneli gizle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
   <div class="vhprev" id="vhPrev" hidden><video id="vhV" autoplay playsinline muted></video><div class="vhpb"><span class="dot"></span><span id="vhPl"></span><span class="sp"></span><button class="btn sm" data-vhbig>Büyük izle</button></div></div>
   <div class="vhbody" id="voiceBody"></div>
-  <div class="vchat" id="vChat" hidden><div class="vchl" id="vChL"></div><div class="vchup" id="vChUp" hidden></div><form id="vChF" autocomplete="off"><button class="vclip" type="button" id="vChAtt" title="Dosya ekle · ekler pazartesi silinir" aria-label="Dosya ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2 7.6 8 12.8a3.3 3.3 0 0 1-4.7-4.7l5.6-5.6a2.2 2.2 0 0 1 3.1 3.1L6.5 11.1a1.1 1.1 0 0 1-1.6-1.6L9.8 4.6"/></svg></button><input type="file" id="vChFile" multiple hidden><input class="field" id="vChIn" maxlength="2000" placeholder="Odaya yaz…"><button class="btn sm" type="submit">Gönder</button></form></div></aside>
+  <div class="vchat" id="vChat" hidden><div class="vchl" id="vChL"></div><div class="vchup" id="vChUp" hidden></div><form id="vChF" autocomplete="off"><button class="vclip" type="button" id="vChAtt" title="Dosya ekle · ekler 7 gün sonra silinir" aria-label="Dosya ekle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2 7.6 8 12.8a3.3 3.3 0 0 1-4.7-4.7l5.6-5.6a2.2 2.2 0 0 1 3.1 3.1L6.5 11.1a1.1 1.1 0 0 1-1.6-1.6L9.8 4.6"/></svg></button><input type="file" id="vChFile" multiple hidden><input class="field" id="vChIn" maxlength="2000" placeholder="Odaya yaz…"><button class="btn sm" type="submit">Gönder</button></form></div></aside>
 <div class="folbar" id="folBar" hidden><span class="dot"></span><span id="folT"></span><button class="btn sm" id="folStop">Bırak</button></div>
 <div class="pop" id="bellPop" hidden role="dialog" aria-label="Bildirimler"><div class="bellh"><h3>Bildirimler</h3><button class="mini" id="bellSys" title="Pencere arkadayken sistem bildirimi göster"></button><button class="mini" id="bellAll">tümünü okundu say</button></div><div class="bell" id="bellList"></div></div>
 <div class="sk" id="npk" hidden role="dialog" aria-label="Yeni proje"><div class="skbox npbox"><div class="kbhead"><h2>Yeni proje</h2><button class="btn" id="npClose">Vazgeç <kbd>Esc</kbd></button></div>
@@ -4746,7 +4746,8 @@ const auHTML=()=>`<div class="auw"><button class="aup" data-aplay data-nodrag ar
   <div class="aum"><div class="txt"></div><div class="aubar" data-nodrag><i></i></div><div class="aur"><span class="host"></span><span class="aut mono"></span></div></div></div><a target="_blank" rel="noopener" class="aulink">Aç ↗</a>`;
 
 /* ---------- Sohbet: genel + kişiye özel, haftalık silinir ---------- */
-function weekStartISO(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.toISOString()}
+/* mesajlar ve ekler 7 gün yaşar (sunucuda private.prune_messages, R2 kuralı c/ 7 gün) */
+function weekStartISO(){return new Date(Date.now()-7*864e5).toISOString()}
 const convOf=m=>m.room?"r:"+m.room:m.recipient?(m.sender===CL.me?m.recipient:m.sender):"g";
 const chatKey=(pid,c)=>"chatRead:"+pid+":"+c;
 async function loadMsgs(pid){if(!CL.sb)return;const {data,error}=await CL.sb.from("messages").select("id,project_id,sender,recipient,text,at,room,att").eq("project_id",pid).gte("at",weekStartISO()).order("at").limit(800);
@@ -5007,10 +5008,10 @@ function drawVChat(){const box=$("vChat");const pid=hubPid();const on=!!pid&&!$(
   const l=(CL.msgs.get(pid)||[]).filter(m=>msgRoom(m)===sel).slice(-40);const mx=l.reduce((a,m)=>Math.max(a,m.id),0);if(mx&&mx>LS.get(vtSeenK(pid,sel),0)){LS.set(vtSeenK(pid,sel),mx);queueMicrotask(()=>{const b=document.querySelector(`[data-vtext="${sel}"] .vub`);if(b)b.remove()})}const L=$("vChL");const atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<30;
   /* aynı içerik yeniden çizilmez: oynayan video ya da yüklenen görsel sıfırlanmasın */
   const key=pid+"|"+sel+"|"+l.map(m=>m.id).join(",");if(L.dataset.k===key)return;L.dataset.k=key;
-  L.innerHTML=l.length?l.map(m=>`<div class="m"><b style="color:${pcol(m.sender)}">${esc(m.sender===CL.me?"Sen":pname(m.sender))}</b>${m.att&&m.att.name===m.text?"":esc(m.text)}${attHTML(m.att)}<time>${new Date(m.at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}</time></div>`).join(""):`<span class="e">#${esc(roomName(pid,"text",sel))} odasında bu hafta yazışma yok. Mesajlar ve ekler pazartesi silinir.</span>`;
+  L.innerHTML=l.length?l.map(m=>`<div class="m"><b style="color:${pcol(m.sender)}">${esc(m.sender===CL.me?"Sen":pname(m.sender))}</b>${m.att&&m.att.name===m.text?"":esc(m.text)}${attHTML(m.att)}<time>${new Date(m.at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}</time></div>`).join(""):`<span class="e">#${esc(roomName(pid,"text",sel))} odasında son 7 günde yazışma yok. Mesajlar ve ekler 7 gün sonra silinir.</span>`;
   attFill(L);if(atEnd)L.scrollTop=L.scrollHeight}
 /* sohbet ekleri: yalnızca R2 (c/<pid>/…), Supabase'e düşmez. Görseller her zaman küçültülür (WebP, en çok 2048 px), diğer dosyalar en çok 200 MB.
-   Mesajlar pazartesi silinir; dosyaları R2 yaşam döngüsü kuralı (c/ önekli, 7 gün) siler. */
+   Mesajlar 7 gün sonra silinir; dosyaları R2 yaşam döngüsü kuralı (c/ önekli, 7 gün) siler. */
 const CH_MAX=200*1024*1024,CATT=new Map();
 const FILE_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M4 1.8h5.2L12.5 5v9.2H4z"/><path d="M9 1.8V5.3h3.5"/></svg>';
 const fsize=n=>n<1024?n+" B":n<1048576?Math.round(n/1024)+" KB":(n/1048576).toFixed(n<10485760?1:0).replace(".",",")+" MB";
@@ -5049,13 +5050,13 @@ async function chatUpload(files){const pid=hubPid();if(!pid||!CL.sb||!CL.me)retu
       const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);ok++;drawVChat()}
     catch(e){toast((f0.name||"Dosya")+" yüklenemedi: "+(e.message||e),null,true)}
     finally{UPS.delete(k);drawUps()}}
-  if(ok)toast((ok>1?ok+" dosya":"Dosya")+" yüklendi · sohbet ekleri pazartesi otomatik silinir",null,true)}
-$("vChAtt").onclick=()=>{toast("Ekli dosyalar pazartesi otomatik silinir · görseller küçültülür, sınır 200 MB",null,true);$("vChFile").click()};
+  if(ok)toast((ok>1?ok+" dosya":"Dosya")+" yüklendi · sohbet ekleri 7 gün sonra otomatik silinir",null,true)}
+$("vChAtt").onclick=()=>{toast("Ekli dosyalar 7 gün sonra otomatik silinir · görseller küçültülür, sınır 200 MB",null,true);$("vChFile").click()};
 $("vChFile").onchange=e=>{const fs=[...e.target.files];e.target.value="";if(fs.length)chatUpload(fs)};
 (()=>{const L=$("vChat");L.addEventListener("dragover",e=>{if(![...(e.dataTransfer?.types||[])].includes("Files"))return;e.preventDefault();e.stopPropagation();$("vChL").classList.add("drop")});
   L.addEventListener("dragleave",e=>{if(!L.contains(e.relatedTarget))$("vChL").classList.remove("drop")});
-  L.addEventListener("drop",e=>{$("vChL").classList.remove("drop");if(!e.dataTransfer?.files?.length)return;e.preventDefault();e.stopPropagation();toast("Ekli dosyalar pazartesi otomatik silinir",null,true);chatUpload(e.dataTransfer.files)});
-  $("vChIn").addEventListener("paste",e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();toast("Ekli dosyalar pazartesi otomatik silinir",null,true);chatUpload(fs)}})})();
+  L.addEventListener("drop",e=>{$("vChL").classList.remove("drop");if(!e.dataTransfer?.files?.length)return;e.preventDefault();e.stopPropagation();toast("Ekli dosyalar 7 gün sonra otomatik silinir",null,true);chatUpload(e.dataTransfer.files)});
+  $("vChIn").addEventListener("paste",e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();toast("Ekli dosyalar 7 gün sonra otomatik silinir",null,true);chatUpload(fs)}})})();
 $("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=hubPid();if(!v||!pid)return;i.value="";const sel=vtSel(pid);
   const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:null,text:v,room:sel==="main"?null:sel}).select("id,project_id,sender,recipient,text,at,room,att").single();
   if(error){toast("Mesaj gönderilemedi: "+error.message,null,true);i.value=v;return}const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawVChat();if(curP()===pid)drawChat(pid)});
