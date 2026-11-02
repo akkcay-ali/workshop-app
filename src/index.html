@@ -903,6 +903,7 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vav.talk{box-shadow:0 0 0 2px var(--t5),0 0 12px color-mix(in srgb,var(--t5) 60%,transparent)}.vav.mut{opacity:.55}
 .vctl{display:flex;align-items:center;gap:8px;border-top:1px solid var(--stroke);padding-top:12px;position:relative}
 .vnsb{position:relative}.vnsb svg{width:16px;height:16px}.vnsb.strong{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--stroke-2))}.vnsb.open{background:var(--glass-2,var(--glass))}
+.vnsb.nsoff{color:var(--muted)}.vnsb.nsoff::after{content:"";position:absolute;width:20px;height:1.5px;background:currentColor;transform:rotate(-45deg);border-radius:2px}
 .vnsd{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .vnspop{position:absolute;left:0;bottom:calc(100% + 8px);z-index:3;width:min(270px,100%);padding:10px;border-radius:12px;background:var(--panel-solid,rgb(24 25 29 / .97));border:1px solid var(--stroke-2);box-shadow:0 16px 36px -14px rgb(0 0 0 / .6);display:flex;flex-direction:column;gap:4px;animation:popIn .35s linear both;transform-origin:20% 100%}
 .vnspop b{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.04em;padding:0 6px 4px}
@@ -4766,9 +4767,13 @@ async function rnnWrap(raw){const ctx=new AudioContext({sampleRate:48000});
     t.stop=()=>{stop();raw.getTracks().forEach(x=>x.stop());try{node.port.postMessage("destroy")}catch(_){}ctx.close().catch(()=>{})};
     t.getSettings=()=>rt.getSettings();Object.defineProperty(t,"label",{value:rt.label});dst.stream.rnn=true;return dst.stream}
   catch(e){ctx.close().catch(()=>{});throw e}}
-async function micStream(id){const strong=!!LS.get("vNs",false);const raw=await rawMic(id,!strong);if(!strong)return raw;
+/* üç durum (LS vNsM): off = hiç engelleme, normal = tarayıcının, strong = RNNoise. Eski LS vNs (true = güçlü) okunur */
+const nsMode=()=>{const m=LS.get("vNsM","");return m==="off"||m==="normal"||m==="strong"?m:(LS.get("vNs",false)?"strong":"normal")};
+const NS_TX={off:"Gürültü engelleme kapalı",normal:"Normal gürültü engelleme",strong:"Güçlü gürültü engelleme açık"};
+async function micStream(id){const mode=nsMode();const raw=await rawMic(id,mode==="normal");if(mode!=="strong")return raw;
   try{return await rnnWrap(raw)}catch(e){raw.getTracks().forEach(t=>t.stop());toast("Güçlü gürültü engelleme bu cihazda açılamadı · normal mod",null,true);return rawMic(id,true)}}
-function setNs(on){LS.set("vNs",!!on);drawVoice();if(V.stream)setMic(LS.get("vMic",""),on?"Güçlü gürültü engelleme açık":"Normal gürültü engelleme");else toast(on?"Güçlü gürültü engelleme açık · odaya girince devreye girer":"Normal gürültü engelleme",null,true)}
+function setNs(mode){if(mode===true)mode="strong";else if(mode===false)mode="normal";LS.set("vNsM",mode);LS.set("vNs",mode==="strong");drawVoice();
+  if(V.stream)setMic(LS.get("vMic",""),NS_TX[mode]);else toast(NS_TX[mode]+" · odaya girince devreye girer",null,true)}
 async function setMic(id,msg){if(!V.stream)return;let ns;try{ns=await micStream(id)}catch(e){toast("Mikrofon değiştirilemedi: "+((e&&e.message)||e),null,true);return}
   LS.set("vMic",id);const nt=ns.getAudioTracks()[0];nt.enabled=!V.muted;
   for(const p of V.peers.values()){const snd=p.pc.getSenders().find(x=>x.track&&x.track.kind==="audio");if(snd)await snd.replaceTrack(nt).catch(()=>{})}
@@ -4779,7 +4784,7 @@ async function voiceDevMenu(x,y){let ds=[];try{ds=await navigator.mediaDevices.e
   const curMic=V.stream&&V.stream.getAudioTracks()[0]&&V.stream.getAudioTracks()[0].getSettings().deviceId;const curOut=LS.get("vOut","")||"default";
   const ins=ds.filter(d=>d.kind==="audioinput"&&d.deviceId!=="communications"),outs=ds.filter(d=>d.kind==="audiooutput"&&d.deviceId!=="communications");
   const nm=(d,i,k)=>(d.label||(k+" "+(i+1))).replace(/\s*\([0-9a-f]{4}:[0-9a-f]{4}\)$/i,"");
-  const it=[{label:V.muted?"Mikrofonu aç":"Mikrofonu kapat",fn:voiceMute},{label:"Güçlü gürültü engelleme",on:!!LS.get("vNs",false),fn:()=>setNs(!LS.get("vNs",false))},"-",{label:"MİKROFON",head:true}];
+  const it=[{label:V.muted?"Mikrofonu aç":"Mikrofonu kapat",fn:voiceMute},{label:"Güçlü gürültü engelleme",on:nsMode()==="strong",fn:()=>setNs(nsMode()==="strong"?"normal":"strong")},"-",{label:"MİKROFON",head:true}];
   ins.forEach((d,i)=>it.push({label:nm(d,i,"Mikrofon"),on:d.deviceId===curMic||(!curMic&&d.deviceId==="default"),fn:()=>setMic(d.deviceId)}));
   if(outs.length&&HTMLMediaElement.prototype.setSinkId){it.push("-",{label:"HOPARLÖR / KULAKLIK",head:true});outs.forEach((d,i)=>it.push({label:nm(d,i,"Çıkış"),on:d.deviceId===curOut,fn:()=>setOut(d.deviceId)}))}
   openCtx(x,y,"Ses ayarları",it)}
@@ -4929,10 +4934,11 @@ const tfRow=()=>{const on=TF.on,run=!!TM.endAt;
   ${on?`<button class="btn sm${run?"":" primary"}" data-vtfgo>${run?"Duraklat":"Başlat"}</button>`:""}<div class="seg sm" role="group" aria-label="Ekip odağı"><button data-vtf="0" aria-pressed="${!on}">Kapalı</button><button data-vtf="1" aria-pressed="${on}">Açık</button></div></div>`};
 /* gürültü engelleme: küçük düğme, basınca seçici (Normal = tarayıcı, Güçlü = RNNoise) */
 const NS_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1.8 8h1.6l1.3-3.2 2 7 2-9.6 1.8 7.4 1.2-1.6h2.5"/></svg>';
-const nsBtn=()=>{const on=!!LS.get("vNs",false);return `<button class="vbtn vnsb${on?" strong":""}${S.nsOpen?" open":""}" data-vnsm title="Gürültü engelleme · ${on?"Güçlü":"Normal"}" aria-label="Gürültü engelleme" aria-expanded="${!!S.nsOpen}">${NS_IC}${on?'<i class="vnsd"></i>':""}</button>`};
-const nsPop=()=>{if(!S.nsOpen)return "";const on=!!LS.get("vNs",false);return `<div class="vnspop" role="menu"><b>Gürültü engelleme</b>
-  <button data-vns="0" aria-pressed="${!on}"><span>Normal</span><em>Fan, uğultu gibi sabit sesler</em></button>
-  <button data-vns="1" aria-pressed="${on}"><span>Güçlü · RNNoise</span><em>Klavye, tıklama ve arka plan da kesilir</em></button></div>`};
+const nsBtn=()=>{const m=nsMode();return `<button class="vbtn vnsb${m==="strong"?" strong":m==="off"?" nsoff":""}${S.nsOpen?" open":""}" data-vnsm title="Gürültü engelleme · ${{off:"Kapalı",normal:"Normal",strong:"Güçlü"}[m]}" aria-label="Gürültü engelleme" aria-expanded="${!!S.nsOpen}">${NS_IC}${m==="strong"?'<i class="vnsd"></i>':""}</button>`};
+const nsPop=()=>{if(!S.nsOpen)return "";const m=nsMode();return `<div class="vnspop" role="menu"><b>Gürültü engelleme</b>
+  <button data-vns="off" aria-pressed="${m==="off"}"><span>Kapalı</span><em>Mikrofon olduğu gibi gider (stüdyo mikrofonu, müzik)</em></button>
+  <button data-vns="normal" aria-pressed="${m==="normal"}"><span>Normal</span><em>Fan, uğultu gibi sabit sesler</em></button>
+  <button data-vns="strong" aria-pressed="${m==="strong"}"><span>Güçlü · RNNoise</span><em>Klavye, tıklama ve arka plan da kesilir</em></button></div>`};
 const nsRow=()=>{const on=!!LS.get("vNs",false);return `<div class="vns"><span><b>Gürültü engelleme</b><span class="small">${on?"Güçlü: klavye, tıklama ve arka plan seslerini de azaltır":"Normal: fan ve uğultu gibi sabit sesleri keser"}</span></span>
   <div class="seg sm" role="group" aria-label="Gürültü engelleme"><button data-vns="0" aria-pressed="${!on}">Normal</button><button data-vns="1" aria-pressed="${on}">Güçlü</button></div></div>`};
 function shareBlock(){const o=sharerOf(V.pid),k=LS.get("vQ","1080p30");
@@ -4974,7 +4980,7 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-sgo]")){S.sharePick=false;closePops();shareStart().finally(drawVoice);return}
   if(e.target.closest("[data-sstop]")){shareStop();return}
   const vq=e.target.closest("[data-vq]");if(vq){setQuality(vq.dataset.vq);return}
-  const vn=e.target.closest("[data-vns]");if(vn){S.nsOpen=false;if(vn.getAttribute("aria-pressed")!=="true")setNs(vn.dataset.vns==="1");else drawVoice();return}
+  const vn=e.target.closest("[data-vns]");if(vn){S.nsOpen=false;if(vn.getAttribute("aria-pressed")!=="true")setNs({"0":"normal","1":"strong"}[vn.dataset.vns]||vn.dataset.vns);else drawVoice();return}
   if(e.target.closest("[data-vnsm]")){S.nsOpen=!S.nsOpen;drawVoice();return}
   if(S.nsOpen&&!e.target.closest(".vnspop")){S.nsOpen=false;drawVoice()}
   if(e.target.closest("[data-swatch]")||e.target.closest("[data-vhbig]")){S.scrHide=false;S.scrPop=true;if(e.target.closest("[data-vhbig]")){LS.set("scrBig",true);$("scr").classList.add("big")}drawScreen();return}
