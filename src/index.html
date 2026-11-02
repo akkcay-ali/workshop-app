@@ -903,6 +903,14 @@ body.rdc .rdir{transform:translateX(-104%);opacity:0;pointer-events:none}body.rd
 .vvolpop{position:absolute;right:0;top:calc(100% + 4px);z-index:4;width:220px;padding:10px 12px;border-radius:12px;background:var(--panel-solid,rgb(24 25 29 / .97));border:1px solid var(--stroke-2);box-shadow:0 16px 36px -14px rgb(0 0 0 / .6);display:flex;flex-direction:column;gap:8px;animation:popIn .35s linear both;cursor:default}
 .vvolpop b{font-size:12px;font-weight:500}.vvolpop .r{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)}.vvolpop input[type=range]{flex:1;accent-color:var(--accent)}
 .vkeys{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}.vkeys kbd{font-size:10.5px}.vkeys .sp{flex:1}
+.vsec{display:flex;flex-direction:column;gap:2px}.vsech{display:flex;align-items:center;justify-content:space-between;font-size:10.5px;letter-spacing:.06em;color:var(--muted);padding:2px 6px 4px;font-family:var(--f-mono)}
+.vadd{width:22px;height:22px;border-radius:7px;border:0;background:transparent;color:var(--muted);font-size:16px;line-height:1;cursor:pointer}.vadd:hover{background:var(--glass);color:var(--ink)}
+.vrm,.vtr{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;cursor:pointer;font-size:13px;color:var(--ink-2);transition:background .15s,color .15s;min-width:0}
+.vrm:hover,.vtr:hover{background:var(--glass);color:var(--ink)}.vrm.on,.vtr.on{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--ink)}.vrm.on{cursor:default}
+.vrm b,.vtr b{font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vrm .ic,.vtr .ic{width:16px;flex:0 0 auto;display:grid;place-items:center;color:var(--muted);font-family:var(--f-mono)}.vrm .ic svg{width:15px;height:15px}.vrm.on .ic{color:var(--accent)}
+.vrm .vavs{display:flex}.vrm .vavs .vav{width:20px;height:20px;margin-left:-5px;font-size:10px}.vub{min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--accent);color:#16171B;font-size:10px;font-weight:700;display:grid;place-items:center}
+.vrm+.vlist{margin:6px 0 4px 6px;padding-left:8px;border-left:1px solid var(--stroke)}
+.vradd{display:flex;gap:6px;padding:2px 4px 6px}.vradd .field,.vrenin{flex:1;min-width:0;padding:5px 8px;font-size:12.5px}
 .vchat{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--stroke);padding-top:10px;min-height:0;max-height:42%}.vchl{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin}
 .vchl .m{font-size:12.5px;line-height:1.4;word-break:break-word}.vchl .m b{font-weight:600;margin-right:6px}.vchl .m time{font-size:10.5px;color:var(--muted);margin-left:6px}.vchl .e{font-size:11.5px;color:var(--muted)}
 .vchat form{display:flex;gap:6px}.vchat .field{flex:1;min-width:0;padding:7px 10px;font-size:12.5px}
@@ -3524,7 +3532,7 @@ function drawTimer(){
   const fs=focusStats(),gl=fGoal();$("tstat").textContent=`Bugün ${fs.n}/${gl} odak · ${fmtMin(fs.m)}`+(fs.n>=gl?" · hedef tamam":"");
   $("tgoalF").style.width=Math.min(100,fs.n/gl*100)+"%";$("tgoal").classList.toggle("done",fs.n>=gl);
   ambSync();brkDraw();drawSpoNow();
-  {const t=$("ttf");t.hidden=!TF.on;if(TF.on){const ppl=V.pid?voiceIn(V.pid).filter(u=>u!==CL.me).length:0;const tx="Ekip odağı · "+(ppl?ppl+" kişiyle birlikte":"sesli odada");if(t.textContent!==tx)t.textContent=tx}
+  {const t=$("ttf");t.hidden=!TF.on;if(TF.on){const ppl=roomIn().filter(u=>u!==CL.me).length;const tx="Ekip odağı · "+(ppl?ppl+" kişiyle birlikte":"sesli odada");if(t.textContent!==tx)t.textContent=tx}
    const vt=$("vtfT");if(vt){const tx=tfText();if(vt.textContent!==tx)vt.textContent=tx}if(TF.on&&TF.wasRun!==run_){TF.wasRun=run_;drawVoice()}}
   /* odak çalışmıyorsa ve kronometre çalışıyorsa düğmede kronometre görünür */
   const swOn=!run_&&!!SW.start;$("timerBtn").classList.toggle("sw",swOn);
@@ -4444,7 +4452,7 @@ function presSync(){if(!CL.sb||!CL.me)return;const want=new Set([...CL.pids].fil
   for(const [pid,ch] of CL.pres)if(!want.has(pid)){CL.sb.removeChannel(ch);CL.pres.delete(pid);CL.here.delete(pid)}
   for(const pid of want){if(CL.pres.has(pid))continue;
     const ch=CL.sb.channel("proj:"+pid,{config:{private:true,presence:{key:CL.me}}});CL.pres.set(pid,ch);
-    ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:!!s.v,m:!!s.m,d:!!s.d,s:!!s.s,f:s.f||0});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
+    ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:s.v?(typeof s.v==="string"?s.v:"main"):"",m:!!s.m,d:!!s.d,s:!!s.s,f:s.f||0});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
       .on("broadcast",{event:"rtc"},({payload})=>onRtc(pid,payload))
       .on("broadcast",{event:"hide"},({payload})=>onHide(pid,payload))
       .on("broadcast",{event:"cur"},({payload})=>onCur(pid,payload))
@@ -4456,7 +4464,7 @@ function presTrack(force){if(!CL.me)return;curCheck();if(force){presSent.clear()
 function presFlush(){presT=null;if(!CL.me)return;const pid=curP();const w=pid?subOf(pid):"";let wait=0;
   /* sesli odadayken başka sayfaya geçince de o projede görünmeye devam et */
   for(const [p,ch] of CL.pres){if(ch.state!=="joined")continue;
-    const st=p===pid||p===V.pid?{w:p===pid?w:"",n:pname(CL.me),v:V.pid===p,m:V.pid===p&&V.muted,d:V.pid===p&&!!V.deaf,s:V.pid===p&&!!V.screen,f:focusPres()}:null;
+    const st=p===pid||p===V.pid?{w:p===pid?w:"",n:pname(CL.me),v:V.pid===p?(V.room||"main"):false,m:V.pid===p&&V.muted,d:V.pid===p&&!!V.deaf,s:V.pid===p&&!!V.screen,f:focusPres()}:null;
     const key=st?JSON.stringify(st):"-";const prev=presSent.get(p);if(prev===key||(prev===undefined&&!st))continue;
     const gap=Date.now()-(presAt.get(p)||0);if(gap<1200){wait=Math.max(wait,1200-gap);continue}
     presSent.set(p,key);presAt.set(p,Date.now());try{if(st)ch.track(st);else ch.untrack()}catch(_){}}
@@ -4725,9 +4733,9 @@ const auHTML=()=>`<div class="auw"><button class="aup" data-aplay data-nodrag ar
 
 /* ---------- Sohbet: genel + kişiye özel, haftalık silinir ---------- */
 function weekStartISO(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.toISOString()}
-const convOf=m=>m.recipient?(m.sender===CL.me?m.recipient:m.sender):"g";
+const convOf=m=>m.room?"r:"+m.room:m.recipient?(m.sender===CL.me?m.recipient:m.sender):"g";
 const chatKey=(pid,c)=>"chatRead:"+pid+":"+c;
-async function loadMsgs(pid){if(!CL.sb)return;const {data,error}=await CL.sb.from("messages").select("id,project_id,sender,recipient,text,at").eq("project_id",pid).gte("at",weekStartISO()).order("at").limit(800);
+async function loadMsgs(pid){if(!CL.sb)return;const {data,error}=await CL.sb.from("messages").select("id,project_id,sender,recipient,text,at,room").eq("project_id",pid).gte("at",weekStartISO()).order("at").limit(800);
   if(error)return;CL.msgs.set(pid,data||[]);drawChat(pid)}
 function unreadOf(pid,c){const last=LS.get(chatKey(pid,c),0);return (CL.msgs.get(pid)||[]).filter(m=>convOf(m)===c&&m.sender!==CL.me&&m.id>last).length}
 const CLK_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5.8"/><path d="M8 4.8V8l2.2 1.4"/></svg>';
@@ -4749,16 +4757,19 @@ function drawChatBadge(){document.querySelectorAll(".st[data-sub='hub'] .cbadge"
   const cs=new Set((CL.msgs.get(pid)||[]).map(convOf));let n=0;for(const c of cs){if(!(subOf(pid)==="hub"&&(CL.chatTo.get(pid)||"g")===c))n+=unreadOf(pid,c)}
   const st=document.querySelector(".subtabs .st[data-sub='hub']");if(st&&n)st.insertAdjacentHTML("beforeend",`<span class="cbadge">${n>9?"9+":n}</span>`)}
 async function sendChat(){const i=$("chatIn");const v=i.value.trim();const pid=curP();if(!v||!pid)return;const to=CL.chatTo.get(pid)||"g";i.value="";
-  const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:to==="g"?null:to,text:v}).select("id,project_id,sender,recipient,text,at").single();
+  const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:to==="g"?null:to,text:v}).select("id,project_id,sender,recipient,text,at,room").single();
   if(error){toast("Mesaj gönderilemedi: "+error.message,null,true);i.value=v;return}
   const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawChat(pid)}
 function onMsg(p){const m=p.new;if(!m||!m.id||!CL.pids.has(m.project_id))return;const l=CL.msgs.get(m.project_id);if(l&&l.some(x=>x.id===m.id))return;
   if(l)l.push(m);else{CL.msgs.set(m.project_id,[m])}
-  if(m.project_id===V.pid&&!m.recipient)drawVChat();
+  if(m.room){const pid=m.project_id,seeing=hubPid()===pid&&!$("voicePop").hidden&&vtSel(pid)===m.room;
+    if(seeing)drawVChat();else{drawVoice();if(m.sender!==CL.me)toast(pname(m.sender)+" · #"+roomName(pid,"text",m.room)+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{setVtSel(pid,m.room);vhOpen(true)}})}
+    if(m.sender!==CL.me&&pname(CL.me)&&m.text.includes("@"+pname(CL.me)))teamNotify(pname(m.sender)+" · #"+roomName(pid,"text",m.room),m.text.slice(0,140),true);return}
+  if(hubPid()===m.project_id&&!m.recipient)drawVChat();
   const viewing=curP()===m.project_id&&subOf(m.project_id)==="hub"&&(CL.chatTo.get(m.project_id)||"g")===convOf(m);
   if(m.sender!==CL.me){if(viewing&&document.hasFocus())drawChat(m.project_id);
     else{drawChat(m.project_id);drawChatBadge();const pn=(proj(m.project_id)||{}).name||"";const who=pname(m.sender)+(m.recipient?" (özel)":" · "+pn);
-      if(m.recipient||(!viewing&&!(m.project_id===V.pid&&!$("voicePop").hidden))){toast(who+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{go(m.project_id);S.sub[m.project_id]="hub";CL.chatTo.set(m.project_id,convOf(m));save();renderProject()}});
+      if(m.recipient||(!viewing&&!(m.project_id===hubPid()&&!$("voicePop").hidden&&vtSel(m.project_id)==="main"))){toast(who+": "+m.text.slice(0,80),{label:"Aç",fn:()=>{go(m.project_id);S.sub[m.project_id]="hub";CL.chatTo.set(m.project_id,convOf(m));save();renderProject()}});
         /* sistem bildirimi: özel mesaj ya da adın geçtiyse; genel sohbet her mesajda rahatsız etmesin */
         if(m.recipient||(pname(CL.me)&&m.text.includes("@"+pname(CL.me))))teamNotify(who,m.text.slice(0,140),true)}}}}
 document.addEventListener("click",e=>{const c=e.target.closest("[data-chat]");if(!c)return;const pid=curP();CL.chatTo.set(pid,c.dataset.chat);const L=$("chatList");if(L)delete L.dataset.init;drawChat(pid);setTimeout(()=>{const i=$("chatIn");if(i)i.focus()},0)});
@@ -4769,7 +4780,7 @@ document.addEventListener("submit",e=>{if(e.target.id==="chatForm"){e.preventDef
    üzerinden (broadcast "rtc"). Kim odada: presence durumunda v:true.
    Doğrudan bağlanamayanlar için Cloudflare TURN (edge function turn-ice).
    ===================================================================== */
-const V={pid:null,stream:null,peers:new Map(),muted:false,ice:null,speak:new Set(),actx:null,loop:0,meAn:null,follow:null,fans:new Set(),deaf:false,pttDown:false};
+const V={room:"main",pid:null,stream:null,peers:new Map(),muted:false,ice:null,speak:new Set(),actx:null,loop:0,meAn:null,follow:null,fans:new Set(),deaf:false,pttDown:false};
 /* cihaz seçimi: mikrofon (vMic) ve hoparlör (vOut) bu cihazda hatırlanır */
 function rawMic(id,ns){const a={echoCancellation:true,noiseSuppression:ns,autoGainControl:true};if(id)a.deviceId={exact:id};
   return navigator.mediaDevices.getUserMedia({audio:a,video:false}).catch(e=>{if(id&&(e.name==="OverconstrainedError"||e.name==="NotFoundError")){LS.set("vMic","");return rawMic("",ns)}throw e})}
@@ -4809,14 +4820,16 @@ const STUN=[{urls:"stun:stun.cloudflare.com:3478"},{urls:"stun:stun.l.google.com
 async function iceServers(){if(V.ice&&V.ice.at>Date.now()-(V.ice.list===STUN?60e3:6*3600e3))return V.ice.list;/* TURN alınamadıysa 1 dk sonra yeniden dene */
   try{const {data,error}=await CL.sb.functions.invoke("turn-ice",{body:{}});if(!error&&data&&data.iceServers&&data.iceServers.length){V.ice={at:Date.now(),list:data.iceServers};return data.iceServers}}catch(_){}
   V.ice={at:Date.now(),list:STUN};return STUN}
-const voiceIn=pid=>{const l=CL.here.get(pid)||[];const u=new Set(l.filter(h=>h.v).map(h=>h.u));if(V.pid===pid)for(const k of V.peers.keys())u.add(k);return [...u]};
-async function voiceJoin(pid){if(V.pid===pid)return;if(V.pid)voiceLeave();
+/* odadakiler: room verilirse yalnızca o ses odası */
+const voiceIn=(pid,room)=>{const l=CL.here.get(pid)||[];const u=new Set(l.filter(h=>h.v&&(room==null||h.v===room)).map(h=>h.u));if(V.pid===pid&&(room==null||room===V.room))for(const k of V.peers.keys())u.add(k);return [...u]};
+const roomIn=()=>V.pid?voiceIn(V.pid,V.room):[];
+async function voiceJoin(pid,room){room=room||"main";if(V.pid===pid&&V.room===room)return;if(V.pid)voiceLeave();V.room=room;
   try{V.stream=await micStream(LS.get("vMic",""))}
   catch(e){toast("Mikrofona erişilemedi: "+(e&&e.name==="NotAllowedError"?"izin verilmedi":(e&&e.message)||e),null,true);return}
   V.pid=pid;V.muted=false;await iceServers();
   if(!V.actx)try{V.actx=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}
   V.meAn=analyse(V.stream);if(pttOn()){V.muted=true;V.stream.getAudioTracks().forEach(t=>t.enabled=false)}voiceLoop();presTrack(true);drawVoice();chimeJoin(true);
-  rtcSend("*",{k:"join"});for(const u of voiceIn(pid))if(u!==CL.me)peerFor(u)}
+  rtcSend("*",{k:"join"});for(const u of voiceIn(pid,room))if(u!==CL.me)peerFor(u)}
 function voiceLeave(){if(!V.pid)return;shareStop();tfOff();S.scrHide=false;rtcSend("*",{k:"bye"});for(const u of [...V.peers.keys()])peerClose(u);
   if(V.stream)V.stream.getTracks().forEach(t=>t.stop());V.stream=null;V.meAn=null;const pid=V.pid;V.pid=null;V.speak.clear();cancelAnimationFrame(V.loop);
   V.deaf=false;V.deafMic=false;V.pttDown=false;if(V.follow){V.follow=null;drawFol()}V.fans.clear();presTrack(true);drawVoice();drawScreen();chimeJoin(false);void pid}
@@ -4843,8 +4856,8 @@ function peerFor(u){if(!V.pid||u===CL.me)return null;let p=V.peers.get(u);if(p)r
   pc.onconnectionstatechange=()=>{const st=pc.connectionState;if(st==="failed"){toast(pname(u)+" ile ses bağlantısı kurulamadı"+(V.ice&&V.ice.list===STUN?" · ara sunucu (TURN) ayarlı değil":""),null,true);peerClose(u)}drawVoice()};
   return p}
 function peerClose(u){const p=V.peers.get(u);if(!p)return;try{p.pc.close()}catch(_){}if(p.audio){p.audio.srcObject=null}const hadV=!!p.video;V.peers.delete(u);V.speak.delete(u);drawVoice();if(hadV)drawScreen()}
-function rtcSend(to,msg){const ch=CL.pres.get(V.pid);if(!ch)return;ch.send({type:"broadcast",event:"rtc",payload:Object.assign({to,from:CL.me},msg)})}
-async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||pid!==V.pid||!V.stream)return;let p=V.peers.get(m.from);
+function rtcSend(to,msg){const ch=CL.pres.get(V.pid);if(!ch)return;ch.send({type:"broadcast",event:"rtc",payload:Object.assign({to,from:CL.me,room:V.room||"main"},msg)})}
+async function onRtc(pid,m){if(!m||m.from===CL.me||(m.to!==CL.me&&m.to!=="*")||pid!==V.pid||!V.stream)return;if((m.room||"main")!==(V.room||"main"))return;let p=V.peers.get(m.from);
   /* odaya giriş/çıkış: presence gecikse ya da kısılsa da bağlantı kurulur */
   if(m.k==="join"){if(!p)peerFor(m.from);rtcSend(m.from,{k:"here"});if(TF.on)rtcSend(m.from,{k:"tf",on:true,tog:1,quiet:1,lead:TF.lead,tm:TM.endAt?tfSnap():null});return}
   if(m.k==="tf"){tfOnRtc(m);return}
@@ -4865,7 +4878,7 @@ const SQ={"1080p60":{w:1920,h:1080,f:60,b:7000e3,hint:"motion",l:"1080p60"},"108
 const vqKey=(r,f)=>r==="480p"&&f===30?"low":r+f;
 const vqParts=k=>{const q=SQ[k]||SQ["1080p30"];return {r:q.h+"p",f:q.f}};
 const sq=()=>SQ[LS.get("vQ","1080p30")]||SQ["1080p30"];
-const sharerOf=pid=>V.screen&&V.pid===pid?CL.me:((CL.here.get(pid)||[]).find(h=>h.s&&h.v)||{}).u||null;
+const sharerOf=pid=>V.screen&&V.pid===pid?CL.me:((CL.here.get(pid)||[]).find(h=>h.s&&h.v&&(V.pid!==pid||h.v===V.room))||{}).u||null;
 function applyEnc(snd){const q=sq();try{const pr=snd.getParameters();if(!pr.encodings||!pr.encodings.length)return;pr.encodings[0].maxBitrate=q.b;pr.encodings[0].maxFramerate=q.f;pr.encodings[0].scaleResolutionDownBy=1;pr.encodings[0].priority="high";pr.encodings[0].networkPriority="high";
   pr.degradationPreference=q.hint==="motion"?"maintain-framerate":"maintain-resolution";snd.setParameters(pr).catch(()=>{})}catch(_){}}
 async function shareStart(){if(!V.pid)return;const o=sharerOf(V.pid);if(o&&o!==CL.me){toast(pname(o)+" şu an ekranını paylaşıyor",null,true);return}
@@ -4917,7 +4930,7 @@ function drawScreen(){const w=$("scr");let src=null,who=null;for(const p of V.pe
   const v=$("scrV");if(v.srcObject!==src){v.srcObject=src;v.play().catch(()=>{})}$("scrT").textContent=pname(who)+" ekranını paylaşıyor";
   if(w.hidden){if(LS.get("scrBig",true))w.classList.add("big");animShow(w);statsLoop()}drawVoice()}
 /* odadaki kişiler değişince bağlan / kopar */
-function voiceSync(pid){if(V.pid!==pid)return;const inn=new Set(voiceIn(pid));for(const u of inn)if(u!==CL.me&&!V.peers.has(u))peerFor(u);
+function voiceSync(pid){if(V.pid!==pid)return;const inn=new Set(voiceIn(pid,V.room));for(const u of inn)if(u!==CL.me&&!V.peers.has(u))peerFor(u);
   /* presence'ta görünmeyen kişiyi yalnızca bağlantısı da kopmuşsa kapat (çıkış "bye" ile gelir) */
   for(const [u,p] of [...V.peers])if(!inn.has(u)&&["failed","closed","disconnected"].includes(p.pc.connectionState))peerClose(u)}
 /* konuşan kişiyi göster */
@@ -4940,8 +4953,13 @@ function setPvol(u,v){const m=LS.get("vVol",{});m[u]=v;LS.set("vVol",m);applyVol
 function setPmute(u,on){const m=LS.get("vPm",{});if(on)m[u]=1;else delete m[u];LS.set("vPm",m);applyVol(u)}
 const volPop=u=>`<div class="vvolpop"><b>${esc(pname(u))}</b><div class="r"><span>Ses</span><input type="range" min="0" max="100" value="${Math.round(pvol(u)*100)}" data-pvol="${esc(u)}"><span>%${Math.round(pvol(u)*100)}</span></div>
   <button class="btn sm" data-pmute="${esc(u)}">${pmute(u)?"Sesini aç":"Bu kişiyi sessize al"}</button></div>`;
+$("voiceBody").addEventListener("submit",e=>{const f=e.target.closest("[data-vraddf]");if(!f)return;e.preventDefault();const pid=hubPid();addRoom(pid,f.dataset.vraddf,f.querySelector("input").value);S.vradd=null;drawVoice()});
+$("voiceBody").addEventListener("keydown",e=>{const i=e.target.closest("[data-vrenin]");const f=e.target.closest(".vradd");
+  if(f&&e.key==="Escape"){S.vradd=null;drawVoice();return}if(!i)return;
+  if(e.key==="Enter"){e.preventDefault();const v=i.value.trim().slice(0,32);const id=i.dataset.vrenin;S.vren=null;if(v)run(api.update(id,{name:v}));drawVoice()}else if(e.key==="Escape"){S.vren=null;drawVoice()}});
+$("voiceBody").addEventListener("focusout",e=>{if(e.target.closest("[data-vrenin]")&&S.vren){setTimeout(()=>{if(S.vren&&!document.activeElement?.closest?.("[data-vrenin]")){S.vren=null;drawVoice()}},120)}});
 $("voiceBody").addEventListener("input",e=>{const r=e.target.closest("[data-pvol]");if(!r)return;setPvol(r.dataset.pvol,r.value/100);const t=r.nextElementSibling;if(t)t.textContent="%"+r.value});
-$("voiceBody").addEventListener("contextmenu",e=>{const r=e.target.closest("[data-vfol]");if(!r)return;e.preventDefault();S.volFor=S.volFor===r.dataset.vfol?null:r.dataset.vfol;drawVoice()});
+$("voiceBody").addEventListener("contextmenu",e=>{const rm=e.target.closest("[data-vrid]");if(rm&&!e.target.closest("[data-vfol]")){roomMenu(e,hubPid(),rm.dataset.vrk,rm.dataset.vrid);return}const r=e.target.closest("[data-vfol]");if(!r)return;e.preventDefault();S.volFor=S.volFor===r.dataset.vfol?null:r.dataset.vfol;drawVoice()});
 /* bas-konuş (LS vPtt): açıkken mikrofon kapalı durur, Ctrl+Alt+V basılıyken açılır */
 const pttOn=()=>!!LS.get("vPtt",false);
 function micSet(on){if(!V.stream)return;V.muted=!on;V.stream.getAudioTracks().forEach(t=>t.enabled=on);presTrack(true);drawVoice()}
@@ -4971,13 +4989,14 @@ function onView(m){if(V.follow!==m.from)return;if(m.out){$("folT").textContent=p
 stage.addEventListener("pointerdown",()=>{if(V.follow)followStop("Takip bırakıldı")},true);
 stage.addEventListener("wheel",()=>{if(V.follow)followStop("Takip bırakıldı")},{capture:true,passive:true});
 /* oda sohbeti: projenin genel sohbeti, sesli odadayken panelin altında */
-function drawVChat(){const box=$("vChat");const on=!!V.pid&&!$("voicePop").hidden;box.hidden=!on;if(!on)return;
-  if(!CL.msgs.has(V.pid)){loadMsgs(V.pid);$("vChL").innerHTML=`<span class="e">yükleniyor…</span>`;return}
-  const l=(CL.msgs.get(V.pid)||[]).filter(m=>!m.recipient).slice(-30);const L=$("vChL");const atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<30;
-  L.innerHTML=l.length?l.map(m=>`<div class="m"><b style="color:${pcol(m.sender)}">${esc(m.sender===CL.me?"Sen":pname(m.sender))}</b>${esc(m.text)}<time>${new Date(m.at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}</time></div>`).join(""):`<span class="e">Bu hafta odada yazışma yok. Yazdıkların Merkez'deki genel sohbete de düşer.</span>`;
+function drawVChat(){const box=$("vChat");const pid=hubPid();const on=!!pid&&!$("voicePop").hidden&&!!LS.get("vhub",false);box.hidden=!on;if(!on)return;
+  const sel=vtSel(pid);$("vChIn").placeholder="#"+roomName(pid,"text",sel)+" odasına yaz…";
+  if(!CL.msgs.has(pid)){loadMsgs(pid);$("vChL").innerHTML=`<span class="e">yükleniyor…</span>`;return}
+  const l=(CL.msgs.get(pid)||[]).filter(m=>msgRoom(m)===sel).slice(-40);const mx=l.reduce((a,m)=>Math.max(a,m.id),0);if(mx&&mx>LS.get(vtSeenK(pid,sel),0)){LS.set(vtSeenK(pid,sel),mx);queueMicrotask(()=>{const b=document.querySelector(`[data-vtext="${sel}"] .vub`);if(b)b.remove()})}const L=$("vChL");const atEnd=L.scrollHeight-L.scrollTop-L.clientHeight<30;
+  L.innerHTML=l.length?l.map(m=>`<div class="m"><b style="color:${pcol(m.sender)}">${esc(m.sender===CL.me?"Sen":pname(m.sender))}</b>${esc(m.text)}<time>${new Date(m.at).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}</time></div>`).join(""):`<span class="e">#${esc(roomName(pid,"text",sel))} odasında bu hafta yazışma yok.${sel==="main"?" Burası Merkez'deki genel sohbetle aynı.":""}</span>`;
   if(atEnd)L.scrollTop=L.scrollHeight}
-$("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=V.pid;if(!v||!pid)return;i.value="";
-  const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:null,text:v}).select("id,project_id,sender,recipient,text,at").single();
+$("vChF").addEventListener("submit",async e=>{e.preventDefault();const i=$("vChIn"),v=i.value.trim(),pid=hubPid();if(!v||!pid)return;i.value="";const sel=vtSel(pid);
+  const {data,error}=await CL.sb.from("messages").insert({project_id:pid,recipient:null,text:v,room:sel==="main"?null:sel}).select("id,project_id,sender,recipient,text,at,room").single();
   if(error){toast("Mesaj gönderilemedi: "+error.message,null,true);i.value=v;return}const l=CL.msgs.get(pid)||[];if(!l.some(m=>m.id===data.id))l.push(data);CL.msgs.set(pid,l);drawVChat();if(curP()===pid)drawChat(pid)});
 function voiceLoop(){let last=0;const tick=t=>{if(!V.pid)return;V.loop=requestAnimationFrame(tick);if(t-last<120)return;last=t;
   {const mb=document.querySelector("[data-vmute]");if(mb)mb.style.setProperty("--lvl",V.muted?0:Math.min(1,level(V.meAn)/55).toFixed(2))}
@@ -4991,27 +5010,46 @@ function voiceBar(pid){const inn=voiceIn(pid).filter(u=>u!==CL.me);const me=V.pi
   return `<div class="vbar"><span class="vl">${MIC_IC}${inn.length?`<span><b>${inn.length} kişi</b> sesli odada</span>`:"<span>Sesli oda boş</span>"}</span><span class="vavs">${avs}</span><span class="sp"></span><button class="btn sm primary" data-vjoin>Sesli katıl</button></div>`}
 const vhIsOpen=()=>!$("voicePop").hidden&&!$("voicePop").classList.contains("closing");
 function vhOpen(on){if(on)closePops();LS.set("vhub",!!on);$("voiceBtn").setAttribute("aria-expanded",!!on);if(on)animShow($("voicePop"));else animHide($("voicePop"));drawVoice();drawScreen()}
+/* ===== odalar: her projede "Genel" ses ve "genel" metin odası hazır; ekip yenilerini ekler (öğe type:"room", kind voice|text) ===== */
+const ROOM_DEF={voice:{id:"main",name:"Genel",def:true},text:{id:"main",name:"genel",def:true}};
+const roomsOf=(pid,kind)=>[ROOM_DEF[kind],...S.items.filter(i=>i.type==="room"&&i.project===pid&&i.kind===kind&&!i.deleted).sort((a,b)=>(a.created||0)-(b.created||0))];
+const roomName=(pid,kind,id)=>(roomsOf(pid,kind).find(r=>r.id===id)||{name:id==="main"?ROOM_DEF[kind].name:"oda"}).name;
+const hubPid=()=>V.pid||(isShared(curP())?curP():null);
+const vtSel=pid=>{const r=LS.get("vtxt",{})[pid]||"main";return roomsOf(pid,"text").some(x=>x.id===r)?r:"main"};
+function setVtSel(pid,r){const m=LS.get("vtxt",{});m[pid]=r;LS.set("vtxt",m);drawVoice()}
+const msgRoom=m=>m.recipient?null:(m.room||"main");
+const vtSeenK=(pid,r)=>"vts:"+pid+":"+r;
+function vtUnread(pid,r){const last=LS.get(vtSeenK(pid,r),0);return (CL.msgs.get(pid)||[]).filter(m=>msgRoom(m)===r&&m.sender!==CL.me&&m.id>last).length}
+const canRoom=(pid,r)=>!r.def&&(r.by===CL.me||isAdmin(pid));
+const SPK_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2h2.2L8 3.5v9L4.7 9.8H2.5z"/><path d="M10.8 5.6a3.4 3.4 0 010 4.8M12.6 3.8a6 6 0 010 8.4"/></svg>';
+function addRoom(pid,kind,name){name=(name||"").trim().slice(0,32);if(!name||!api)return;run(api.add({type:"room",project:pid,kind,name,by:CL.me,created:Date.now()})).then(r=>{if(kind==="text"&&r&&r.id)setVtSel(pid,r.id)})}
+function roomMenu(e,pid,kind,id){const r=roomsOf(pid,kind).find(x=>x.id===id);if(!r||!canRoom(pid,r))return;e.preventDefault();
+  openCtx(e.clientX,e.clientY,(kind==="voice"?"Ses odası · ":"# ")+r.name,[{label:"Yeniden adlandır",fn:()=>{S.vren=id;drawVoice();setTimeout(()=>{const i=document.querySelector("[data-vrenin]");if(i){i.focus();i.select()}},30)}},
+    {label:"Odayı sil",danger:true,fn:()=>{run(api.remove(id));if(kind==="text"&&vtSel(pid)===id)setVtSel(pid,"main");if(kind==="voice"&&V.room===id&&V.pid===pid)toast("Oda silindi · bağlantın sürüyor, istersen Genel'e geç",null,true)}}])}
 function drawVoice(){queueMicrotask(drawVChat);const btn=$("voiceBtn");const shared=[...CL.pids].filter(isShared);const avail=!!CL.me&&!!shared.length;const open=avail&&!!LS.get("vhub",false);
   btn.hidden=!avail||open;if(!avail||!open){if(!$("voicePop").hidden&&!$("voicePop").classList.contains("closing"))animHide($("voicePop"))}else if($("voicePop").hidden)animShow($("voicePop"));if(!avail)return;
-  $("vtAv").innerHTML=V.pid?[CL.me,...voiceIn(V.pid).filter(u=>u!==CL.me)].slice(0,5).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join(""):"";
-  const ctx=V.pid||(isShared(curP())?curP():null);const n=ctx?voiceIn(ctx).filter(u=>u!==CL.me).length+(V.pid?1:0):0;
+  $("vtAv").innerHTML=V.pid?[CL.me,...roomIn().filter(u=>u!==CL.me)].slice(0,5).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join(""):"";
+  const ctx=hubPid();const n=V.pid?roomIn().filter(u=>u!==CL.me).length+1:ctx?voiceIn(ctx).filter(u=>u!==CL.me).length:0;
   /* odaya yalnızca açık olan ortak projeden girilir; başka projelerin odası burada görünmez */
   const cp=isShared(curP())?curP():null;const others=cp?voiceIn(cp).filter(u=>u!==CL.me).length:0;
   btn.classList.toggle("on",!!V.pid);btn.classList.toggle("sharing",!!V.screen);btn.classList.toggle("muted",!!V.pid&&V.muted);btn.classList.toggle("talk",!!V.pid&&[...V.speak].some(u=>u!==CL.me));
-  const shown=V.pid?n:others;$("voiceN").hidden=!shown;$("voiceN").textContent=shown;btn.title=V.pid?"Sesli oda · "+((proj(V.pid)||{}).name||""):others?others+" kişi sesli odada":"Sesli oda";
+  const shown=V.pid?n:others;$("voiceN").hidden=!shown;$("voiceN").textContent=shown;btn.title=V.pid?"Ses odası · "+roomName(V.pid,"voice",V.room)+" · "+((proj(V.pid)||{}).name||""):others?others+" kişi sesli odada":"Sesli oda";
   if(!open)return;drawPrev();const B=$("voiceBody");
   const row=u=>{const lc=u===CL.me?null:locOf(u);return `<div class="vrow${u!==CL.me?" can":""}${V.follow===u?" fol":""}"${u!==CL.me?` data-vfol="${esc(u)}" title="Tıkla: takip et · sağ tık: ses düzeyi"`:""}><span class="vav${V.speak.has(u)?" talk":""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?" mut":""}" data-vu="${esc(u)}">${avatar(u)}</span><span class="vn"><span>${esc(u===CL.me?"Sen":pname(u))}${pvol(u)<1&&u!==CL.me?` <span class="vloc">· %${Math.round(pvol(u)*100)}</span>`:""}</span>${lc?`<span class="vloc${lc.fx?" fx":""}">${esc(lc.t)}</span>`:u===CL.me&&V.fans.size?`<span class="vloc">${V.fans.size} kişi seni takip ediyor</span>`:""}</span>${V.follow===u?`<span class="vfl">takipte</span>`:""}${pmute(u)?`<span class="vmut">${HPOFF_IC}</span>`:""}${(u===CL.me&&V.muted)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).m?`<span class="vmut">${MICOFF_IC}</span>`:""}${(u===CL.me&&V.deaf)||((CL.here.get(V.pid)||[]).find(h=>h.u===u)||{}).d?`<span class="vmut">${HPOFF_IC}</span>`:""}${S.volFor===u?volPop(u):""}</div>`};
-  if(V.pid){const ppl=[CL.me,...voiceIn(V.pid).filter(u=>u!==CL.me)];
-    B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">${esc((proj(V.pid)||{}).name||"")} · ${ppl.length} kişi</span></div></div>
-      <div class="vlist">${ppl.map(row).join("")}</div>
-      ${tfRow()}${shareBlock()}
+  if(!ctx){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Odalar</h3><span class="small">Ses ve metin odaları ortak projelerde. Önce ortak bir projeyi aç.</span></div></div>`;return}
+  const me=V.pid===ctx;const ppl=me?[CL.me,...roomIn().filter(u=>u!==CL.me)]:[];
+  const ctl=`<div class="vlist">${ppl.map(row).join("")}</div>${tfRow()}${shareBlock()}
       <div class="vctl">${nsPop()}<button class="vbtn${V.muted?" off":""}${pttOn()?" ptt":""}" data-vmute title="${pttOn()?"Bas-konuş açık · Ctrl+Alt+V basılıyken konuşursun":V.muted?"Mikrofonu aç · Ctrl+Alt+M":"Mikrofonu kapat · Ctrl+Alt+M"}" aria-label="Mikrofon">${V.muted?MICOFF_IC:MIC_IC}</button><button class="vbtn${V.deaf?" off":""}" data-vdeaf title="${V.deaf?"Kulaklığı aç":"Kulaklığı kapat · kimseyi duymazsın"}" aria-label="Kulaklık">${V.deaf?HPOFF_IC:HP_IC}</button>${nsBtn()}
-        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`}
-  else{const ps=cp?[cp]:[];
-    if(!cp){B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Odaya katılmak için önce ortak bir projeyi aç. Her projenin kendi odası var.</span></div></div>`;return}
-    B.innerHTML=`<div class="vhead">${HEAD_IC}<div><h3>Sesli oda</h3><span class="small">Çalışırken ekiple konuş; sayfa değiştirsen de bağlı kalırsın.</span></div></div>
-      <div class="vrooms">${ps.map(p=>{const inn=voiceIn(p).filter(u=>u!==CL.me);return `<div class="vroom"><div class="vrt"><b>${esc((proj(p)||{}).name||"Proje")}</b><span class="small">${inn.length?inn.length+" kişi konuşuyor":"boş"}</span></div>
-        <span class="vavs">${inn.map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join("")}</span><button class="btn sm primary" data-vjoinp="${esc(p)}">Katıl</button></div>`}).join("")}</div>`}}
+        <button class="btn sm" data-vdev>Ses ayarları</button><span class="sp"></span><button class="btn sm danger" data-vleave>${HANG_IC}Ayrıl</button></div>`;
+  const nameEl=(kind,r,pre)=>S.vren===r.id?`<input class="field vrenin" data-vrenin="${esc(r.id)}" data-vrk="${kind}" value="${esc(r.name)}" maxlength="32">`:`<b>${pre}${esc(r.name)}</b>`;
+  const addF=kind=>S.vradd===kind?`<form class="vradd" data-vraddf="${kind}"><input class="field" maxlength="32" placeholder="${kind==="voice"?"Ses odası adı":"metin odası adı"}"><button class="btn sm primary">Ekle</button></form>`:"";
+  const vrooms=roomsOf(ctx,"voice").map(r=>{const act=me&&V.room===r.id;const inn=voiceIn(ctx,r.id).filter(u=>u!==CL.me||act);
+    return `<div class="vrm${act?" on":""}" data-vjoinr="${esc(r.id)}" data-vrid="${esc(r.id)}" data-vrk="voice"><span class="ic">${SPK_IC}</span>${nameEl("voice",r,"")}<span class="vavs">${(act?[]:inn).slice(0,4).map(u=>`<span class="vav${V.speak.has(u)?" talk":""}" data-vu="${esc(u)}">${avatar(u)}</span>`).join("")}${!act&&inn.length>4?`<span class="small">+${inn.length-4}</span>`:""}</span>${act?`<span class="small">${ppl.length} kişi</span>`:inn.length?"":`<span class="small">boş</span>`}</div>${act?ctl:""}`}).join("");
+  const sel=vtSel(ctx);
+  const trooms=roomsOf(ctx,"text").map(r=>{const un=r.id===sel&&!$("voicePop").hidden?0:vtUnread(ctx,r.id);return `<div class="vtr${r.id===sel?" on":""}" data-vtext="${esc(r.id)}" data-vrid="${esc(r.id)}" data-vrk="text"><span class="ic">#</span>${nameEl("text",r,"")}${un?`<span class="vub">${un>9?"9+":un}</span>`:""}</div>`}).join("");
+  B.innerHTML=`<div class="vsec"><div class="vsech"><span>SES ODALARI</span><button class="vadd" data-vradd="voice" title="Ses odası ekle" aria-label="Ses odası ekle">+</button></div>${addF("voice")}${vrooms}</div>
+    <div class="vsec"><div class="vsech"><span>METİN ODALARI</span><button class="vadd" data-vradd="text" title="Metin odası ekle" aria-label="Metin odası ekle">+</button></div>${addF("text")}${trooms}</div>`;
+  const af=B.querySelector("[data-vraddf] input");if(af&&document.activeElement!==af)setTimeout(()=>af.focus(),20)}
 const tfText=()=>{const run=!!TM.endAt,brk=TM.mode==="break";return TF.on?(run?(brk?"Molada":"Odaktasınız")+" · birlikte "+fmt(tLeft()).replace(/^0/,"")+" kaldı":"Açık · biri sayacı başlatınca herkeste başlar")+(TF.by&&TF.by!==CL.me?" · açan "+pname(TF.by):""):"Açınca odadaki herkesin sayacı birlikte çalışır"};
 const tfRow=()=>{const on=TF.on,run=!!TM.endAt;
   return `<div class="vns vtf${on?" on":""}"><span><b>Ekip odağı</b><span class="small" id="vtfT">${esc(tfText())}</span></span>
@@ -5060,6 +5098,10 @@ $("vhV").onclick=()=>{if($("vhPrev").classList.contains("mine"))return;S.scrHide
 document.addEventListener("click",e=>{
   if(e.target.closest("[data-vjoin]")){voiceJoin(curP());return}
   const jp=e.target.closest("[data-vjoinp]");if(jp){voiceJoin(jp.dataset.vjoinp);return}
+  if(e.target.closest("[data-vrenin],.vradd"))return;
+  {const a=e.target.closest("[data-vradd]");if(a){S.vradd=S.vradd===a.dataset.vradd?null:a.dataset.vradd;drawVoice();return}}
+  {const t=e.target.closest("[data-vtext]");if(t){setVtSel(hubPid(),t.dataset.vtext);return}}
+  {const r=e.target.closest("[data-vjoinr]");if(r&&!r.classList.contains("on")){const pid=hubPid();if(pid)voiceJoin(pid,r.dataset.vjoinr);return}}
   if(e.target.closest("[data-sstart]")){S.sharePick=true;drawVoice();return}
   if(e.target.closest("[data-scancel]")){S.sharePick=false;drawVoice();return}
   if(e.target.closest("[data-sgo]")){S.sharePick=false;closePops();shareStart().finally(drawVoice);return}
@@ -5095,7 +5137,7 @@ function rerender(){
   if(S.editing){renderTabs();if(boardVisible())syncCards();return}
   const ae=document.activeElement;const keep=ae&&ae.id&&ae.tagName==="INPUT"&&!ae.closest(".pop")&&!ae.closest("#drw")?ae.id:null;
   const kv=keep?ae.value:null,ks=keep?ae.selectionStart:null;
-  renderAll();if(keep&&$(keep)){const el=$(keep);if(kv!=null&&el.value!==kv){el.value=kv}el.focus();try{if(ks!=null)el.setSelectionRange(ks,ks)}catch(_){}}
+  renderAll();if(!$("voicePop").hidden){const a=document.activeElement;if(!(a&&$("voiceBody").contains(a)&&a.tagName==="INPUT"))drawVoice()}if(keep&&$(keep)){const el=$(keep);if(kv!=null&&el.value!==kv){el.value=kv}el.focus();try{if(ks!=null)el.setSelectionRange(ks,ks)}catch(_){}}
   if(drId){const a2=document.activeElement;if(!(a2&&$("drw").contains(a2)&&a2.id!=="cmIn"))drawDrawer()}
 }
 
