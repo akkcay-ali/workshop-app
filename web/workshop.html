@@ -1299,6 +1299,7 @@ html.wmove,html.wmove *{cursor:move!important;user-select:none}
     <button class="btn sm" id="audPerm" hidden>Cihaz adlarını göster</button>
     <button class="sw2" id="pttSw" role="switch" aria-checked="false"><span><b>Bas-konuş</b><span class="small">Sesli odada mikrofon kapalı durur, Ctrl+Alt+V basılıyken konuşursun. Ctrl+Alt+M mikrofonu, Ctrl+Alt+D kulaklığı açıp kapatır.</span></span><span class="tg"></span></button></div>
   <div class="cfgsec" id="npSec" hidden><button class="sw2" id="npSw" role="switch" aria-checked="true"><span><b>Şu an çalanı üstte göster</b><span class="small">Kapalıyken üst çubukta yalnızca karakter kalır; şarkı adı ve süre görünmez. Tıklayınca açılan pencere yine çalışır.</span></span><span class="tg"></span></button></div>
+  <div class="cfgsec" id="clSec" hidden><button class="sw2" id="clSw" role="switch" aria-checked="false"><span><b>Claude bağlantısı</b><span class="small">Açıkken bu bilgisayardaki Claude masaüstü uygulaması açık projene not, link ve görsel ekleyebilir, kartları dizebilir. Silme yapamaz; eklediklerini geri alabilirsin. Önce Claude uzantısını kur.</span></span><span class="tg"></span></button><a class="small" href="https://github.com/akkcay-ali/workshop-app/raw/main/claude-extension/workshop.mcpb">Claude uzantısını indir ↗</a></div>
   <div class="cfgsec" id="updSec" hidden><span class="wlock sm" id="verLock"></span><span class="small" id="verTxt">Sürüm</span><button class="btn" id="updCheck">Güncellemeleri denetle</button></div>
   <div class="cfgsec" id="libSec" hidden><span class="small">Proje klasörü · her proje burada bir .workshop dosyası</span>
     <div class="libpath mono" id="libPath"></div>
@@ -1952,8 +1953,12 @@ const maxZ=()=>cards(curBoard()).reduce((m,c)=>Math.max(m,c.z||1),1);
 function syncCards(){
   if(!boardVisible())return;
   const cs=cards(curBoard());const seen=new Set();$("bempty").hidden=cs.length>0||inks(curBoard()).length>0;syncInk();
+  /* hız: kart öğeleri ve yorumlar her kart için yeniden aranmasın, bir kez toplanır */
+  const els=new Map();for(const n of world.children){const id=n.dataset&&n.dataset.id;if(id&&!els.has(id))els.set(id,n)}
+  const cmm=new Map();for(const i of S.items)if(i.type==="comment"){const a=cmm.get(i.target);if(a)a.push(i);else cmm.set(i.target,[i])}
+  const cmOf=id=>cmm.get(id)||[];
   for(const c of cs){seen.add(c.id);
-    let el=world.querySelector(`[data-id="${c.id}"]`);if(el&&!el.classList.contains("k-"+c.kind)){el.remove();el=null}
+    let el=els.get(c.id);if(el&&!el.classList.contains("k-"+c.kind)){el.remove();el=null}
     if(!el){el=document.createElement("div");el.className="card k-"+c.kind;el.dataset.id=c.id;el.innerHTML=cardHTML(c);world.appendChild(el)}
     if(drag&&(drag.id===c.id||(drag.ids&&drag.ids.has(c.id))))continue;
     el.style.left=c.x+"px";el.style.top=c.y+"px";el.style.width=(c.w||260)+"px";el.style.zIndex=c.kind==="frame"?0:(c.z||1);
@@ -1962,12 +1967,12 @@ function syncCards(){
     if(c.kind==="palette"){const key=(c.colors||[]).join();if(el.dataset.k!==key){el.dataset.k=key;
       el.querySelector(".pal").innerHTML=(c.colors||[]).map(h=>`<button class="psw" data-hex="${esc(h)}" style="background:${esc(h)};color:${lum(h)>.55?"#18191C":"#F2F3F5"}" title="Kopyala">${esc(h.toUpperCase())}</button>`).join("")}}
     el.classList.toggle("sel",S.selSet.has(c.id));el.classList.toggle("locked",!!c.locked);
-    {const rvt=isShared(curP())&&c.review&&c.review.state?{wait:"onay bekliyor",ok:"onaylandı",rev:"revizyon"}[c.review.state]:null,ncm=isShared(curP())?commentsOf(c.id).length:0;
+    {const rvt=isShared(curP())&&c.review&&c.review.state?{wait:"onay bekliyor",ok:"onaylandı",rev:"revizyon"}[c.review.state]:null,ncm=isShared(curP())?cmOf(c.id).length:0;
      el.dataset.rv=rvt?c.review.state:"";const bs=[...((c.tags||[]).slice(0,2).map(t=>"#"+t)),c.versions&&c.versions.length&&("v"+(c.versions.length+1)),c.locked&&"kilitli",c.ext&&"web",rvt,ncm&&{cm:ncm}].filter(Boolean);let bd=el.querySelector(":scope > .badges");
      if(bs.length){if(!bd){bd=document.createElement("span");bd.className="badges";el.appendChild(bd)}const h=bs.map(x=>typeof x==="object"?`<span class="bcm" data-cmopen data-nodrag title="Yorumları aç (C)">${x.cm} yorum</span>`:`<span>${x}</span>`).join("");if(bd.innerHTML!==h)bd.innerHTML=h}else if(bd)bd.remove()}
     if(c.kind==="image"){const img=el.querySelector("img");const s=imgSrc(c);if(img.getAttribute("src")!==s)img.setAttribute("src",s);el.classList.toggle("gray",!!c.gray);el.classList.toggle("flip",!!c.flip);guideSync(el,c);
       /* görsele iğneli yorumlar: panoda küçük numaralı noktalar */
-      const pins=commentsOf(c.id).filter(x=>x.pin);let pl=el.querySelector(":scope > .cpins");
+      const pins=cmOf(c.id).filter(x=>x.pin).sort((a,b)=>(a.created||0)-(b.created||0));let pl=el.querySelector(":scope > .cpins");
       if(pins.length){if(!pl){pl=document.createElement("span");pl.className="cpins";el.appendChild(pl)}const h=pins.map((x,i)=>`<span class="cpin" style="left:${(c.flip?1-x.pin.x:x.pin.x)*100}%;top:${x.pin.y*100}%" data-cmopen data-nodrag title="${esc((x.text||"").slice(0,80))}">${i+1}</span>`).join("");if(pl.innerHTML!==h)pl.innerHTML=h}else if(pl)pl.remove()}
     const txt=el.querySelector(".txt");
     if(txt&&S.editing!==c.id){const val=c.kind==="audio"?(c.text||"Ses kaydı"):c.kind==="video"?(c.text||""):c.kind==="link"?(c.text||hostOf(c.url)||c.url):(c.text||"");if(txt.textContent!==val)txt.textContent=val}
@@ -2998,7 +3003,8 @@ function inkG(k){
 }
 function syncInk(){
   const svg=world.querySelector(".ink");if(!svg)return;const seen=new Set();
-  for(const k of inks(curBoard())){seen.add(k.id);let g=svg.querySelector(`g[data-ink="${k.id}"]`);
+  const gs=new Map();svg.querySelectorAll("g[data-ink]").forEach(g=>{const id=g.getAttribute("data-ink");if(!gs.has(id))gs.set(id,g)});
+  for(const k of inks(curBoard())){seen.add(k.id);let g=gs.get(k.id);
     if(!g){g=inkG(k);svg.appendChild(g)}
     else if(!(drag&&drag.ids&&drag.ids.has(k.id))){const d=inkD(k),vd=inkVisD(k);const v=g.querySelector(".vis");if(v&&v.getAttribute("d")!==vd){v.setAttribute("d",vd);const h=g.querySelector(".hit");if(h)h.setAttribute("d",d)}}
     g.classList.toggle("sel",S.selSet.has(k.id))}
@@ -3922,11 +3928,12 @@ function drawUiScale(){const on=!!window.__UIK;$("uiSec").hidden=!on;if(on)$("ui
 $("uiScale").addEventListener("click",e=>{const b=e.target.closest("[data-uik]");if(!b)return;const k=+b.dataset.uik;LS.set("uiScale",k);window.__UIK=k;
   const m=document.querySelector('meta[name=viewport]');if(m)m.setAttribute("content",`width=device-width,initial-scale=${k},minimum-scale=${k},maximum-scale=${k},user-scalable=no,viewport-fit=cover`);drawUiScale();
   setTimeout(()=>{if(curP()&&boardVisible())applyView()},120)});
-function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("pttSw").setAttribute("aria-checked",pttOn());$("pttSw").hidden=NOKBD;$("npSec").hidden=!SPO.on();$("npSw").setAttribute("aria-checked",npShow());$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
+function drawCfg(){drawStorage();drawLib();drawAud();drawUiScale();drawSpo();$("pttSw").setAttribute("aria-checked",pttOn());$("pttSw").hidden=NOKBD;$("npSec").hidden=!SPO.on();$("npSw").setAttribute("aria-checked",npShow());$("clSec").hidden=!CB_OK;$("clSw").setAttribute("aria-checked",cbOn());$("sndSw").setAttribute("aria-checked",sndOn());const on=hqOn();$("hqSw").setAttribute("aria-checked",on);
   $("hqTxt").textContent=on?"Görseller orijinal boyut ve kalitede yüklenir. Depolama daha hızlı dolar, büyük panolar iPad'de yavaşlayabilir.":"Görseller en fazla 2048 px ve WebP olarak yüklenir. Hızlı ve az yer kaplar."}
 const npShow=()=>LS.get("npShow",true);
 $("npSw").onclick=()=>{LS.set("npShow",!npShow());$("npSw").setAttribute("aria-checked",npShow());const c=$("npChip");delete c.dataset.k;drawSpoNow()};
 $("pttSw").onclick=()=>{setPtt(!pttOn());$("pttSw").setAttribute("aria-checked",pttOn())};
+$("clSw").onclick=()=>cbSet(!cbOn());
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
   run(api.set("settings",Object.assign({},c,{type:"settings",hq:v})));drawCfg();toast(v?"Görseller yüksek kalitede eklenecek":"Görseller optimize edilerek eklenecek")};
@@ -4069,6 +4076,117 @@ async function exportProjectCopy(pid){const p=S.items.find(i=>i.id===pid);await 
   const dest=await TA.dialog.save({defaultPath:FS.dir+SEP()+safeName(p&&p.name)+" kopya.workshop",filters:[{name:"Workshop projesi",extensions:["workshop"]}]});if(!dest)return;
   const {items,pid:np}=remapIds(projectItems(pid),pid);
   try{await writeBytes(dest,await zipItems(np,items));toast("Kopya kaydedildi")}catch(e){toast("Kaydedilemedi: "+(e&&e.message||e))}}
+/* ---------- Claude bağlantısı (masaüstü) ----------
+   Claude masaüstü uygulamasındaki Workshop uzantısı (claude-extension/) → lib.rs `bridge` (127.0.0.1:43118)
+   → `claude-req` olayı → cbRun → `bridge_reply`. Yalnızca açık projede çalışır, silme yoktur, eklenenler
+   ve taşınanlar geri alınabilir. Ayar: LS `claudeOn` (varsayılan kapalı), Ayarlar `#clSw`. */
+function cbOn(){return LS.get("claudeOn",false)}
+var CB_OK=false;/* var: drawCfg bu satırdan önce de çağrılabilir */
+async function cbSet(v){
+  try{await tinv(v?"bridge_start":"bridge_stop");LS.set("claudeOn",v);toast(v?"Claude bağlantısı açık":"Claude bağlantısı kapalı",null,true)}
+  catch(e){LS.set("claudeOn",false);toast("Claude bağlantısı açılamadı: "+((e&&e.message)||e),null,true)}
+  drawCfg()}
+function cbInit(){
+  if(/iPad|iPhone|Android/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1))return;
+  CB_OK=true;
+  TA.event.listen("claude-req",async e=>{const {id,body}=e.payload||{};let out;
+    try{const q=JSON.parse(body||"{}");out={ok:true,result:await cbRun(q.tool,q.args||{})}}catch(err){out={ok:false,error:String((err&&err.message)||err)}}
+    tinv("bridge_reply",{id,body:JSON.stringify(out)}).catch(()=>{})});
+  if(cbOn())tinv("bridge_start").catch(()=>LS.set("claudeOn",false));
+}
+const cbErr=m=>{throw new Error(m)};
+const cbName=b=>b.name||"Referanslar";
+function cbProj(){const pid=curP();const p=pid&&projects().find(x=>x.id===pid);
+  if(!p)cbErr("Workshop'ta açık bir proje yok. Kullanıcıdan Workshop'ta bir proje sekmesine geçmesini iste.");return p}
+function cbBoard(pid,ref){const bs=boards(pid);
+  if(ref==null||ref==="")return bs.find(b=>b.id===curBoard())||bs.find(b=>b.id===(S.lastB||{})[pid])||bs[0];
+  const q=String(ref).trim().toLowerCase();
+  return bs.find(b=>b.id===ref)||bs.find(b=>cbName(b).toLowerCase()===q)||bs.find(b=>cbName(b).toLowerCase().includes(q))
+    ||cbErr(`"${ref}" adında pano yok. Panolar: `+bs.map(cbName).join(", "))}
+/* kart yüksekliği kayıtlı değil: pano açıksa ekrandan ölç, değilse tahmin et; görsellerde en-boy oranı bir kez ölçülür */
+const CBAR=new Map();
+async function cbMeasure(cs){await Promise.all(cs.filter(c=>c.kind==="image"&&!CBAR.has(c.id)&&imgSrc(c)).map(c=>new Promise(res=>{const im=new Image();const t=setTimeout(res,4000);
+  im.onload=()=>{clearTimeout(t);if(im.naturalWidth)CBAR.set(c.id,im.naturalHeight/im.naturalWidth);res()};im.onerror=()=>{clearTimeout(t);res()};im.src=imgSrc(c)})))}
+function cbH(c){if(c.kind==="frame")return c.h||300;
+  const el=boardVisible()&&c.board===curBoard()?world.querySelector(`[data-id="${c.id}"]`):null;if(el&&el.offsetHeight)return el.offsetHeight;
+  if(c.kind==="image")return Math.round((c.w||260)*(CBAR.get(c.id)||.7));if(c.kind==="text")return Math.round((c.fs||72)*1.3);
+  if(c.kind==="note")return 44+Math.ceil(Math.max(1,(c.text||"").length)/Math.max(12,(c.w||240)/7.5))*20;return 90}
+const cbCard=c=>{const o={id:c.id,kind:c.kind,x:Math.round(c.x||0),y:Math.round(c.y||0),w:Math.round(c.w||260),h:cbH(c)};
+  if(c.text)o.text=String(c.text).slice(0,500);if(c.url||c.extUrl)o.url=c.url||c.extUrl;if(c.tags&&c.tags.length)o.tags=c.tags;if(c.note)o.note=String(c.note).slice(0,300);if(c.locked)o.locked=true;return o};
+function cbStatus(){const p=cbProj(),open=curBoard();
+  return {project:{id:p.id,name:p.name||"Proje",shared:isShared(p.id)},openBoard:open?cbName(boards(p.id).find(b=>b.id===open)||{}):null,
+    boards:boards(p.id).map(b=>({id:b.id,name:cbName(b),cards:cards(b.id).length,private:!!b.private,open:b.id===open}))}}
+async function cbList(a){const p=cbProj(),b=cbBoard(p.id,a.board),cs=cards(b.id);await cbMeasure(cs);return {board:{id:b.id,name:cbName(b)},cards:cs.map(cbCard)}}
+async function cbView(a){const p=cbProj(),ids=(Array.isArray(a.ids)?a.ids:[]).slice(0,8),images=[],skipped=[];
+  for(const id of ids){const c=S.items.find(i=>i.id===id&&i.type==="card");
+    if(!c||itemProject(c)!==p.id||c.kind!=="image"){skipped.push({id,reason:"açık projede böyle bir görsel kartı yok"});continue}
+    const src=imgSrc(c);const im=src&&await loadBitmap(src);if(!im){skipped.push({id,reason:"görsel yüklenemedi (pano açık değilse önce panoyu aç)"});continue}
+    try{const W=im.width||im.naturalWidth,H=im.height||im.naturalHeight,s=Math.min(1,512/Math.max(W,H));const cv=document.createElement("canvas");
+      cv.width=Math.max(1,Math.round(W*s));cv.height=Math.max(1,Math.round(H*s));cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);
+      images.push({id,mime:"image/jpeg",data:cv.toDataURL("image/jpeg",.8).split(",")[1]})}catch(_){skipped.push({id,reason:"görsel okunamadı (web'den bağlı görsel)"})}}
+  return {images,skipped}}
+async function cbBlob(c){
+  if(c.data){const bin=atob(String(c.data).replace(/^data:[^,]*,/,""));const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:c.mime||"image/png"})}
+  if(c.path){const ext=(String(c.path).split(".").pop()||"").toLowerCase(),type=EXT_IMG[ext];if(!type||!/^image\//.test(type))cbErr("desteklenmeyen görsel türü: ."+ext);
+    return new Blob([await tinv("read_bytes",{path:c.path})],{type})}
+  if(c.url){const r=await fetch(c.url);if(!r.ok)throw new Error("indirilemedi");const b=await r.blob();if(!/^image\//.test(b.type))throw new Error("görsel değil");return b}
+  cbErr("görsel için url, path ya da data gerekli")}
+async function cbAdd(a){const p=cbProj(),pid=p.id,b=cbBoard(pid,a.board),bid=b.id;
+  const list=(Array.isArray(a.cards)?a.cards:[]).slice(0,60);if(!list.length)cbErr("eklenecek kart yok");
+  const GAP=24,items=[],failed=[];
+  for(const [i,c] of list.entries()){try{
+    const kind=c.kind||(c.path||c.data?"image":c.url?"link":"note");const tags=Array.isArray(c.tags)?c.tags.map(t=>String(t).replace(/^#/,"").trim()).filter(Boolean).slice(0,8):null;
+    const doc={type:"card",board:bid,kind};if(tags&&tags.length)doc.tags=tags;let w,h;
+    if(kind==="image"){
+      if(!assets)cbErr("görsel deposu yok");
+      if(isCloud(pid)&&privB(bid)!==privB(curBoard()))cbErr(`"${cbName(b)}" panosuna görsel eklemek için o pano Workshop'ta açık olmalı`);
+      let blob=null;try{blob=await cbBlob(c)}catch(e){if(!c.url||c.path||c.data)throw e}
+      if(blob){const f=new File([blob],"claude",{type:blob.type});
+        const d=await new Promise(res=>{const u=URL.createObjectURL(f);const im=new Image();im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight,im});im.onerror=()=>res(null);im.src=u});
+        if(!d)cbErr("görsel açılamadı");const up=await assets.upload(await shrink(f,d));doc.assetId=up.id;doc.assetUrl=up.url;w=c.w||280;h=w*d.h/Math.max(1,d.w)}
+      else{doc.extUrl=c.url;doc.ext=true;w=c.w||280;h=w*.7}/* site indirmeye izin vermedi: link olarak bağlı görsel */
+      if(c.text)doc.note=String(c.text).slice(0,2000)}
+    else if(kind==="link"){if(!/^https?:\/\//i.test(c.url||""))cbErr("link için http(s) adresi gerekli");doc.url=c.url;doc.text=String(c.text||"").slice(0,300);w=c.w||260;h=90}
+    else if(kind==="text"){doc.text=String(c.text||"").slice(0,300);doc.fs=Math.max(10,Math.min(800,Math.round(c.size||56)));w=Math.round(Math.max(80,doc.text.length*doc.fs*.78+doc.fs*.3));h=Math.round(doc.fs*1.3)}
+    else if(kind==="note"){doc.text=String(c.text||"").slice(0,5000);w=c.w||240;h=44+doc.text.split("\n").reduce((n,l)=>n+Math.max(1,Math.ceil(l.length/Math.max(12,w/7.5))),0)*20}
+    else cbErr("bilinmeyen kart türü: "+kind);
+    items.push({doc,w:Math.round(w),h:Math.round(h),x:c.x,y:c.y,i})}catch(e){failed.push({index:i,reason:String((e&&e.message)||e)})}}
+  if(!items.length)return {board:cbName(b),added:[],failed};
+  /* yer: verilmediyse panodaki mevcut kartların sağına, satır satır */
+  const ex=cards(bid);await cbMeasure(ex);let ox=a.x,oy=a.y;
+  if(typeof ox!=="number"||typeof oy!=="number"){if(ex.length){ox=Math.max(...ex.map(c=>c.x+(c.w||260)))+140;oy=Math.min(...ex.map(c=>c.y))}else{ox=0;oy=0}}
+  const pad=a.title?40:0,top=a.title?70:0,cols=Math.max(1,Math.ceil(Math.sqrt(items.length*1.4)));let gx=ox+pad,gy=oy+top,rowH=0,col=0,x1=ox,y1=oy;
+  for(const it of items){if(typeof it.x==="number"&&typeof it.y==="number"){it.doc.x=Math.round(it.x);it.doc.y=Math.round(it.y)}
+    else{it.doc.x=Math.round(gx);it.doc.y=Math.round(gy);rowH=Math.max(rowH,it.h);if(++col>=cols){col=0;gx=ox+pad;gy+=rowH+GAP;rowH=0}else gx+=it.w+GAP}
+    it.doc.w=it.w;x1=Math.max(x1,it.doc.x+it.w);y1=Math.max(y1,it.doc.y+it.h)}
+  let z=ex.reduce((m,c)=>Math.max(m,c.z||1),1);const ids=[],added=[],now=Date.now();let frame=null;
+  if(a.title){const r=await api.add({type:"card",board:bid,kind:"frame",x:Math.round(ox),y:Math.round(oy),w:Math.round(x1-ox+pad),h:Math.round(y1-oy+pad),text:String(a.title).slice(0,80),created:now});if(r){ids.push(r.id);frame=r.id}}
+  for(const it of items){it.doc.z=++z;it.doc.created=now+1+it.i;const r=await api.add(it.doc);if(r){ids.push(r.id);if(it.doc.kind==="image")CBAR.set(r.id,it.h/Math.max(1,it.w));added.push({id:r.id,kind:it.doc.kind,x:it.doc.x,y:it.doc.y,w:it.w,h:it.h,linked:it.doc.ext?true:undefined})}}
+  if(ids.length){undoRemove("Claude",ids);toast(`Claude ${added.length} kart ekledi · ${cbName(b)}`,null,true)}
+  return {board:cbName(b),frame,added,failed}}
+function cbMove(a){const p=cbProj(),old=[],ups=[],skipped=[];
+  for(const m of (Array.isArray(a.moves)?a.moves:[]).slice(0,400)){const c=S.items.find(i=>i.id===m.id&&i.type==="card"&&i.kind!=="draw");
+    if(!c||itemProject(c)!==p.id){skipped.push({id:m.id,reason:"açık projede böyle bir kart yok"});continue}
+    if(c.locked){skipped.push({id:m.id,reason:"kart kilitli"});continue}
+    const u={};for(const k of ["x","y","w"])if(typeof m[k]==="number"&&isFinite(m[k]))u[k]=Math.round(k==="w"?Math.max(40,m[k]):m[k]);
+    if(c.kind==="frame"&&typeof m.h==="number"&&isFinite(m.h))u.h=Math.round(Math.max(40,m.h));
+    if(!Object.keys(u).length)continue;const o={};for(const k in u)o[k]=c[k]??null;old.push([c.id,o]);ups.push([c,u])}
+  if(ups.length){undoPatch("Claude düzeni",old);ups.forEach(([c,u])=>{Object.assign(c,u);run(api.update(c.id,u))});if(boardVisible())syncCards();toast(`Claude ${ups.length} kartı taşıdı`,null,true)}
+  return {moved:ups.length,skipped}}
+async function cbNewBoard(a){const p=cbProj(),pid=p.id,name=String(a.name||"").trim().slice(0,60);if(!name)cbErr("pano adı gerekli");
+  const priv=isShared(pid)&&a.private!==false;
+  const r=await api.add(Object.assign({type:"board",project:pid,name,order:Date.now()},CL.me&&isCloud(pid)?{owner:CL.me}:{},priv?{private:true}:{}));
+  if(!r)cbErr("pano oluşturulamadı");toast(`Claude "${name}" panosunu açtı`,null,true);return {id:r.id,name,private:priv}}
+async function cbRun(tool,a){
+  if(!api||!S.loaded)cbErr("Workshop henüz hazır değil");
+  if(tool==="status")return cbStatus();
+  if(tool==="list_cards")return cbList(a);
+  if(tool==="view_cards")return cbView(a);
+  if(tool==="add_cards")return cbAdd(a);
+  if(tool==="move_cards")return cbMove(a);
+  if(tool==="create_board")return cbNewBoard(a);
+  cbErr("bilinmeyen araç: "+tool)}
+
 async function fileMode(){
   S.mode="file";
   FS.dir=LS.get("libdir","")||await tinv("library_dir");
@@ -4102,7 +4220,7 @@ async function fileMode(){
   const first=await tinv("initial_files");if(first&&first.length)openWorkshopFiles(first);
   setTimeout(()=>checkUpdate(false),4000);cBoot().then(maybeWelcome);
   TA.event.listen("open-files",e=>openWorkshopFiles(e.payload||[]));
-  TA.event.listen("snip",()=>startSnip());document.body.classList.add("isdesk");
+  TA.event.listen("snip",()=>startSnip());document.body.classList.add("isdesk");cbInit();
   /* pencere kapanırken bekleyen kayıtları bitir */
   const win=TA.window.getCurrentWindow();let closing=false;
   win.onCloseRequested(async ev=>{if(closing)return;const pending=CL.out.size>0||[...FS.files.values()].some(f=>f.dirty||f.saving||f.timer);

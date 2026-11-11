@@ -193,6 +193,183 @@ fn spo_listen(app: tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+/// Claude bağlantısı (masaüstü): Claude masaüstü uygulamasına kurulan Workshop uzantısı (`claude-extension/`)
+/// bu bilgisayardaki 127.0.0.1:43118 adresine istek atar; istek `claude-req` olayıyla arayüze gider,
+/// arayüz `bridge_reply` ile yanıtlar. Yalnızca bu makineden erişilir, her açılışta yenilenen anahtar ister.
+/// Adres ve anahtar `~/.workshop/claude-bridge.json` dosyasına yazılır (uzantı oradan okur).
+mod bridge {
+    use std::collections::HashMap;
+    use std::io::{Read, Write};
+    use std::net::{TcpListener, TcpStream};
+    use std::path::PathBuf;
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+    use std::sync::{mpsc, Mutex, OnceLock};
+    use std::time::Duration;
+    use tauri::{AppHandle, Emitter, Manager};
+
+    const PORT: u16 = 43118;
+    const MAX_BODY: usize = 48 * 1024 * 1024;
+    static ON: AtomicBool = AtomicBool::new(false);
+    static STARTED: AtomicBool = AtomicBool::new(false);
+    static SEQ: AtomicU64 = AtomicU64::new(1);
+    static TOKEN: OnceLock<String> = OnceLock::new();
+    static PENDING: OnceLock<Mutex<HashMap<u64, mpsc::Sender<String>>>> = OnceLock::new();
+
+    #[derive(Clone, serde::Serialize)]
+    struct Req {
+        id: u64,
+        body: String,
+    }
+
+    fn pending() -> &'static Mutex<HashMap<u64, mpsc::Sender<String>>> {
+        PENDING.get_or_init(|| Mutex::new(HashMap::new()))
+    }
+
+    /// Tahmin edilemeyen anahtar: işletim sisteminin rastgele tohumladığı SipHash anahtarlarından.
+    fn token() -> &'static str {
+        TOKEN.get_or_init(|| {
+            use std::hash::{BuildHasher, Hasher};
+            let t = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos() as u64)
+                .unwrap_or(0);
+            (0..4u64)
+                .map(|i| {
+                    let mut h = std::collections::hash_map::RandomState::new().build_hasher();
+                    h.write_u64(t ^ i);
+                    format!("{:016x}", h.finish())
+                })
+                .collect()
+        })
+    }
+
+    fn info_path(app: &AppHandle) -> Result<PathBuf, String> {
+        Ok(app.path().home_dir().map_err(|e| e.to_string())?.join(".workshop").join("claude-bridge.json"))
+    }
+
+    fn respond(s: &mut TcpStream, status: &str, body: &str) {
+        let _ = s.write_all(
+            format!("HTTP/1.1 {status}\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", body.len()).as_bytes(),
+        );
+        let _ = s.write_all(body.as_bytes());
+    }
+
+    fn handle(mut s: TcpStream, app: AppHandle) {
+        let _ = s.set_read_timeout(Some(Duration::from_secs(20)));
+        let mut buf: Vec<u8> = Vec::with_capacity(8192);
+        let mut tmp = [0u8; 16384];
+        let head_end = loop {
+            if let Some(p) = buf.windows(4).position(|w| w == b"\r\n\r\n") {
+                break p + 4;
+            }
+            if buf.len() > 65536 {
+                return respond(&mut s, "431 Request Header Fields Too Large", "{}");
+            }
+            match s.read(&mut tmp) {
+                Ok(0) | Err(_) => return,
+                Ok(n) => buf.extend_from_slice(&tmp[..n]),
+            }
+        };
+        let head = String::from_utf8_lossy(&buf[..head_end]).to_string();
+        let mut lines = head.lines();
+        let first = lines.next().unwrap_or("");
+        let mut auth = String::new();
+        let mut len = 0usize;
+        let mut origin = false;
+        for l in lines {
+            if let Some((k, v)) = l.split_once(':') {
+                match k.trim().to_ascii_lowercase().as_str() {
+                    "authorization" => auth = v.trim().to_string(),
+                    "content-length" => len = v.trim().parse().unwrap_or(0),
+                    "origin" => origin = true,
+                    _ => {}
+                }
+            }
+        }
+        if !first.starts_with("POST /rpc ") {
+            return respond(&mut s, "404 Not Found", "{}");
+        }
+        // Tarayıcıdaki bir sayfa buraya istek atamasın: tarayıcılar Origin yollar, uzantı yollamaz
+        if origin || auth != format!("Bearer {}", token()) {
+            return respond(&mut s, "401 Unauthorized", r#"{"ok":false,"error":"yetkisiz"}"#);
+        }
+        if !ON.load(Ordering::SeqCst) {
+            return respond(&mut s, "503 Service Unavailable", r#"{"ok":false,"error":"Claude bağlantısı Workshop ayarlarında kapalı"}"#);
+        }
+        if len > MAX_BODY {
+            return respond(&mut s, "413 Payload Too Large", r#"{"ok":false,"error":"istek çok büyük"}"#);
+        }
+        let mut body = buf[head_end..].to_vec();
+        while body.len() < len {
+            match s.read(&mut tmp) {
+                Ok(0) | Err(_) => return,
+                Ok(n) => body.extend_from_slice(&tmp[..n]),
+            }
+        }
+        body.truncate(len);
+        let id = SEQ.fetch_add(1, Ordering::SeqCst);
+        let (tx, rx) = mpsc::channel();
+        pending().lock().unwrap().insert(id, tx);
+        let _ = app.emit_to("main", "claude-req", Req { id, body: String::from_utf8_lossy(&body).to_string() });
+        match rx.recv_timeout(Duration::from_secs(120)) {
+            Ok(out) => respond(&mut s, "200 OK", &out),
+            Err(_) => {
+                pending().lock().unwrap().remove(&id);
+                respond(&mut s, "504 Gateway Timeout", r#"{"ok":false,"error":"Workshop yanıt vermedi"}"#)
+            }
+        }
+    }
+
+    /// Dinleyiciyi (bir kez) başlatır, bağlantıyı açar ve adres/anahtar dosyasını yazar.
+    #[tauri::command]
+    pub fn bridge_start(app: AppHandle) -> Result<(), String> {
+        if cfg!(mobile) {
+            return Err("yalnızca masaüstü".into());
+        }
+        if !STARTED.load(Ordering::SeqCst) {
+            let l = TcpListener::bind(("127.0.0.1", PORT)).map_err(|e| format!("{PORT} numaralı port açılamadı: {e}"))?;
+            STARTED.store(true, Ordering::SeqCst);
+            let a = app.clone();
+            std::thread::spawn(move || {
+                for s in l.incoming().flatten() {
+                    let a = a.clone();
+                    std::thread::spawn(move || handle(s, a));
+                }
+            });
+        }
+        let p = info_path(&app)?;
+        if let Some(d) = p.parent() {
+            std::fs::create_dir_all(d).map_err(|e| e.to_string())?;
+        }
+        let info = serde_json::json!({ "port": PORT, "token": token(), "pid": std::process::id() });
+        std::fs::write(&p, info.to_string()).map_err(|e| e.to_string())?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o600));
+        }
+        ON.store(true, Ordering::SeqCst);
+        Ok(())
+    }
+
+    /// Bağlantıyı kapatır: istekler reddedilir, adres/anahtar dosyası silinir.
+    #[tauri::command]
+    pub fn bridge_stop(app: AppHandle) {
+        ON.store(false, Ordering::SeqCst);
+        if let Ok(p) = info_path(&app) {
+            let _ = std::fs::remove_file(p);
+        }
+    }
+
+    /// Arayüzün `claude-req` isteğine yanıtı (JSON metni).
+    #[tauri::command]
+    pub fn bridge_reply(id: u64, body: String) {
+        if let Some(tx) = pending().lock().unwrap().remove(&id) {
+            let _ = tx.send(body);
+        }
+    }
+}
+
 /// Ekran alıntısı: sistemin kendi alıntı aracını açar (Windows: Ekran Alıntısı, macOS: screencapture).
 /// Seçilen bölge panoya (clipboard) kopyalanır; arayüz `clip_seq`/`clip_image` ile alır.
 #[tauri::command]
@@ -425,7 +602,10 @@ pub fn run() {
             snip_start,
             clip_seq,
             clip_image,
-            spo_listen
+            spo_listen,
+            bridge::bridge_start,
+            bridge::bridge_stop,
+            bridge::bridge_reply
         ])
         .run(tauri::generate_context!());
     if let Err(e) = res {

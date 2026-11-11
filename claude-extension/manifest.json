@@ -1,0 +1,30 @@
+{
+  "manifest_version": "0.3",
+  "name": "workshop",
+  "display_name": "Workshop",
+  "version": "0.1.0",
+  "description": "Workshop masaüstü uygulamasındaki açık projeye not, link ve görsel ekler, panodaki kartları okur ve dizer.",
+  "long_description": "Workshop açıkken ve Ayarlar › Claude bağlantısı açıkken çalışır. Yalnızca bu bilgisayardaki Workshop'a bağlanır; kart silemez. Claude'un eklediği ve taşıdığı her şey Workshop'ta geri alınabilir.",
+  "author": { "name": "Ali Akkçay" },
+  "homepage": "https://github.com/akkcay-ali/workshop-app",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"]
+    }
+  },
+  "tools": [
+    { "name": "workshop_status", "description": "Açık proje ve panoları" },
+    { "name": "workshop_list_cards", "description": "Bir panodaki kartlar ve konumları" },
+    { "name": "workshop_view_cards", "description": "Görsel kartların küçük önizlemeleri" },
+    { "name": "workshop_add_cards", "description": "Panoya not, başlık, link ve görsel ekler" },
+    { "name": "workshop_move_cards", "description": "Kartları taşır ve yeniden boyutlandırır" },
+    { "name": "workshop_create_board", "description": "Açık projede yeni pano açar" }
+  ],
+  "compatibility": {
+    "platforms": ["win32", "darwin"],
+    "runtimes": { "node": ">=18.0.0" }
+  }
+}

@@ -100,6 +100,18 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Her projede: görsele bağlı not (`card.note`), ses kartı (`kind:"audio"`, Drive linki → `uc?export=download`).
 - Drive API anahtarı: `public.app_config` (`drive_key`, okuma herkes, yazma `set_app_config` yalnızca proje sahibi), istemcide LS `dkey`; varsa Drive ses/video `googleapis.com/drive/v3/files/<id>?alt=media&key=` ile akış (büyük dosya uyarısına takılmaz). Ses/video eklenince dosya adı çekilir (`mediaName`: Drive API `fields=name`, ya da linkteki dosya adı); adı boş eski kartlara bir kez yazılır (`fillName`). Anahtar uygulamada görünmez; Supabase panelinden `app_config` tablosuna (`key`=`drive_key`) girilir.
 
+## Claude bağlantısı (masaüstü, yerel MCP)
+- Zincir: Claude masaüstü uzantısı `claude-extension/` (bağımlılıksız Node stdio MCP sunucusu, `server/index.js`) → `lib.rs` `mod bridge`
+  (127.0.0.1:43118 `POST /rpc`, `Authorization: Bearer <anahtar>`, `Origin` başlıklı istekler reddedilir) → `claude-req` olayı → arayüzde `cbRun` → `bridge_reply`.
+  Adres/anahtar `~/.workshop/claude-bridge.json` (her açılışta yeni anahtar; kapatınca silinir). Komutlar `bridge_start`/`bridge_stop`/`bridge_reply`.
+- Ayar: Ayarlar `#clSec`/`#clSw` (LS `claudeOn`, varsayılan kapalı; `CB_OK` yalnızca masaüstünde). Aynı bölümdeki bağlantı depodaki `claude-extension/workshop.mcpb` dosyasını indirir.
+- Araçlar (`cb*`): `status`, `list_cards`, `view_cards` (≤8 görsel, 512 px JPEG), `add_cards` (not/yazı/link/görsel; yer verilmezse mevcut kartların sağına ızgara,
+  `title` ile çerçeve), `move_cards`, `create_board` (ortak projede varsayılan özel). Yalnızca açık projede (`curP()`) çalışır, silme yok;
+  ekleme `undoRemove("Claude")`, taşıma `undoPatch("Claude düzeni")`. Web görsellerini uzantı indirir (uygulama içinden CORS engeller), indiremezse `extUrl`.
+  Bulut projesinde görsel yalnızca açık panoyla aynı gizlilikteki panoya eklenir (`assets.upload` `curBoard()` gizliliğine bakar).
+- Uzantı değişince `python tools/pack-extension.py` ile `.mcpb` yeniden üretilir ve gönderilir; araç adı/şeması `server/index.js` `TOOLS` ile `manifest.json` `tools` içinde.
+- Linux'ta uçtan uca deneme: `cargo build` + `xvfb-run` (HOME geçici klasör, `~/.config/user-dirs.dirs` içinde `XDG_DOCUMENTS_DIR`), uzantı `HOME` aynı olacak şekilde `node server/index.js`.
+
 ## Giriş ve pencere (masaüstü + web)
 - Web (Pages) de aynı giriş ekranını gösterir; hesapsız modda yerel projeler tarayıcıda (öğeler localStorage `wloose`, görseller IndexedDB `ws-local` → `idbAssets`).
 - İlk açılış: giriş ekranı `#welcome` (`maybeWelcome`, LS `welcome` = `acct`|`guest`); hesapsız devam = çevrimdışı, bir daha sorulmaz, giriş sağ üstten. Girişsizken ses/bildirim düğmeleri gizli.

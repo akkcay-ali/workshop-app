@@ -82,3 +82,15 @@ Tauri 2 iOS'u destekler; derleme yalnızca Mac'te Xcode ile yapılabilir.
 
 iPad'de dosyalar uygulamanın Belgeler klasöründe tutulur; iCloud Drive ile PC arasında
 paylaşım ayrı bir adım olarak eklenecek.
+
+## Claude bağlantısı
+
+Claude masaüstü uygulaması, açık Workshop projene not, link ve görsel ekleyebilir, panodaki kartları dizebilir.
+
+1. Workshop'ta **Ayarlar › Claude bağlantısı**nı aç.
+2. Aynı yerdeki **Claude uzantısını indir** bağlantısıyla `workshop.mcpb` dosyasını indir ve çift tıkla
+   (ya da Claude masaüstü › Ayarlar › Uzantılar'a sürükle), **Yükle**'ye bas.
+3. Claude'a "bunları Workshop'a taşı" de. Workshop açık ve bir proje sekmesi seçili olmalı.
+
+Bağlantı yalnızca bu bilgisayarda çalışır, internete açılmaz. Claude kart silemez; eklediklerini ve
+taşıdıklarını Workshop'ta Ctrl+Z ile geri alabilirsin.
