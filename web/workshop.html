@@ -3963,7 +3963,7 @@ $("clSw").onclick=()=>cbSet(!cbOn());
 $("msgSw").onclick=e=>{if(e.target.id==="msgTest"){e.preventDefault();msgTone();return}const v=!msgOn();LS.set("msnd",v);drawCfg();if(v)msgTone()};
 $("msgDmSw").onclick=()=>{LS.set("msndDm",!LS.get("msndDm",false));drawCfg()};
 /* YENİLİKLER (sürüm notları): her güncellemede en üste yeni kayıt eklenir */
-const PATCH=[{d:"16 Kasım 2026",n:["Ekran paylaşımında ses: Başlat'tan önce \"Sesi de paylaş\" seçilirse paylaşılan ekranın ya da sekmenin sesi de izleyenlere gider.","Mesaj sesi: yeni mesajda kısa bildirim sesi. Ayarlar'da ayrı anahtarı ve \"Yalnızca özel mesaj ve bahsetme\" seçeneği var.","Yayın kalitesi seçimi daha okunaklı: çözünürlük ve kare hızı ayrı satırlarda, hem açılır pencerede hem ses panelinde.","Ortam sesi seçilince Kapalı seçilene kadar kesintisiz çalar; odak sayacı gerekmez.","Ayarlar'a Yenilikler bölümü eklendi.","Pano paneli sola sürüklenerek kapatılabilir.","Pano panelinin altındaki sağ tık ipucu kaldırıldı.","Kart sağ tık menüsü kısaldı: gri ton, çevirme, palet ve kompozisyon Görünüm altında; sürümler ve ekip panosuna gönderme kendi alt menülerinde.","Panoda boşluğa sağ tıklayınca tarayıcı menüsü artık açılmıyor."]}];
+const PATCH=[{d:"16 Kasım 2026",n:["Düzeltme: sohbet açılırken \"yükleniyor…\" yazısında takılıp mesajları göstermeyebiliyordu.","Düzeltme: ekip bağlantısı koparsa uygulama kendiliğinden yeniden bağlanır; odadakiler görünmeme sorunu için.","Ekran paylaşımında ses: Başlat'tan önce \"Sesi de paylaş\" seçilirse paylaşılan ekranın ya da sekmenin sesi de izleyenlere gider.","Mesaj sesi: yeni mesajda kısa bildirim sesi. Ayarlar'da ayrı anahtarı ve \"Yalnızca özel mesaj ve bahsetme\" seçeneği var.","Yayın kalitesi seçimi daha okunaklı: çözünürlük ve kare hızı ayrı satırlarda, hem açılır pencerede hem ses panelinde.","Ortam sesi seçilince Kapalı seçilene kadar kesintisiz çalar; odak sayacı gerekmez.","Ayarlar'a Yenilikler bölümü eklendi.","Pano paneli sola sürüklenerek kapatılabilir.","Pano panelinin altındaki sağ tık ipucu kaldırıldı.","Kart sağ tık menüsü kısaldı: gri ton, çevirme, palet ve kompozisyon Görünüm altında; sürümler ve ekip panosuna gönderme kendi alt menülerinde.","Panoda boşluğa sağ tıklayınca tarayıcı menüsü artık açılmıyor."]}];
 $("pnOpen").onclick=()=>{const L=$("pnList"),o=L.hidden;if(o&&!L.dataset.i){L.dataset.i=1;L.innerHTML=PATCH.map(p=>`<div class="pnd">${esc(p.d)}</div><ul>${p.n.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`).join("")}L.hidden=!o;$("pnOpen").setAttribute("aria-expanded",o);if(o)L.scrollIntoView({block:"nearest"})};
 $("sndSw").onclick=e=>{if(e.target.id==="sndTest"){e.preventDefault();chime(true);return}const v=!sndOn();LS.set("snd",v);drawCfg();if(v)chime(true)};
 $("hqSw").onclick=()=>{if(!api)return;const v=!hqOn();const c=cfg();S.items=S.items.filter(i=>i.id!=="settings");S.items.push(Object.assign({},c,{id:"settings",type:"settings",hq:v}));
@@ -4825,14 +4825,16 @@ function curTick(){CUR.raf=0;const L=$("curs");const pid=curP(),k=pid?subOf(pid)
 
 /* --- şu an kim burada (Supabase presence, özel kanal proj:<pid>) --- */
 function presSync(){if(!CL.sb||!CL.me)return;const want=new Set([...CL.pids].filter(isShared));
-  for(const [pid,ch] of CL.pres)if(!want.has(pid)){CL.sb.removeChannel(ch);CL.pres.delete(pid);CL.here.delete(pid)}
+  for(const [pid,ch] of CL.pres)if(!want.has(pid)){CL.pres.delete(pid);CL.here.delete(pid);CL.sb.removeChannel(ch)}
   for(const pid of want){if(CL.pres.has(pid))continue;
     const ch=CL.sb.channel("proj:"+pid,{config:{private:true,presence:{key:CL.me}}});CL.pres.set(pid,ch);
     ch.on("presence",{event:"sync"},()=>{const st=ch.presenceState();const l=[];for(const k in st){const s=st[k]&&st[k][0];if(s&&k!==CL.me){l.push({u:k,w:s.w,n:s.n,v:s.v?(typeof s.v==="string"?s.v:"main"):"",m:!!s.m,d:!!s.d,s:!!s.s,f:s.f||0});const p=CL.prof.get(k);if(s.n&&(!p||!p.name))CL.prof.set(k,Object.assign({id:k,email:""},p,{name:s.n}))}}CL.here.set(pid,l);drawHere();voiceSync(pid);drawVoice()})
       .on("broadcast",{event:"rtc"},({payload})=>onRtc(pid,payload))
       .on("broadcast",{event:"hide"},({payload})=>onHide(pid,payload))
       .on("broadcast",{event:"cur"},({payload})=>onCur(pid,payload))
-      .subscribe(s=>{if(s==="SUBSCRIBED"){presSent.delete(pid);presTrack();if(V.pid===pid)rtcSend("*",{k:"join"})}})}}
+      .subscribe(s=>{if(s==="SUBSCRIBED"){presSent.delete(pid);presTrack();if(V.pid===pid)rtcSend("*",{k:"join"});return}
+        /* kanal kapanır ya da hata verirse (ör. sunucu presence sınırı) kendiliğinden yeniden bağlan: yoksa kimse görünmüyor, sohbet güncellenmiyordu */
+        if((s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED")&&CL.pres.get(pid)===ch){CL.pres.delete(pid);presSent.delete(pid);try{CL.sb.removeChannel(ch)}catch(_){}clearTimeout(presSync.rt);presSync.rt=setTimeout(presSync,5000)}})}}
 /* Supabase istemci başına presence mesajını sınırlar: aynı durumu tekrar gönderme, değişiklikleri biriktir,
    her kanala yalnızca durumu gerçekten değiştiyse ve en fazla ~1,2 sn'de bir yaz. */
 const presSent=new Map(),presAt=new Map();let presT=null;
@@ -5113,8 +5115,10 @@ const auHTML=()=>`<div class="auw"><button class="aup" data-aplay data-nodrag ar
 function weekStartISO(){return new Date(Date.now()-7*864e5).toISOString()}
 const convOf=m=>m.room?"r:"+m.room:m.recipient?(m.sender===CL.me?m.recipient:m.sender):"g";
 const chatKey=(pid,c)=>"chatRead:"+pid+":"+c;
-async function loadMsgs(pid){if(!CL.sb)return;const {data,error}=await CL.sb.from("messages").select("id,project_id,sender,recipient,text,at,room,att").eq("project_id",pid).gte("at",weekStartISO()).order("at").limit(800);
-  if(error)return;CL.msgs.set(pid,data||[]);drawChat(pid)}
+async function loadMsgs(pid){if(!CL.sb||loadMsgs.busy===pid)return;loadMsgs.busy=pid;try{const {data,error}=await CL.sb.from("messages").select("id,project_id,sender,recipient,text,at,room,att").eq("project_id",pid).gte("at",weekStartISO()).order("at").limit(800);
+  if(error){const L=$("vChL");if(L&&hubPid()===pid)L.innerHTML=`<span class="e">Sohbet yüklenemedi. Paneli kapatıp açarak yeniden dene.</span>`;return}
+  /* sohbet artık ses panelinde: yükleme bitince orayı da çiz (yoksa \"yükleniyor…\" yazısında kalıyordu) */
+  CL.msgs.set(pid,data||[]);drawChat(pid);drawVChat()}finally{loadMsgs.busy=null}}
 function unreadOf(pid,c){const last=LS.get(chatKey(pid,c),0);return (CL.msgs.get(pid)||[]).filter(m=>convOf(m)===c&&m.sender!==CL.me&&m.id>last).length}
 const CLK_IC='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5.8"/><path d="M8 4.8V8l2.2 1.4"/></svg>';
 function chatBlock(pid){return `<section class="block chat" id="chatBox"><div class="bhead"><h2>Sohbet</h2><span class="count" title="Mesajlar her pazartesi silinir">bu hafta</span></div>
