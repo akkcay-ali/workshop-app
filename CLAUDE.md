@@ -120,6 +120,11 @@ Kullanıcı Türkçe çalışır; arayüz metinleri ve yorumlar Türkçe.
 - Sağ tuşla sürükle = pencereyi taşı (PureRef gibi; ana, ref, mini pencerelerde; `cursorPosition` + `setPosition` fiziksel piksel, büyütülmüşken kapalı; kıpırdamadan bırakınca sağ tık menüsü açılır; izinler `default.json` outer/set/cursor-position).
 - Pencere × düğmesi simge alanına (saatin yanı, tray) gizler (`w.hide()`); tray: tık = aç, sağ tık menü Aç/Çıkış (`lib.rs` `TrayIconBuilder`, `tray-quit` olayı, 6 sn sonra zorla çıkış). Çıkış ayrıca × üzerinde sağ tık ya da Ctrl+Q (`onCloseRequested` bekleyen kayıtları bitirir).
 
+## Yenilikler (sürüm notları)
+- Ayarlar'ın altında "Yenilikler" (`#pnOpen` → `#pnList`), içerik `PATCH` dizisi (`web/workshop.html`): her değişiklikte en üstteki tarihe madde ya da yeni tarih kaydı eklenir. Kullanıcı sürüm notlarını uygulama içinden görmek istiyor.
+- Bugünkü ekler: ekran paylaşımında ses (LS `vSA`, `saBtn`, gönderen `p.sasnd`, izleyen `p.saudio`; mikrofon akışı `p.mid`), mesaj sesi (`msgPing`/`msgTone`, LS `msnd`/`msndDm`, Ayarlar `#msgSw`/`#msgDmSw`),
+  ortam sesi elle seçilince sürekli (`AMB.manual`), pano dizini sola sürüklenerek kapanır, kart sağ tık menüsünde alt menüler (Görünüm…, Sürümler…, Ekip panosuna gönder…).
+
 ## Derleme
 - Masaüstü derlemesi yalnızca `src-tauri/tauri.conf.json` değişince (sürüm artışı) çalışır.
 - Web sürümü `pages.yml` ile GitHub Pages'e gider (arayüz değişince).
